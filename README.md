@@ -39,11 +39,45 @@ The admin page is at **http://localhost:5173/admin** — sign in with the
 | Command | What it does |
 |---|---|
 | `npm run dev` | Runs the API (port 4000) and the website (port 5173) together. |
+| `npm run dev:host` | Same, but also serves the site to your Wi-Fi network so you can open it on your phone. Vite prints a `Network:` address — use that one. |
 | `npm run seed` | Loads the 10 sample listings. Safe to run twice. |
 | `npm run reset` | Deletes the sample listings and reloads them. Your own listings are left alone. |
 | `npm run build` | Builds the website into `client/dist/` for deployment. |
 | `npm start` | Runs the API and serves the built website from one port (4000). |
 | `npm test` | Checks the VietQR generator against known values. |
+
+---
+
+## Testing it on your phone
+
+The site is built mobile first, so this is worth doing. Your phone and your
+computer must be on **the same Wi-Fi**.
+
+```bash
+npm run dev:host
+```
+
+Vite prints two addresses. Use the **Network** one:
+
+```
+Local:   http://localhost:5173/
+Network: http://192.168.1.14:5173/      <- type this into your phone
+```
+
+Your number will be different. If no `Network:` line appears, your computer is
+offline or on a network that blocks it.
+
+If the phone cannot load the page, it is almost always your computer's firewall:
+
+- **Windows:** the first time you run it, a Windows Defender Firewall popup asks
+  whether to allow Node.js. Tick **Private networks** and allow it. If you
+  dismissed it, go to Windows Security -> Firewall -> Allow an app, and allow Node.
+- **Mac:** System Settings -> Network -> Firewall -> Options, and allow incoming
+  connections for Node.
+
+Cafe and university Wi-Fi often use "client isolation", which stops devices on
+the network from seeing each other no matter how you configure your laptop. Use
+a home network or your phone's hotspot instead.
 
 ---
 
