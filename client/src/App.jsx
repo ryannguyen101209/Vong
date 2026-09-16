@@ -16,7 +16,11 @@ import { NotFound } from './pages/NotFound.jsx';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
-  useEffect(() => window.scrollTo(0, 0), [pathname]);
+  useEffect(() => {
+    window.scrollTo(0, 0);
+    // In the embedded demo the app shell scrolls, not the window.
+    document.getElementById('root')?.scrollTo?.(0, 0);
+  }, [pathname]);
   return null;
 }
 

@@ -17,8 +17,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 148,
-    "created_at": "2026-09-15T13:47:32.191Z",
-    "published_at": "2026-09-15T13:47:32.191Z"
+    "created_at": "2026-09-15T13:54:13.868Z",
+    "published_at": "2026-09-15T13:54:13.868Z"
   },
   {
     "id": "seed-2",
@@ -38,8 +38,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 96,
-    "created_at": "2026-09-14T13:47:32.191Z",
-    "published_at": "2026-09-14T13:47:32.191Z"
+    "created_at": "2026-09-14T13:54:13.868Z",
+    "published_at": "2026-09-14T13:54:13.868Z"
   },
   {
     "id": "seed-3",
@@ -59,8 +59,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 211,
-    "created_at": "2026-09-13T13:47:32.191Z",
-    "published_at": "2026-09-13T13:47:32.191Z"
+    "created_at": "2026-09-13T13:54:13.868Z",
+    "published_at": "2026-09-13T13:54:13.868Z"
   },
   {
     "id": "seed-4",
@@ -80,8 +80,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 74,
-    "created_at": "2026-09-12T13:47:32.191Z",
-    "published_at": "2026-09-12T13:47:32.191Z"
+    "created_at": "2026-09-12T13:54:13.868Z",
+    "published_at": "2026-09-12T13:54:13.868Z"
   },
   {
     "id": "seed-5",
@@ -101,8 +101,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 389,
-    "created_at": "2026-09-11T13:47:32.191Z",
-    "published_at": "2026-09-11T13:47:32.191Z"
+    "created_at": "2026-09-11T13:54:13.868Z",
+    "published_at": "2026-09-11T13:54:13.868Z"
   },
   {
     "id": "seed-6",
@@ -122,8 +122,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 267,
-    "created_at": "2026-09-10T13:47:32.191Z",
-    "published_at": "2026-09-10T13:47:32.191Z"
+    "created_at": "2026-09-10T13:54:13.868Z",
+    "published_at": "2026-09-10T13:54:13.868Z"
   },
   {
     "id": "seed-7",
@@ -143,8 +143,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 132,
-    "created_at": "2026-09-09T13:47:32.191Z",
-    "published_at": "2026-09-09T13:47:32.191Z"
+    "created_at": "2026-09-09T13:54:13.868Z",
+    "published_at": "2026-09-09T13:54:13.868Z"
   },
   {
     "id": "seed-8",
@@ -164,8 +164,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 88,
-    "created_at": "2026-09-07T13:47:32.191Z",
-    "published_at": "2026-09-07T13:47:32.191Z"
+    "created_at": "2026-09-07T13:54:13.868Z",
+    "published_at": "2026-09-07T13:54:13.868Z"
   },
   {
     "id": "seed-9",
@@ -185,8 +185,8 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 119,
-    "created_at": "2026-09-05T13:47:32.191Z",
-    "published_at": "2026-09-05T13:47:32.191Z"
+    "created_at": "2026-09-05T13:54:13.868Z",
+    "published_at": "2026-09-05T13:54:13.868Z"
   },
   {
     "id": "seed-10",
@@ -206,7 +206,7 @@
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 203,
-    "created_at": "2026-09-03T13:47:32.191Z",
-    "published_at": "2026-09-03T13:47:32.191Z"
+    "created_at": "2026-09-03T13:54:13.868Z",
+    "published_at": "2026-09-03T13:54:13.868Z"
   }
 ]

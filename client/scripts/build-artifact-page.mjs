@@ -18,6 +18,12 @@ const css = html.match(/href="\.\/(assets\/[^"]+\.css)"/)?.[1];
 if (!js || !css) throw new Error('Could not find the built asset filenames in index.html');
 
 const page = `<title>Vòng Marketplace</title>
+<style>
+  /* The demo runs inside a frame: give the app its own scroll area so it never
+     grows taller than the frame and every page starts at the top. */
+  html, body { height: 100%; }
+  #root { height: 100%; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+</style>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,600;9..144,700&family=Inter:wght@400;500;600;700&display=swap">
