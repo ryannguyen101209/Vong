@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.env
+.env.local
+
+# SQLite database and uploaded photos are local state, not source.
+server/data/
+server/uploads/listings/
+
+.DS_Store
+*.log

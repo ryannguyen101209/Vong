@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBF3E4"/><stop offset="1" stop-color="#F3E4C9"/>
+    </linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/>
+      <feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1200" height="900" fill="url(#g)"/>
+  <ellipse cx="600" cy="700" rx="430" ry="90" fill="#D3D4C0" opacity="0.5"/>
+  <g fill="none" stroke="#0A2947" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M250 430 h700 v40 h-700 z" fill="#8B5E3C" stroke="#8B5E3C"/>
+    <path d="M290 470 v250 M910 470 v250"/>
+    <path d="M620 470 h290 v130 h-290 z" fill="#FBF3E4"/>
+    <path d="M660 505 h60 M660 555 h60"/>
+    <g stroke="#0A2947"><path d="M380 430 v-110 l90 -70"/><path d="M470 350 l70 40 -50 45 -70 -40 z" fill="#D3D4C0"/></g>
+    <path d="M300 430 v-60 h120" stroke="#D3D4C0"/>
+  </g>
+  <rect width="1200" height="900" filter="url(#grain)" opacity="0.06"/>
+</svg>

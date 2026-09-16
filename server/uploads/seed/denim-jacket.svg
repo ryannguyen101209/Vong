@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" role="img">
+  <defs>
+    <linearGradient id="g" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#FBF3E4"/><stop offset="1" stop-color="#D3D4C0"/>
+    </linearGradient>
+    <filter id="grain"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/>
+      <feColorMatrix type="saturate" values="0"/></filter>
+  </defs>
+  <rect width="1200" height="900" fill="url(#g)"/>
+  <ellipse cx="600" cy="700" rx="430" ry="90" fill="#D3D4C0" opacity="0.5"/>
+  <g fill="none" stroke="#0A2947" stroke-width="12" stroke-linecap="round" stroke-linejoin="round">
+    
+    <path d="M600 200 v50" stroke="#0A2947"/>
+    <path d="M600 200 a30 30 0 1 1 0.1 0" stroke="#0A2947"/>
+    <path d="M420 300 h360 l-40 60 v40 l40 20 v240 h-360 v-240 l40 -20 v-40 z" fill="#0A2947" opacity="0.85" stroke="#0A2947"/>
+    <path d="M600 300 v360" stroke="#F3E4C9"/>
+    <path d="M500 330 h60 v70 h-60 z M640 330 h60 v70 h-60 z" stroke="#F3E4C9"/>
+    <path d="M420 360 l-80 40 v210 h80 z M780 360 l80 40 v210 h-80 z" fill="#0A2947" opacity="0.85" stroke="#0A2947"/>
+    <circle cx="600" cy="420" r="8" fill="#F3E4C9" stroke="none"/>
+    <circle cx="600" cy="500" r="8" fill="#F3E4C9" stroke="none"/>
+    <circle cx="600" cy="580" r="8" fill="#F3E4C9" stroke="none"/>
+  </g>
+  <rect width="1200" height="900" filter="url(#grain)" opacity="0.06"/>
+</svg>
