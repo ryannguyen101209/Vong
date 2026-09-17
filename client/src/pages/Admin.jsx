@@ -119,6 +119,25 @@ function RejectDialog({ onClose, onSubmit }) {
   );
 }
 
+/**
+ * Builds a mailto: link with the approval or rejection message filled in.
+ * The app sends nothing itself -- this opens a draft in the admin's own mail
+ * app, which is the honest way to do it until a mail service is wired up.
+ */
+function sellerMailto({ listing, action, reason, title, t }) {
+  const key = action === 'approve' ? 'Approved' : 'Rejected';
+  const vars = {
+    name: listing.seller_name,
+    title,
+    ref: listing.ref,
+    reason: reason || listing.reject_reason || '—',
+    url: `${window.location.origin}/listing/${listing.id}`,
+  };
+  const subject = t(`admin.email${key}Subject`, vars);
+  const body = t(`admin.email${key}Body`, vars);
+  return `mailto:${encodeURIComponent(listing.seller_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
 function Queue({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [listings, setListings] = useState([]);
@@ -126,6 +145,8 @@ function Queue({ token, onAuthError }) {
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [rejecting, setRejecting] = useState(null);
+  // What you just did, so the seller can be emailed at the moment it happens.
+  const [lastAction, setLastAction] = useState(null);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -142,11 +163,13 @@ function Queue({ token, onAuthError }) {
   useEffect(load, [load]);
 
   const act = async (id, action, reason) => {
+    const listing = listings.find((item) => item.id === id);
     setBusyId(id);
     try {
       if (action === 'approve') await api.admin.approve(token, id);
       else await api.admin.reject(token, id, reason);
       setRejecting(null);
+      setLastAction({ listing, action, reason });
       load();
     } catch (error) {
       if (error.status === 401) onAuthError();
@@ -169,6 +192,38 @@ function Queue({ token, onAuthError }) {
         ))}
       </div>
 
+      {lastAction && (
+        <div
+          className={`notice notice--${lastAction.action === 'approve' ? 'positive' : 'danger'}`}
+          style={{ marginBottom: 20 }}
+        >
+          <p className="notice__title">
+            {t(lastAction.action === 'approve' ? 'admin.actionedApproved' : 'admin.actionedRejected', {
+              title: localized(lastAction.listing, 'title'),
+            })}
+          </p>
+          {lastAction.listing.seller_email ? (
+            <>
+              <p className="small" style={{ margin: '0 0 12px' }}>{t('admin.actionedHint')}</p>
+              <a
+                className="btn btn--small"
+                href={sellerMailto({
+                  listing: lastAction.listing,
+                  action: lastAction.action,
+                  reason: lastAction.reason,
+                  title: localized(lastAction.listing, 'title'),
+                  t,
+                })}
+              >
+                {t('admin.emailSeller')} →
+              </a>
+            </>
+          ) : (
+            <p className="small" style={{ margin: 0 }}>{t('admin.noSellerEmail')}</p>
+          )}
+        </div>
+      )}
+
       {listings.length === 0 ? (
         <EmptyState title={t('admin.queueEmptyTitle')} body={t('admin.queueEmptyBody')} />
       ) : (
@@ -184,6 +239,12 @@ function Queue({ token, onAuthError }) {
                 <p className="small muted" style={{ marginBottom: 10 }}>
                   {listing.seller_name} · {listing.seller_phone} · {t(`districts.${listing.district}`)} ·{' '}
                   {formatPrice(listing.price_vnd, lang)}
+                  {listing.seller_email && (
+                    <>
+                      <br />
+                      <a href={`mailto:${listing.seller_email}`}>{listing.seller_email}</a>
+                    </>
+                  )}
                 </p>
 
                 <div className="notice notice--warning small">

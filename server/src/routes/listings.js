@@ -101,6 +101,7 @@ function validateListing(body) {
   const description = String(body.description ?? '').trim();
   const sellerName = String(body.seller_name ?? '').trim();
   const sellerPhone = String(body.seller_phone ?? '').trim();
+  const sellerEmail = String(body.seller_email ?? '').trim();
   const price = Number(String(body.price_vnd ?? '').replace(/[^\d]/g, ''));
 
   if (title.length < 4 || title.length > 120) errors.title = 'length';
@@ -111,8 +112,11 @@ function validateListing(body) {
   if (!Number.isFinite(price) || price < 1000 || price > 2_000_000_000) errors.price_vnd = 'invalid';
   if (sellerName.length < 2 || sellerName.length > 80) errors.seller_name = 'length';
   if (!/^[\d\s+().-]{8,20}$/.test(sellerPhone)) errors.seller_phone = 'invalid';
+  if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(sellerEmail) || sellerEmail.length > 120) {
+    errors.seller_email = 'invalid';
+  }
 
-  return { errors, values: { title, description, sellerName, sellerPhone, price } };
+  return { errors, values: { title, description, sellerName, sellerPhone, sellerEmail, price } };
 }
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
@@ -134,12 +138,12 @@ router.post('/', upload.single('image'), (req, res) => {
   db.prepare(`
     INSERT INTO listings (
       id, ref, title_en, title_vi, description_en, description_vi, category,
-      price_vnd, district, condition, seller_name, seller_phone, image_path,
-      status, fee_vnd, created_at
+      price_vnd, district, condition, seller_name, seller_phone, seller_email,
+      image_path, status, fee_vnd, created_at
     ) VALUES (
       @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
-      @price_vnd, @district, @condition, @seller_name, @seller_phone, @image_path,
-      'pending_payment', @fee_vnd, @created_at
+      @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email,
+      @image_path, 'pending_payment', @fee_vnd, @created_at
     )
   `).run({
     id,
@@ -154,6 +158,7 @@ router.post('/', upload.single('image'), (req, res) => {
     condition: req.body.condition,
     seller_name: values.sellerName,
     seller_phone: values.sellerPhone,
+    seller_email: values.sellerEmail,
     image_path: imagePath,
     fee_vnd: fee,
     created_at: new Date().toISOString(),

@@ -26,6 +26,7 @@ const listings = SEED_LISTINGS.map((listing, index) => {
     condition: listing.condition,
     seller_name: listing.seller_name,
     seller_phone: listing.seller_phone,
+    seller_email: listing.seller_email,
     // Relative on purpose: the demo is served from a subdirectory.
     image_path: `uploads/seed/${listing.slug}.svg`,
     status: 'published',

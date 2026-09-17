@@ -181,11 +181,26 @@ that fire on an incoming transfer), then match the webhook's transfer note
 against the listing's reference code and approve automatically. Until then, the
 queue is the product.
 
-**No email or SMS is sent, ever.** The contact form saves to the database and
-prints to the server log; you read messages in the admin Settings tab. Sellers
-are not notified when their listing is approved or rejected — they have to
-revisit their payment page. To fix: an email service (Resend, SendGrid) or an
-SMS/Zalo ZNS provider, plus an email address field on the sell form.
+**Nothing is emailed automatically.** Sellers now give an email address when
+they post, and the admin queue shows it. After you approve or reject a listing,
+an "Email the seller" button appears that opens a **prefilled draft in your own
+mail app** — the right message, the listing title, the link and the reference
+code already filled in. You press send. That is a deliberate stopgap, not a
+pretence: the app itself sends nothing.
+
+To make it automatic you need a mail service — Resend and SendGrid both have
+free tiers big enough for a project this size. It is roughly an afternoon's
+work: add the API key to `.env`, and call the service from the approve and
+reject handlers in `server/src/routes/admin.js`, where the seller's email is
+already loaded. The message templates are already written, in both languages,
+in the `admin.emailApprovedBody` / `admin.emailRejectedBody` keys of
+`client/src/i18n/`.
+
+Seller emails are stored but never sent to the browser on public pages — an
+address on a public listing page is a spam magnet. Only the admin views see them.
+
+**Contact form messages are not emailed either.** They save to the database and
+print to the server log; you read them in the admin Settings tab.
 
 **No user accounts.** Sellers cannot edit or delete their own listings, and
 saved items live in one browser. This is why the FAQ tells people to contact you

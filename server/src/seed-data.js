@@ -19,6 +19,7 @@ export const SEED_LISTINGS = [
     days_ago: 1,
     seller_name: 'Chị Hạnh',
     seller_phone: '0903 118 274',
+    seller_email: 'hanh.nguyen.d3@gmail.com',
     title_en: 'Pair of teak dining chairs',
     title_vi: 'Cặp ghế ăn gỗ teak',
     description_en: `Two solid teak chairs my family has had since we moved into this apartment in 2019. They came from a little shop on Nguyễn Đình Chiểu that has since closed down. Still very sturdy — no wobble when you sit, and all the joints are tight.
@@ -42,6 +43,7 @@ Mình bán vì mới mua bàn tròn nên ghế không hợp dáng bàn nữa. Nh
     days_ago: 2,
     seller_name: 'Minh Tuấn',
     seller_phone: '0937 442 019',
+    seller_email: 'minhtuan.dn@gmail.com',
     title_en: 'IKEA study desk with drawer unit',
     title_vi: 'Bàn học IKEA kèm hộc kéo',
     description_en: `Bought this from the IKEA in Thailand and shipped it over when I started university — it's been my desk for three years of assignments. Real desk height (75cm), top is 120x60cm, big enough for a laptop plus an external monitor and still room to write.
@@ -65,6 +67,7 @@ Mình sắp tốt nghiệp và về lại Đà Nẵng nên cần thanh lý trong
     days_ago: 3,
     seller_name: 'Ngọc Anh',
     seller_phone: '0912 667 530',
+    seller_email: 'ngocanh.tran95@gmail.com',
     title_en: 'Vintage-wash denim jacket, size M',
     title_vi: 'Áo khoác jean wash vintage, size M',
     description_en: `Mid-weight denim jacket in a faded indigo wash, labelled size M — fits me at 1m62 with a bit of room for a hoodie underneath, so it would sit oversized on someone smaller. Bought it at a secondhand shop on Lê Văn Sỹ last year for 400k.
@@ -88,6 +91,7 @@ Buổi tối mình hay ở khu Bến Thành / Nguyễn Thái Bình, có thể h�
     days_ago: 4,
     seller_name: 'Đức Huy',
     seller_phone: '0908 215 946',
+    seller_email: 'duchuy.le@gmail.com',
     title_en: 'Three linen shirts, size L (bundle)',
     title_vi: 'Combo 3 áo sơ mi linen, size L',
     description_en: `Three short-sleeve linen shirts, all size L: one off-white, one sage green, one navy. Uniqlo and a local brand from Saigon Square. Linen is the only fabric that makes sense in this weather and these have served me well for about two years of office days.
@@ -111,6 +115,7 @@ Mình lên cân nên mặc chật vai, không mặc được nữa. Giá này l�
     days_ago: 5,
     seller_name: 'Trung Kiên',
     seller_phone: '0975 330 812',
+    seller_email: 'kien.photo.q7@gmail.com',
     title_en: 'Canon EOS 600D + 18-55mm kit lens',
     title_vi: 'Canon EOS 600D + lens kit 18-55mm',
     description_en: `Canon EOS 600D with the 18-55mm IS II kit lens, one battery, charger, strap and an 32GB SD card. Shutter count is around 24,000 — I checked it with EOSInfo last week and can show you the reading when we meet. For a body rated at 100,000 actuations, that's plenty of life left.
@@ -134,6 +139,7 @@ Mình mới mua con Sony A6400 cũ để quay video nên máy này nằm trong n
     days_ago: 6,
     seller_name: 'Phương Thảo',
     seller_phone: '0389 704 155',
+    seller_email: 'phuongthao.ng@gmail.com',
     title_en: 'iPad Air 2 64GB, wifi only',
     title_vi: 'iPad Air 2 64GB, bản wifi',
     description_en: `iPad Air 2, 64GB, wifi only, space grey. I used it almost entirely for reading PDFs and lecture slides. Battery health is the honest weak point of a tablet this age: I get about four hours of reading out of it, and it charges slowly. If you need all-day battery, this isn't your device.
@@ -157,6 +163,7 @@ Mình bán vì mới mua iPad có hỗ trợ bút để làm đồ án năm cu�
     days_ago: 7,
     seller_name: 'Gia Bảo',
     seller_phone: '0967 881 403',
+    seller_email: 'giabao.ielts@gmail.com',
     title_en: 'IELTS prep bundle — Cambridge 15-17 + vocabulary book',
     title_vi: 'Combo luyện IELTS — Cambridge 15-17 + sách từ vựng',
     description_en: `Four books: Cambridge IELTS 15, 16 and 17, plus Cambridge Vocabulary for IELTS. These got me from 6.0 to 7.5 over about eight months, so I have some affection for them.
@@ -180,6 +187,7 @@ Mình thi xong rồi, muốn sách đến tay bạn nào đang ôn hơn là đ�
     days_ago: 9,
     seller_name: 'Thu Hà',
     seller_phone: '0934 562 187',
+    seller_email: 'thuha.sach@gmail.com',
     title_en: 'Six Nguyễn Nhật Ánh paperbacks',
     title_vi: 'Sáu cuốn truyện Nguyễn Nhật Ánh',
     description_en: `Six Nguyễn Nhật Ánh novels in Vietnamese, all Trẻ Publishing editions: Mắt Biếc, Cho Tôi Xin Một Vé Đi Tuổi Thơ, Tôi Thấy Hoa Vàng Trên Cỏ Xanh, Cô Gái Đến Từ Hôm Qua, Ngồi Khóc Trên Cây, and Con Chó Nhỏ Mang Giỏ Hoa Hồng.
@@ -203,6 +211,7 @@ Mình chuyển qua phòng nhỏ hơn ở Bình Thạnh, không còn chỗ kê k�
     days_ago: 11,
     seller_name: 'Cô Lan',
     seller_phone: '0901 448 776',
+    seller_email: 'colan.thaodien@gmail.com',
     title_en: 'Panasonic 1.8L rice cooker',
     title_vi: 'Nồi cơm điện Panasonic 1.8L',
     description_en: `Panasonic 1.8L rice cooker, the simple mechanical type with one lever — no digital menu to break. Cooks enough for four to five people. Bought new at Điện Máy Xanh about three years ago and it has never once failed to cook a pot of rice.
@@ -226,6 +235,7 @@ Tết vừa rồi con gái cô mua cho cái nồi mới có hẹn giờ ủ ấm
     days_ago: 13,
     seller_name: 'Hoàng Nam',
     seller_phone: '0708 993 214',
+    seller_email: 'hoangnam.guitar@gmail.com',
     title_en: 'Yamaha F310 acoustic guitar + soft case',
     title_vi: 'Đàn guitar acoustic Yamaha F310 + bao đựng',
     description_en: `Yamaha F310, the classic beginner dreadnought, with a padded soft case, a capo and a handful of picks. Bought it at a shop on Nguyễn Thiện Thuật — the guitar street — two years ago for 2.4 million with a setup included.

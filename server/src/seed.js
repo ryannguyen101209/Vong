@@ -28,11 +28,11 @@ const { fee_vnd: fee } = getSettings();
 const insert = db.prepare(`
   INSERT INTO listings (
     id, ref, title_en, title_vi, description_en, description_vi, category,
-    price_vnd, district, condition, seller_name, seller_phone, image_path,
+    price_vnd, district, condition, seller_name, seller_phone, seller_email, image_path,
     status, fee_vnd, views, is_seed, created_at, paid_marked_at, reviewed_at, published_at
   ) VALUES (
     @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
-    @price_vnd, @district, @condition, @seller_name, @seller_phone, @image_path,
+    @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email, @image_path,
     'published', @fee_vnd, @views, 1, @created_at, @created_at, @created_at, @created_at
   )
 `);
@@ -53,6 +53,7 @@ const insertAll = db.transaction((listings) => {
       condition: listing.condition,
       seller_name: listing.seller_name,
       seller_phone: listing.seller_phone,
+      seller_email: listing.seller_email,
       image_path: images[listing.slug] ?? null,
       fee_vnd: fee,
       views: listing.views,

@@ -41,6 +41,7 @@ db.exec(`
     condition       TEXT NOT NULL,
     seller_name     TEXT NOT NULL,
     seller_phone    TEXT NOT NULL,
+    seller_email    TEXT,
     image_path      TEXT,
     status          TEXT NOT NULL DEFAULT 'pending_payment',
     reject_reason   TEXT,
@@ -115,6 +116,14 @@ if (titleColumn?.notnull === 1) {
     CREATE INDEX IF NOT EXISTS idx_listings_status  ON listings(status);
     CREATE INDEX IF NOT EXISTS idx_listings_created ON listings(created_at DESC);
   `);
+}
+
+/* Migration: sellers now give an email so they can be told when a listing is
+ * approved. Existing listings keep an empty one. */
+const columns = db.prepare('PRAGMA table_info(listings)').all().map((c) => c.name);
+if (!columns.includes('seller_email')) {
+  console.log('Adding seller_email to listings…');
+  db.exec('ALTER TABLE listings ADD COLUMN seller_email TEXT');
 }
 
 /* Repair databases whose buy_requests foreign key was rewritten by the migration

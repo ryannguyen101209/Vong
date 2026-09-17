@@ -129,6 +129,7 @@ export const api = {
     if (!Number.isFinite(price) || price < 1000) fields.price_vnd = 'invalid';
     if (get('seller_name').length < 2) fields.seller_name = 'length';
     if (!/^[\d\s+().-]{8,20}$/.test(get('seller_phone'))) fields.seller_phone = 'invalid';
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(get('seller_email'))) fields.seller_email = 'invalid';
 
     if (Object.keys(fields).length > 0) {
       return Promise.reject(new DemoError(400, { error: 'validation_failed', fields }));
@@ -152,6 +153,7 @@ export const api = {
       condition: get('condition'),
       seller_name: get('seller_name'),
       seller_phone: get('seller_phone'),
+      seller_email: get('seller_email'),
       // Object URLs do not survive a reload; the card falls back to the empty state.
       image_path: image && image.size ? URL.createObjectURL(image) : null,
       status: 'pending_payment',

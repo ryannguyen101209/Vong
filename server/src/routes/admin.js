@@ -21,7 +21,7 @@ router.use(requireAdmin);
 
 const ADMIN_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd,
-  district, condition, seller_name, seller_phone, image_path, status, reject_reason,
+  district, condition, seller_name, seller_phone, seller_email, image_path, status, reject_reason,
   fee_vnd, views, created_at, paid_marked_at, reviewed_at, published_at
 `;
 

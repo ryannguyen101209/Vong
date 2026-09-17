@@ -15,6 +15,7 @@ const EMPTY = {
   description: '',
   seller_name: '',
   seller_phone: '',
+  seller_email: '',
 };
 
 export function Sell() {
@@ -53,6 +54,7 @@ export function Sell() {
     const code = errors[key];
     if (!code) return undefined;
     if (key === 'seller_phone') return t('sell.errorPhone');
+    if (key === 'seller_email') return t('sell.errorEmail');
     if (key === 'price_vnd') return t('sell.errorPrice');
     return code === 'invalid' ? t('sell.errorInvalid') : t('sell.errorLength');
   };
@@ -256,6 +258,26 @@ export function Sell() {
             )}
           </Field>
         </div>
+
+        <Field
+          label={t('sell.sellerEmailLabel')}
+          hint={t('sell.sellerEmailHint')}
+          error={errorFor('seller_email')}
+          required
+        >
+          {(props) => (
+            <input
+              {...props}
+              className="input"
+              type="email"
+              autoComplete="email"
+              value={values.seller_email}
+              onChange={set('seller_email')}
+              placeholder={t('sell.sellerEmailPlaceholder')}
+              maxLength={120}
+            />
+          )}
+        </Field>
 
         <button type="submit" className="btn btn--accent btn--block" disabled={submitting}>
           {submitting ? t('sell.submitting') : t('sell.submit')}
