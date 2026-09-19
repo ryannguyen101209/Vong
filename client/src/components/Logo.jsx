@@ -41,8 +41,8 @@ export function LogoTile({ size = 56, className = '' }) {
       aria-hidden="true"
       focusable="false"
     >
-      <rect width="120" height="120" rx="30" fill="#0A2947" />
-      <g transform="translate(16 26) scale(0.44)">
+      <rect width="120" height="120" rx="28" fill="#0A2947" />
+      <g transform="translate(24.67 31.38) scale(0.3533)">
         <path
           d={MARK_PATH}
           fill="none"
