@@ -7,7 +7,7 @@
     "dev": "vite",
     "dev:host": "vite --host",
     "build": "vite build",
-    "demo": "node scripts/build-demo-data.mjs && VONG_DEMO=1 vite build",
+    "demo": "node scripts/build-demo.mjs",
     "preview": "vite preview"
   },
   "dependencies": {

@@ -1,3 +1,4 @@
+import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -18,16 +19,32 @@ const demoApiPlugin = {
   async resolveId(source, importer, options) {
     if (!source.includes('lib/api.js')) return null;
     const resolved = await this.resolve(source, importer, { ...options, skipSelf: true });
-    return resolved?.id === path.resolve(here, 'src/lib/api.js')
+    const resolvedId = resolved?.id.replaceAll('\\', '/');
+    const realApiId = path.resolve(here, 'src/lib/api.js').replaceAll('\\', '/');
+    return resolvedId === realApiId
       ? path.resolve(here, 'src/lib/api.demo.js')
       : null;
   },
 };
 
+const demoAssetsPlugin = {
+  name: 'vong-demo-assets',
+  closeBundle() {
+    fs.cpSync(
+      path.resolve(here, '../server/uploads/seed'),
+      path.resolve(here, 'dist-demo/uploads/seed'),
+      { recursive: true },
+    );
+  },
+};
+
 export default defineConfig({
-  plugins: DEMO ? [demoApiPlugin, react()] : [react()],
-  base: DEMO ? './' : '/',
-  define: { __VONG_DEMO__: JSON.stringify(DEMO) },
+  plugins: DEMO ? [demoApiPlugin, demoAssetsPlugin, react()] : [react()],
+  base: '/',
+  define: {
+    __VONG_DEMO__: JSON.stringify(DEMO),
+    __VONG_MEMORY_ROUTER__: JSON.stringify(process.env.VONG_MEMORY_ROUTER === '1'),
+  },
   build: DEMO ? { outDir: 'dist-demo', emptyOutDir: true } : {},
   server: {
     port: 5173,

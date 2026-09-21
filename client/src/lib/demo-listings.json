@@ -13,13 +13,13 @@
     "seller_name": "Chị Hạnh",
     "seller_phone": "0903 118 274",
     "seller_email": "hanh.nguyen.d3@gmail.com",
-    "image_path": "uploads/seed/teak-chairs.svg",
+    "image_path": "/uploads/seed/teak-chairs.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 148,
-    "created_at": "2026-09-16T02:03:22.657Z",
-    "published_at": "2026-09-16T02:03:22.657Z"
+    "created_at": "2026-09-20T00:00:00.000Z",
+    "published_at": "2026-09-20T00:00:00.000Z"
   },
   {
     "id": "seed-2",
@@ -35,13 +35,13 @@
     "seller_name": "Minh Tuấn",
     "seller_phone": "0937 442 019",
     "seller_email": "minhtuan.dn@gmail.com",
-    "image_path": "uploads/seed/study-desk.svg",
+    "image_path": "/uploads/seed/study-desk.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 96,
-    "created_at": "2026-09-15T02:03:22.657Z",
-    "published_at": "2026-09-15T02:03:22.657Z"
+    "created_at": "2026-09-19T00:00:00.000Z",
+    "published_at": "2026-09-19T00:00:00.000Z"
   },
   {
     "id": "seed-3",
@@ -57,13 +57,13 @@
     "seller_name": "Ngọc Anh",
     "seller_phone": "0912 667 530",
     "seller_email": "ngocanh.tran95@gmail.com",
-    "image_path": "uploads/seed/denim-jacket.svg",
+    "image_path": "/uploads/seed/denim-jacket.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 211,
-    "created_at": "2026-09-14T02:03:22.657Z",
-    "published_at": "2026-09-14T02:03:22.657Z"
+    "created_at": "2026-09-18T00:00:00.000Z",
+    "published_at": "2026-09-18T00:00:00.000Z"
   },
   {
     "id": "seed-4",
@@ -79,13 +79,13 @@
     "seller_name": "Đức Huy",
     "seller_phone": "0908 215 946",
     "seller_email": "duchuy.le@gmail.com",
-    "image_path": "uploads/seed/linen-shirts.svg",
+    "image_path": "/uploads/seed/linen-shirts.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 74,
-    "created_at": "2026-09-13T02:03:22.657Z",
-    "published_at": "2026-09-13T02:03:22.657Z"
+    "created_at": "2026-09-17T00:00:00.000Z",
+    "published_at": "2026-09-17T00:00:00.000Z"
   },
   {
     "id": "seed-5",
@@ -101,13 +101,13 @@
     "seller_name": "Trung Kiên",
     "seller_phone": "0975 330 812",
     "seller_email": "kien.photo.q7@gmail.com",
-    "image_path": "uploads/seed/dslr-camera.svg",
+    "image_path": "/uploads/seed/dslr-camera.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 389,
-    "created_at": "2026-09-12T02:03:22.657Z",
-    "published_at": "2026-09-12T02:03:22.657Z"
+    "created_at": "2026-09-16T00:00:00.000Z",
+    "published_at": "2026-09-16T00:00:00.000Z"
   },
   {
     "id": "seed-6",
@@ -123,13 +123,13 @@
     "seller_name": "Phương Thảo",
     "seller_phone": "0389 704 155",
     "seller_email": "phuongthao.ng@gmail.com",
-    "image_path": "uploads/seed/tablet.svg",
+    "image_path": "/uploads/seed/tablet.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 267,
-    "created_at": "2026-09-11T02:03:22.657Z",
-    "published_at": "2026-09-11T02:03:22.657Z"
+    "created_at": "2026-09-15T00:00:00.000Z",
+    "published_at": "2026-09-15T00:00:00.000Z"
   },
   {
     "id": "seed-7",
@@ -145,13 +145,13 @@
     "seller_name": "Gia Bảo",
     "seller_phone": "0967 881 403",
     "seller_email": "giabao.ielts@gmail.com",
-    "image_path": "uploads/seed/study-books.svg",
+    "image_path": "/uploads/seed/study-books.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 132,
-    "created_at": "2026-09-10T02:03:22.657Z",
-    "published_at": "2026-09-10T02:03:22.657Z"
+    "created_at": "2026-09-14T00:00:00.000Z",
+    "published_at": "2026-09-14T00:00:00.000Z"
   },
   {
     "id": "seed-8",
@@ -167,13 +167,13 @@
     "seller_name": "Thu Hà",
     "seller_phone": "0934 562 187",
     "seller_email": "thuha.sach@gmail.com",
-    "image_path": "uploads/seed/paperbacks.svg",
+    "image_path": "/uploads/seed/paperbacks.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 88,
-    "created_at": "2026-09-08T02:03:22.658Z",
-    "published_at": "2026-09-08T02:03:22.658Z"
+    "created_at": "2026-09-12T00:00:00.000Z",
+    "published_at": "2026-09-12T00:00:00.000Z"
   },
   {
     "id": "seed-9",
@@ -189,13 +189,13 @@
     "seller_name": "Cô Lan",
     "seller_phone": "0901 448 776",
     "seller_email": "colan.thaodien@gmail.com",
-    "image_path": "uploads/seed/rice-cooker.svg",
+    "image_path": "/uploads/seed/rice-cooker.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 119,
-    "created_at": "2026-09-06T02:03:22.658Z",
-    "published_at": "2026-09-06T02:03:22.658Z"
+    "created_at": "2026-09-10T00:00:00.000Z",
+    "published_at": "2026-09-10T00:00:00.000Z"
   },
   {
     "id": "seed-10",
@@ -211,12 +211,12 @@
     "seller_name": "Hoàng Nam",
     "seller_phone": "0708 993 214",
     "seller_email": "hoangnam.guitar@gmail.com",
-    "image_path": "uploads/seed/guitar.svg",
+    "image_path": "/uploads/seed/guitar.svg",
     "status": "published",
     "reject_reason": null,
     "fee_vnd": 10000,
     "views": 203,
-    "created_at": "2026-09-04T02:03:22.658Z",
-    "published_at": "2026-09-04T02:03:22.658Z"
+    "created_at": "2026-09-08T00:00:00.000Z",
+    "published_at": "2026-09-08T00:00:00.000Z"
   }
 ]

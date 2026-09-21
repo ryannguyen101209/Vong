@@ -8,9 +8,8 @@ import { AuthProvider } from './lib/auth.jsx';
 import { App } from './App.jsx';
 import './styles.css';
 
-// The demo is embedded in a page we do not control, so it routes in memory and
-// never touches the address bar. A real install uses normal URLs.
-const Router = __VONG_DEMO__ ? MemoryRouter : BrowserRouter;
+// Hosted demos use real URLs; an embed can opt into memory routing explicitly.
+const Router = __VONG_MEMORY_ROUTER__ ? MemoryRouter : BrowserRouter;
 
 createRoot(document.getElementById('root')).render(
   <React.StrictMode>

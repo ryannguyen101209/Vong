@@ -10,9 +10,10 @@ import { SEED_LISTINGS } from '../../server/src/seed-data.js';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 const out = path.join(here, '..', 'src', 'lib', 'demo-listings.json');
+const demoNow = new Date('2026-09-21T00:00:00.000Z').getTime();
 
 const listings = SEED_LISTINGS.map((listing, index) => {
-  const createdAt = new Date(Date.now() - listing.days_ago * 86400000).toISOString();
+  const createdAt = new Date(demoNow - listing.days_ago * 86400000).toISOString();
   return {
     id: `seed-${index + 1}`,
     ref: `VONG-DEMO${String(index + 1).padStart(2, '0')}`,
@@ -27,8 +28,7 @@ const listings = SEED_LISTINGS.map((listing, index) => {
     seller_name: listing.seller_name,
     seller_phone: listing.seller_phone,
     seller_email: listing.seller_email,
-    // Relative on purpose: the demo is served from a subdirectory.
-    image_path: `uploads/seed/${listing.slug}.svg`,
+    image_path: `/uploads/seed/${listing.slug}.svg`,
     status: 'published',
     reject_reason: null,
     fee_vnd: 10000,
