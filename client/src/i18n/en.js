@@ -49,6 +49,12 @@ export default {
     posterCycle: 'Buy / sell / repeat',
     posterKeepMoving: 'Keep good things moving',
     posterLoop: 'The student resale loop',
+    storyTitle: 'Good things deserve another room.',
+    storyStep1: 'Find one object worth keeping.',
+    storyStep2: 'Message the person who owns it.',
+    storyStep3: 'Meet up or arrange a bank transfer.',
+    storyStep4: 'Pass it on when your room changes.',
+    storyScroll: 'Scroll to follow the object',
     heroEyebrow: 'Ho Chi Minh City',
     heroTitle: 'Give your things a second round.',
     heroLead:

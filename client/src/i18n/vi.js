@@ -49,6 +49,12 @@ export default {
     posterCycle: 'Mua / bán / lặp lại',
     posterKeepMoving: 'Để đồ tốt tiếp tục lưu chuyển',
     posterLoop: 'Vòng trao đổi của sinh viên',
+    storyTitle: 'Đồ tốt xứng đáng với một căn phòng mới.',
+    storyStep1: 'Tìm một món đồ đáng để giữ lại.',
+    storyStep2: 'Nhắn tin cho người đang sở hữu nó.',
+    storyStep3: 'Gặp mặt hoặc hẹn chuyển khoản.',
+    storyStep4: 'Chuyền tay khi căn phòng của bạn đổi khác.',
+    storyScroll: 'Cuộn để theo hành trình của món đồ',
     heroEyebrow: 'Thành phố Hồ Chí Minh',
     heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
     heroLead:

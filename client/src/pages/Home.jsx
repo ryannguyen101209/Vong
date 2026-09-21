@@ -2,27 +2,24 @@ import { useEffect, useRef, useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { formatPrice } from '../lib/format.js';
 import { ListingCard } from '../components/ListingCard.jsx';
 import { LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon } from '../components/Icons.jsx';
 
 export function Home() {
-  const { t, lang } = useI18n();
+  const { t } = useI18n();
   const homeRef = useRef(null);
   const [listings, setListings] = useState([]);
-  const [fee, setFee] = useState(null);
   const [loading, setLoading] = useState(true);
   const [total, setTotal] = useState(null);
 
   useEffect(() => {
     let active = true;
-    Promise.all([api.listings({ sort: 'newest' }), api.meta()])
-      .then(([listed, meta]) => {
+    api.listings({ sort: 'newest' })
+      .then((listed) => {
         if (!active) return;
         setListings(listed.listings.slice(0, 4));
         setTotal(listed.listings.length);
-        setFee(meta.fee_vnd);
       })
       .catch(() => {})
       .finally(() => active && setLoading(false));
@@ -58,11 +55,11 @@ export function Home() {
     motionItems.forEach((item) => observer.observe(item));
 
     const progress = root.querySelector('.scroll-progress__fill');
-    const hero = root.querySelector('.poster-hero');
-    const heroTop = root.querySelector('.poster-hero__word--top');
-    const heroBottom = root.querySelector('.poster-hero__word--bottom');
-    const heroImage = root.querySelector('.poster-hero__cluster');
-    const heroOrbits = [...root.querySelectorAll('[data-hero-orbit]')];
+    const story = root.querySelector('.scroll-story');
+    const storyVideo = root.querySelector('.scroll-story__video');
+    const storySteps = [...root.querySelectorAll('[data-story-step]')];
+    const storyDots = [...root.querySelectorAll('.scroll-story__dots span')];
+    const storyCards = root.querySelector('.scroll-story__cards');
     const parallaxCopy = [...root.querySelectorAll('[data-parallax]')];
     let frame = 0;
 
@@ -72,15 +69,21 @@ export function Home() {
       const pageProgress = scrollRange > 0 ? window.scrollY / scrollRange : 0;
       progress.style.transform = `scaleX(${Math.min(1, Math.max(0, pageProgress))})`;
 
-      const heroRect = hero.getBoundingClientRect();
-      const heroTravel = Math.min(1, Math.max(0, -heroRect.top / heroRect.height));
-      heroTop.style.transform = `translate3d(${heroTravel * 9}vw, 0, 0)`;
-      heroBottom.style.transform = `translate3d(${-heroTravel * 8}vw, 0, 0)`;
-      heroImage.style.transform = `translate3d(-50%, calc(-50% - ${heroTravel * 7}vh), 0) rotate(${heroTravel * 2.5}deg) scale(${1 + heroTravel * 0.08})`;
-      heroOrbits.forEach((item, index) => {
-        const direction = index % 2 === 0 ? 1 : -1;
-        item.style.transform = `translate3d(0, ${heroTravel * direction * 9}vh, 0) rotate(${heroTravel * direction * 10}deg)`;
-      });
+      const storyRect = story.getBoundingClientRect();
+      const storyRange = Math.max(1, storyRect.height - window.innerHeight);
+      const storyProgress = Math.min(1, Math.max(0, -storyRect.top / storyRange));
+      const activeStep = Math.min(storySteps.length - 1, Math.floor(storyProgress * storySteps.length));
+      root.style.setProperty('--story-progress', storyProgress.toFixed(4));
+      root.style.setProperty('--story-scale', Math.min(1, 0.7 + storyProgress * 0.5).toFixed(4));
+      root.style.setProperty('--story-intro-opacity', Math.max(0, 1 - storyProgress * 6).toFixed(4));
+      root.style.setProperty('--story-card-opacity', Math.max(0, 1 - storyProgress * 4).toFixed(4));
+      storySteps.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
+      storyDots.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
+      storyCards.style.transform = `translate3d(calc(-50% - ${storyProgress * 38}vw), 0, 0)`;
+      if (storyVideo.duration && Number.isFinite(storyVideo.duration)) {
+        const targetTime = storyProgress * Math.max(0, storyVideo.duration - 0.04);
+        if (Math.abs(storyVideo.currentTime - targetTime) > 0.025) storyVideo.currentTime = targetTime;
+      }
 
       parallaxCopy.forEach((item) => {
         const rect = item.getBoundingClientRect();
@@ -114,60 +117,60 @@ export function Home() {
   }));
 
   return (
-    <div className="home-landing" ref={homeRef}>
+    <div className="home-landing minimal-home" ref={homeRef}>
       <div className="scroll-progress" aria-hidden="true">
         <span className="scroll-progress__fill" />
       </div>
-      <section className="poster-hero" aria-labelledby="poster-hero-title">
-        <div className="poster-hero__masthead">
-          <span>{t('home.posterMarket')}</span>
-          <span>Saigon — 2026</span>
-          <span>{total ?? 0} {t('home.heroStatListings')}</span>
-        </div>
+      <section className="scroll-story" aria-labelledby="scroll-story-title">
+        <div className="scroll-story__stage">
+          <header className="scroll-story__head">
+            <span>{t('home.posterMarket')}</span>
+            <span>{t('home.heroLocation')}</span>
+            <span>{total ?? 0} {t('home.heroStatListings')}</span>
+          </header>
 
-        <div className="poster-hero__word poster-hero__word--top" aria-hidden="true">
-          {t('home.heroWordTop')}
-        </div>
-        <figure className="poster-hero__art" aria-hidden="true">
-          <span className="poster-hero__halo" />
-          <img className="poster-hero__cluster" src="/vong-higgsfield-resale-cluster.webp" alt="" />
-          <img className="poster-hero__orbit poster-hero__orbit--camera" data-hero-orbit src="/vong-higgsfield-camera.webp" alt="" />
-          <img className="poster-hero__orbit poster-hero__orbit--tote" data-hero-orbit src="/vong-higgsfield-tote.webp" alt="" />
-          <span className="poster-hero__dot poster-hero__dot--one" />
-          <span className="poster-hero__dot poster-hero__dot--two" />
-        </figure>
-        <h1 id="poster-hero-title" className="sr-only">{t('home.heroTitle')}</h1>
-        <div className="poster-hero__word poster-hero__word--bottom" aria-hidden="true">
-          {t('home.heroWordBottom')}
-        </div>
+          <div className="scroll-story__intro">
+            <p>{t('home.introKicker')}</p>
+            <h1 id="scroll-story-title">{t('home.storyTitle')}</h1>
+          </div>
 
-        <div className="poster-hero__vertical poster-hero__vertical--left">
-          <span>{t('home.heroLocation')}</span>
-          <span>{t('home.heroEdition')}</span>
-        </div>
-        <div className="poster-hero__vertical poster-hero__vertical--right">
-          <span>{t('home.posterCycle')}</span>
-          <span>{t('home.posterKeepMoving')}</span>
-        </div>
+          <div className="scroll-story__frame">
+            <video
+              className="scroll-story__video"
+              poster="/vong-higgsfield-chair.webp"
+              preload="auto"
+              muted
+              playsInline
+              aria-label={t('home.heroImageAlt')}
+            >
+              <source src="/vong-higgsfield-chair-film.mp4" type="video/mp4" />
+            </video>
+          </div>
 
-        <div className="poster-hero__message">
-          <span>01 — {t('home.posterLoop')}</span>
-          <p>{t('home.heroLeadShort')}</p>
-        </div>
+          <div className="scroll-story__copy">
+            {[1, 2, 3, 4].map((number) => (
+              <div className={`scroll-story__step${number === 1 ? ' is-active' : ''}`} data-story-step key={number}>
+                <span>0{number}</span>
+                <p>{t(`home.storyStep${number}`)}</p>
+              </div>
+            ))}
+          </div>
 
-        <div className="poster-hero__footer">
-          <Link to="/browse" className="poster-hero__primary">
-            <span>{t('home.heroCtaSecondary')}</span>
-            <ArrowUpRightIcon size={24} />
-          </Link>
-          <Link to="/sell" className="poster-hero__secondary">
-            <span>{t('home.heroCtaPrimary')}</span>
-            <ArrowUpRightIcon size={24} />
-          </Link>
-          <div className="poster-hero__facts">
-            <span><strong>{total ?? 0}</strong> {t('home.heroStatListings')}</span>
-            <span><strong>{fee == null ? '10,000₫' : formatPrice(fee, lang)}</strong> {t('home.heroStatFee')}</span>
-            <span><strong>0%</strong> {t('home.heroStatCut')}</span>
+          <div className="scroll-story__cards" aria-hidden="true">
+            {['electronics', 'furniture', 'clothing', 'household', 'books', 'hobby'].map((category, index) => (
+              <span className={index === 1 ? 'is-featured' : ''} key={category}>{t(`categories.${category}`)}</span>
+            ))}
+          </div>
+
+          <div className="scroll-story__bottom">
+            <div className="scroll-story__dots" aria-hidden="true">
+              {[1, 2, 3, 4].map((number) => <span className={number === 1 ? 'is-active' : ''} key={number}>0{number}</span>)}
+            </div>
+            <span>{t('home.storyScroll')}</span>
+            <div className="scroll-story__actions">
+              <Link to="/browse">{t('home.heroCtaSecondary')} <ArrowUpRightIcon /></Link>
+              <Link to="/sell">{t('home.heroCtaPrimary')} <ArrowUpRightIcon /></Link>
+            </div>
           </div>
         </div>
       </section>
@@ -176,16 +179,6 @@ export function Home() {
         <p>{t('home.introKicker')}</p>
         <h2 data-parallax>{t('home.introTitle')}</h2>
       </section>
-
-      <div className="motion-rail" aria-hidden="true">
-        <div className="motion-rail__track">
-          {[0, 1].map((group) => (
-            <span key={group}>
-              {t('home.motionRail')} <b>↗</b> {t('home.motionRail')} <b>↗</b> {t('home.motionRail')} <b>↗</b>&nbsp;
-            </span>
-          ))}
-        </div>
-      </div>
 
       <section className="home-products">
         <header className="home-products__head motion-reveal" data-motion>
