@@ -6,6 +6,14 @@ import { ListingCard } from '../components/ListingCard.jsx';
 import { LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon } from '../components/Icons.jsx';
 
+const storyCards = [
+  { category: 'electronics', image: '/uploads/seed/dslr-camera.svg' },
+  { category: 'clothing', image: '/uploads/seed/denim-jacket.svg' },
+  { category: 'furniture', image: '/vong-higgsfield-chair.webp', featured: true },
+  { category: 'books', image: '/uploads/seed/study-books.svg' },
+  { category: 'household', image: '/uploads/seed/rice-cooker.svg' },
+];
+
 export function Home() {
   const { t } = useI18n();
   const homeRef = useRef(null);
@@ -60,8 +68,16 @@ export function Home() {
     const storySteps = [...root.querySelectorAll('[data-story-step]')];
     const storyDots = [...root.querySelectorAll('.scroll-story__dots span')];
     const storyCards = root.querySelector('.scroll-story__cards');
+    const storyFrame = root.querySelector('.scroll-story__frame');
+    const storyPhone = root.querySelector('.scroll-story__phone');
+    const storyIntro = root.querySelector('.scroll-story__intro');
     const parallaxCopy = [...root.querySelectorAll('[data-parallax]')];
     let frame = 0;
+
+    const smoothStep = (start, end, value) => {
+      const progress = Math.min(1, Math.max(0, (value - start) / (end - start)));
+      return progress * progress * (3 - 2 * progress);
+    };
 
     const updateMotion = () => {
       frame = 0;
@@ -72,17 +88,24 @@ export function Home() {
       const storyRect = story.getBoundingClientRect();
       const storyRange = Math.max(1, storyRect.height - window.innerHeight);
       const storyProgress = Math.min(1, Math.max(0, -storyRect.top / storyRange));
-      const activeStep = Math.min(storySteps.length - 1, Math.floor(storyProgress * storySteps.length));
-      root.style.setProperty('--story-progress', storyProgress.toFixed(4));
-      root.style.setProperty('--story-scale', Math.min(1, 0.7 + storyProgress * 0.5).toFixed(4));
-      root.style.setProperty('--story-intro-opacity', Math.max(0, 1 - storyProgress * 6).toFixed(4));
-      root.style.setProperty('--story-card-opacity', Math.max(0, 1 - storyProgress * 4).toFixed(4));
+      const selectProgress = smoothStep(0.03, 0.18, storyProgress);
+      const zoomProgress = smoothStep(0.16, 0.42, storyProgress);
+      const phoneProgress = smoothStep(0.46, 0.66, storyProgress);
+      const activeStep = storyProgress < 0.2 ? 0 : storyProgress < 0.47 ? 1 : storyProgress < 0.72 ? 2 : 3;
       storySteps.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
       storyDots.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
-      storyCards.style.transform = `translate3d(calc(-50% - ${storyProgress * 38}vw), 0, 0)`;
-      if (storyVideo.duration && Number.isFinite(storyVideo.duration)) {
-        const targetTime = storyProgress * Math.max(0, storyVideo.duration - 0.04);
-        if (Math.abs(storyVideo.currentTime - targetTime) > 0.025) storyVideo.currentTime = targetTime;
+      storyCards.style.opacity = `${1 - zoomProgress * 0.72}`;
+      storyCards.style.transform = `translate3d(calc(-50% + ${(1 - selectProgress) * 18}vw), -50%, 0)`;
+      storyFrame.style.opacity = `${smoothStep(0.16, 0.23, storyProgress)}`;
+      storyFrame.style.transform = `translate3d(-50%, -50%, 0) scale(${0.27 + zoomProgress * 0.73})`;
+      storyPhone.style.opacity = `${phoneProgress}`;
+      storyPhone.style.transform = `translate3d(-50%, calc(-50% + ${(1 - phoneProgress) * 24}%), 0) scale(${0.92 + phoneProgress * 0.08})`;
+      storyIntro.style.opacity = `${1 - smoothStep(0.04, 0.18, storyProgress)}`;
+      if (storyProgress >= 0.4 && storyProgress < 0.99) {
+        if (storyVideo.paused) storyVideo.play().catch(() => {});
+      } else {
+        if (!storyVideo.paused) storyVideo.pause();
+        if (storyProgress < 0.4 && storyVideo.currentTime > 0.02) storyVideo.currentTime = 0;
       }
 
       parallaxCopy.forEach((item) => {
@@ -141,10 +164,19 @@ export function Home() {
               preload="auto"
               muted
               playsInline
+              loop
               aria-label={t('home.heroImageAlt')}
             >
               <source src="/vong-higgsfield-chair-film.mp4" type="video/mp4" />
             </video>
+          </div>
+
+          <div className="scroll-story__phone" aria-hidden="true">
+            <span className="scroll-story__phone-notch" />
+            <span className="scroll-story__phone-brand">Vòng</span>
+            <span className="scroll-story__phone-action">
+              {t('home.storyMessageSeller')} <ArrowUpRightIcon size={15} />
+            </span>
           </div>
 
           <div className="scroll-story__copy">
@@ -157,8 +189,11 @@ export function Home() {
           </div>
 
           <div className="scroll-story__cards" aria-hidden="true">
-            {['electronics', 'furniture', 'clothing', 'household', 'books', 'hobby'].map((category, index) => (
-              <span className={index === 1 ? 'is-featured' : ''} key={category}>{t(`categories.${category}`)}</span>
+            {storyCards.map((card) => (
+              <figure className={`scroll-story__card${card.featured ? ' is-featured' : ''}`} key={card.category}>
+                <figcaption>{t(`categories.${card.category}`)}</figcaption>
+                <img src={card.image} alt="" />
+              </figure>
             ))}
           </div>
 

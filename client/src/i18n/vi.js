@@ -55,6 +55,7 @@ export default {
     storyStep3: 'Gặp mặt hoặc hẹn chuyển khoản.',
     storyStep4: 'Chuyền tay khi căn phòng của bạn đổi khác.',
     storyScroll: 'Cuộn để theo hành trình của món đồ',
+    storyMessageSeller: 'Nhắn người bán',
     heroEyebrow: 'Thành phố Hồ Chí Minh',
     heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
     heroLead:

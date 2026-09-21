@@ -55,6 +55,7 @@ export default {
     storyStep3: 'Meet up or arrange a bank transfer.',
     storyStep4: 'Pass it on when your room changes.',
     storyScroll: 'Scroll to follow the object',
+    storyMessageSeller: 'Message seller',
     heroEyebrow: 'Ho Chi Minh City',
     heroTitle: 'Give your things a second round.',
     heroLead:
