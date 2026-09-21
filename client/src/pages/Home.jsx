@@ -7,11 +7,11 @@ import { LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon } from '../components/Icons.jsx';
 
 const storyCards = [
-  { category: 'electronics', image: '/uploads/seed/dslr-camera.svg' },
-  { category: 'clothing', image: '/uploads/seed/denim-jacket.svg' },
+  { category: 'electronics', image: '/vong-higgsfield-camera.webp' },
+  { category: 'clothing', image: '/vong-higgsfield-clothing.webp' },
   { category: 'furniture', image: '/vong-higgsfield-chair.webp', featured: true },
-  { category: 'books', image: '/uploads/seed/study-books.svg' },
-  { category: 'household', image: '/uploads/seed/rice-cooker.svg' },
+  { category: 'books', image: '/vong-higgsfield-books.webp' },
+  { category: 'household', image: '/vong-higgsfield-household.webp' },
 ];
 
 export function Home() {
@@ -88,24 +88,27 @@ export function Home() {
       const storyRect = story.getBoundingClientRect();
       const storyRange = Math.max(1, storyRect.height - window.innerHeight);
       const storyProgress = Math.min(1, Math.max(0, -storyRect.top / storyRange));
-      const selectProgress = smoothStep(0.03, 0.18, storyProgress);
-      const zoomProgress = smoothStep(0.16, 0.42, storyProgress);
-      const phoneProgress = smoothStep(0.46, 0.66, storyProgress);
-      const activeStep = storyProgress < 0.2 ? 0 : storyProgress < 0.47 ? 1 : storyProgress < 0.72 ? 2 : 3;
+      const introExit = smoothStep(0.1, 0.17, storyProgress);
+      const cardsReveal = smoothStep(0.18, 0.25, storyProgress);
+      const selectProgress = smoothStep(0.23, 0.4, storyProgress);
+      const zoomProgress = smoothStep(0.43, 0.68, storyProgress);
+      const phoneProgress = smoothStep(0.69, 0.84, storyProgress);
+      const activeStep = storyProgress < 0.23 ? -1 : storyProgress < 0.43 ? 0 : storyProgress < 0.69 ? 1 : storyProgress < 0.85 ? 2 : 3;
       storySteps.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
       storyDots.forEach((item, index) => item.classList.toggle('is-active', index === activeStep));
-      storyCards.style.opacity = `${1 - zoomProgress * 0.72}`;
+      storyCards.style.opacity = `${cardsReveal * (1 - zoomProgress * 0.78)}`;
       storyCards.style.transform = `translate3d(calc(-50% + ${(1 - selectProgress) * 18}vw), -50%, 0)`;
-      storyFrame.style.opacity = `${smoothStep(0.16, 0.23, storyProgress)}`;
+      storyFrame.style.opacity = `${smoothStep(0.43, 0.5, storyProgress)}`;
       storyFrame.style.transform = `translate3d(-50%, -50%, 0) scale(${0.27 + zoomProgress * 0.73})`;
       storyPhone.style.opacity = `${phoneProgress}`;
       storyPhone.style.transform = `translate3d(-50%, calc(-50% + ${(1 - phoneProgress) * 24}%), 0) scale(${0.92 + phoneProgress * 0.08})`;
-      storyIntro.style.opacity = `${1 - smoothStep(0.04, 0.18, storyProgress)}`;
-      if (storyProgress >= 0.4 && storyProgress < 0.99) {
+      storyIntro.style.opacity = `${1 - introExit}`;
+      storyIntro.style.transform = `translate3d(0, ${introExit * -18}%, 0)`;
+      if (storyProgress >= 0.56 && storyProgress < 0.99) {
         if (storyVideo.paused) storyVideo.play().catch(() => {});
       } else {
         if (!storyVideo.paused) storyVideo.pause();
-        if (storyProgress < 0.4 && storyVideo.currentTime > 0.02) storyVideo.currentTime = 0;
+        if (storyProgress < 0.56 && storyVideo.currentTime > 0.02) storyVideo.currentTime = 0;
       }
 
       parallaxCopy.forEach((item) => {
@@ -181,7 +184,7 @@ export function Home() {
 
           <div className="scroll-story__copy">
             {[1, 2, 3, 4].map((number) => (
-              <div className={`scroll-story__step${number === 1 ? ' is-active' : ''}`} data-story-step key={number}>
+              <div className="scroll-story__step" data-story-step key={number}>
                 <span>0{number}</span>
                 <p>{t(`home.storyStep${number}`)}</p>
               </div>
