@@ -7,6 +7,12 @@ buyer's money.
 
 Fully bilingual (English / Tiếng Việt), light and dark themes, mobile first.
 
+The frontend now includes a Google Identity Services entry point and a
+conversation prototype. Add `VITE_GOOGLE_CLIENT_ID` in `client/.env` to render
+the official Google sign-in button. Credentials are not yet verified by the
+server, and messages remain on the current device until the account and
+messaging backend is added.
+
 ---
 
 ## Run it on your own computer

@@ -25,6 +25,7 @@ export default {
     browse: 'Dạo xem',
     sell: 'Đăng bán',
     saved: 'Đã lưu',
+    messages: 'Tin nhắn',
     about: 'Về Vòng',
     faq: 'Hỏi đáp',
     contact: 'Liên hệ',
@@ -44,6 +45,8 @@ export default {
       'Vòng là nơi mua bán lại bàn ghế, quần áo và đồ đạc đang nằm không trong các căn hộ ở Sài Gòn. Đăng tin miễn phí. Bạn chỉ trả một khoản phí nhỏ khi tin được lên sóng — còn chuyện mua bán thì Vòng không xen vào.',
     heroCtaPrimary: 'Đăng tin ngay',
     heroCtaSecondary: 'Xem tin đang bán',
+    heroVisualLabel: 'Sản phẩm mới đăng',
+    heroFeeNote: 'Phí đăng cố định {{fee}}',
     heroStatListings: 'tin đang bán',
     heroStatFee: 'để đăng tin',
     heroStatCut: 'hoa hồng trên giao dịch',
@@ -99,6 +102,8 @@ export default {
     sellerTitle: 'Người bán',
     sellerNote: 'Thông tin liên hệ sẽ hiện ra khi bạn bấm hỏi mua.',
     requestToBuy: 'Hỏi mua',
+    messageSeller: 'Nhắn người bán',
+    requestPhone: 'Xem số điện thoại',
     requesting: 'Đang lấy thông tin…',
     contactTitle: 'Liên hệ {{name}} theo số này',
     contactBody:
@@ -106,12 +111,15 @@ export default {
     safetyTitle: 'Gặp nhau an toàn',
     safetyBody:
       'Nếu được thì hẹn chỗ đông người và vào ban ngày, xem kỹ món đồ trước khi trả tiền, và trả thẳng cho người bán. Vòng không bao giờ yêu cầu bạn chuyển tiền mua hàng cho tụi mình.',
+    payInPerson: 'Trả tiền khi gặp',
+    payBankTransfer: 'Chuyển khoản sau khi chốt trong tin nhắn',
     notFoundTitle: 'Tin này không còn xem được',
     notFoundBody: 'Có thể tin đã bị gỡ, hoặc vẫn đang chờ được duyệt.',
     statusNotice: 'Tin này chưa công khai — trạng thái: {{status}}.',
   },
 
   sell: {
+    eyebrow: 'Tạo tin đăng',
     title: 'Đăng tin bán',
     lead:
       'Cứ viết như đang kể cho bạn bè nghe. Nói luôn cả khuyết điểm — tin thật thà thường bán nhanh hơn tin bóng bẩy.',
@@ -119,6 +127,8 @@ export default {
     feeNoticeBody:
       'Trang kế tiếp sẽ hiện mã QR. Tin của bạn lên sóng ngay sau khi tụi mình kiểm tra thấy tiền về.',
     photoLabel: 'Hình ảnh',
+    photoDropTitle: 'Kéo ảnh sản phẩm vào đây',
+    photoPreviewAlt: 'Xem trước ảnh sản phẩm đã chọn',
     photoHint: 'Một tấm hình, tối đa 5MB. Định dạng JPG, PNG hoặc WebP.',
     photoChoose: 'Chọn hình',
     photoChange: 'Đổi hình khác',
@@ -156,6 +166,38 @@ export default {
     errorEmail: 'Địa chỉ email này chưa đúng định dạng.',
     errorPrice: 'Nhập giá từ 1.000 VNĐ trở lên.',
     errorImage: 'Hình này nặng quá — bạn để dưới 5MB giúp nhé.',
+    errorImageType: 'Chọn ảnh JPG, PNG hoặc WebP.',
+    submitSummary: 'Thanh toán {{fee}} sau bước này',
+    submitSummaryBody: 'Bạn được kiểm tra mã QR và thông tin ngân hàng trước khi trả.',
+  },
+
+  auth: {
+    title: 'Đăng nhập Vòng',
+    lead: 'Một tài khoản cho tin nhắn, món đã lưu và các tin đăng sau này.',
+    signIn: 'Đăng nhập',
+    signOut: 'Đăng xuất',
+    account: 'Tài khoản',
+    loadError: 'Không tải được đăng nhập Google. Bạn thử lại nhé.',
+    previewTitle: 'Giao diện đăng nhập Google đã sẵn sàng để kết nối.',
+    previewBody: 'Thêm Google OAuth web client ID khi tụi mình bắt đầu phần backend.',
+    terms: 'Khi tiếp tục, bạn đồng ý giao dịch lịch sự và an toàn.',
+  },
+
+  messages: {
+    title: 'Cuộc trò chuyện',
+    signInTitle: 'Đăng nhập để nhắn người bán',
+    signInBody: 'Tài khoản giúp cuộc trò chuyện gắn đúng người mua và người bán.',
+    emptyTitle: 'Các cuộc trò chuyện sẽ nằm ở đây',
+    emptyBody: 'Mở một tin đăng và chọn Nhắn người bán để bắt đầu.',
+    contextLabel: 'Về món đồ này',
+    sellerLabel: 'Người bán: {{name}}',
+    viewListing: 'Xem tin đăng',
+    prototypeBadge: 'Bản xem trước frontend',
+    prototypeNotice: 'Tin nhắn hiện lưu trên thiết bị này. Phần backend sẽ gửi tin thật sau.',
+    startTitle: 'Hỏi một câu hữu ích trước',
+    startBody: 'Xác nhận món còn bán, tình trạng, cách nhận hàng và cách thanh toán.',
+    placeholder: 'Viết tin nhắn',
+    send: 'Gửi',
   },
 
   payment: {

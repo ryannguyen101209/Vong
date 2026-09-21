@@ -25,6 +25,7 @@ export default {
     browse: 'Browse',
     sell: 'Sell',
     saved: 'Saved',
+    messages: 'Messages',
     about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
@@ -44,6 +45,8 @@ export default {
       'Vòng is a marketplace for the furniture, clothes and gear already sitting in Saigon apartments. Listing is free. You pay a small fee only when your listing goes live — and we never touch the sale itself.',
     heroCtaPrimary: 'Post something',
     heroCtaSecondary: 'Browse listings',
+    heroVisualLabel: 'Recently listed products',
+    heroFeeNote: '{{fee}} flat publishing fee',
     heroStatListings: 'listings live',
     heroStatFee: 'to publish',
     heroStatCut: 'commission on sales',
@@ -99,6 +102,8 @@ export default {
     sellerTitle: 'Seller',
     sellerNote: 'Contact details are shown when you request to buy.',
     requestToBuy: 'Request to buy',
+    messageSeller: 'Message seller',
+    requestPhone: 'Show phone number',
     requesting: 'Getting contact…',
     contactTitle: 'Here is how to reach {{name}}',
     contactBody:
@@ -106,12 +111,15 @@ export default {
     safetyTitle: 'Meeting safely',
     safetyBody:
       'Meet somewhere public and in daylight if you can, check the item before you pay, and pay the seller directly. Vòng never asks you to send money to us for an item.',
+    payInPerson: 'Pay in person',
+    payBankTransfer: 'Bank transfer after you agree in chat',
     notFoundTitle: 'This listing is not available',
     notFoundBody: 'It may have been taken down, or it is still waiting to be published.',
     statusNotice: 'This listing is not public yet — status: {{status}}.',
   },
 
   sell: {
+    eyebrow: 'Create a listing',
     title: 'Post a listing',
     lead:
       'Write it the way you would tell a friend. Mention the flaws — honest listings sell faster than polished ones.',
@@ -119,6 +127,8 @@ export default {
     feeNoticeBody:
       'You will see a QR code on the next page. Your listing goes live once we have checked the transfer.',
     photoLabel: 'Photo',
+    photoDropTitle: 'Drop a product photo here',
+    photoPreviewAlt: 'Selected product preview',
     photoHint: 'One photo, up to 5MB. JPG, PNG or WebP.',
     photoChoose: 'Choose a photo',
     photoChange: 'Change photo',
@@ -156,6 +166,38 @@ export default {
     errorEmail: 'That does not look like an email address.',
     errorPrice: 'Enter a price of at least 1,000 VND.',
     errorImage: 'That image is too large — please keep it under 5MB.',
+    errorImageType: 'Choose a JPG, PNG or WebP image.',
+    submitSummary: '{{fee}} due after this step',
+    submitSummaryBody: 'You can review the QR and bank details before paying.',
+  },
+
+  auth: {
+    title: 'Sign in to Vòng',
+    lead: 'Use one account for messages, saved finds and your future listings.',
+    signIn: 'Sign in',
+    signOut: 'Sign out',
+    account: 'Account',
+    loadError: 'Google sign-in could not load. Please try again.',
+    previewTitle: 'Google sign-in is designed and ready to connect.',
+    previewBody: 'Add your Google OAuth web client ID when we start the backend setup.',
+    terms: 'By continuing, you agree to keep transactions respectful and safe.',
+  },
+
+  messages: {
+    title: 'Conversation',
+    signInTitle: 'Sign in to message sellers',
+    signInBody: 'Your account will keep conversations attached to the right buyer and seller.',
+    emptyTitle: 'Your conversations will live here',
+    emptyBody: 'Open a listing and choose Message seller to start.',
+    contextLabel: 'About this item',
+    sellerLabel: 'Sold by {{name}}',
+    viewListing: 'View listing',
+    prototypeBadge: 'Frontend preview',
+    prototypeNotice: 'Messages save on this device for now. Server delivery comes in the backend phase.',
+    startTitle: 'Ask a useful first question',
+    startBody: 'Confirm availability, condition, pickup and how you want to pay.',
+    placeholder: 'Write a message',
+    send: 'Send',
   },
 
   payment: {

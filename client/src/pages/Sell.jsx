@@ -4,7 +4,7 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
-import { BoxIcon } from '../components/Icons.jsx';
+import { UploadIcon } from '../components/Icons.jsx';
 
 const EMPTY = {
   title: '',
@@ -29,6 +29,7 @@ export function Sell() {
   const [preview, setPreview] = useState(null);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [dragging, setDragging] = useState(false);
 
   useEffect(() => {
     api.meta().then(setMeta).catch(() => {});
@@ -82,17 +83,50 @@ export function Sell() {
     }
   };
 
+  const chooseImage = (file) => {
+    setErrors((current) => {
+      const { image: ignored, ...rest } = current;
+      return rest;
+    });
+    if (!file) {
+      setImage(null);
+      return;
+    }
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+      setErrors((current) => ({ ...current, image: 'type' }));
+      return;
+    }
+    if (file.size > 5 * 1024 * 1024) {
+      setErrors((current) => ({ ...current, image: 'too_large' }));
+      return;
+    }
+    setImage(file);
+  };
+
+  const onDrop = (event) => {
+    event.preventDefault();
+    setDragging(false);
+    chooseImage(event.dataTransfer.files?.[0]);
+  };
+
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="shell section" style={{ maxWidth: 820 }}>
-      <div className="section-head">
-        <h1>{t('sell.title')}</h1>
-        <p className="lead">{t('sell.lead')}</p>
-      </div>
+    <div className="shell section sell-page">
+      <header className="sell-intro reveal-on-scroll">
+        <div>
+          <p className="eyebrow">{t('sell.eyebrow')}</p>
+          <h1>{t('sell.title')}</h1>
+          <p className="lead">{t('sell.lead')}</p>
+        </div>
+        <div className="sell-fee-lockup">
+          <span>{feeLabel}</span>
+          <small>{t('common.perListing')}</small>
+        </div>
+      </header>
 
-      <div className="notice notice--accent" style={{ marginBottom: 28 }}>
+      <div className="notice notice--accent fee-notice">
         <p className="notice__title">{t('sell.feeNoticeTitle', { fee: feeLabel })}</p>
         <p style={{ margin: 0 }}>{t('sell.feeNoticeBody')}</p>
       </div>
@@ -105,25 +139,31 @@ export function Sell() {
         </div>
       )}
 
-      <form className="form" onSubmit={onSubmit} noValidate>
+      <form className="form sell-form" onSubmit={onSubmit} noValidate>
         <div className="field">
           <span className="field__label">{t('sell.photoLabel')}</span>
-          <div className="uploader">
-            <div className="uploader__preview">
-              {preview ? (
-                <img src={preview} alt="" />
-              ) : (
-                <span className="muted" style={{ opacity: 0.5 }}><BoxIcon size={38} /></span>
-              )}
-            </div>
-            <div className="stack" style={{ gap: 8 }}>
+          <div
+            className={`uploader${dragging ? ' is-dragging' : ''}${preview ? ' has-preview' : ''}`}
+            onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
+            onDragOver={(event) => event.preventDefault()}
+            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDragging(false); }}
+            onDrop={onDrop}
+          >
+            {preview ? (
+              <div className="uploader__preview"><img src={preview} alt={t('sell.photoPreviewAlt')} /></div>
+            ) : (
+              <div className="uploader__drop-icon"><UploadIcon size={28} /></div>
+            )}
+            <div className="uploader__copy">
               <input
                 ref={fileInput}
                 type="file"
-                accept="image/jpeg,image/png,image/webp,image/gif"
+                accept="image/jpeg,image/png,image/webp"
                 className="sr-only"
-                onChange={(event) => setImage(event.target.files?.[0] ?? null)}
+                onChange={(event) => chooseImage(event.target.files?.[0])}
               />
+              <strong>{image ? image.name : t('sell.photoDropTitle')}</strong>
+              <span className="field__hint">{t('sell.photoHint')}</span>
               <div className="row">
                 <button type="button" className="btn btn--ghost btn--small" onClick={() => fileInput.current?.click()}>
                   {image ? t('sell.photoChange') : t('sell.photoChoose')}
@@ -141,9 +181,9 @@ export function Sell() {
                   </button>
                 )}
               </div>
-              <span className="field__hint">{t('sell.photoHint')}</span>
             </div>
           </div>
+          {errors.image && <span className="field__error">{errors.image === 'too_large' ? t('sell.errorImage') : t('sell.errorImageType')}</span>}
         </div>
 
         <Field label={t('sell.titleLabel')} error={errorFor('title')} required>
@@ -279,9 +319,15 @@ export function Sell() {
           )}
         </Field>
 
-        <button type="submit" className="btn btn--accent btn--block" disabled={submitting}>
+        <div className="sell-submit">
+          <div>
+            <strong>{t('sell.submitSummary', { fee: feeLabel })}</strong>
+            <span>{t('sell.submitSummaryBody')}</span>
+          </div>
+          <button type="submit" className="btn btn--accent" disabled={submitting}>
           {submitting ? t('sell.submitting') : t('sell.submit')}
-        </button>
+          </button>
+        </div>
       </form>
     </div>
   );

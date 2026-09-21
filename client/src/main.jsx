@@ -4,6 +4,7 @@ import { BrowserRouter, MemoryRouter } from 'react-router-dom';
 import { LanguageProvider } from './i18n/index.jsx';
 import { SavedProvider } from './lib/saved.jsx';
 import { ThemeProvider } from './lib/theme.jsx';
+import { AuthProvider } from './lib/auth.jsx';
 import { App } from './App.jsx';
 import './styles.css';
 
@@ -15,11 +16,13 @@ createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <ThemeProvider>
       <LanguageProvider>
-        <SavedProvider>
-          <Router>
-            <App />
-          </Router>
-        </SavedProvider>
+        <AuthProvider>
+          <SavedProvider>
+            <Router>
+              <App />
+            </Router>
+          </SavedProvider>
+        </AuthProvider>
       </LanguageProvider>
     </ThemeProvider>
   </React.StrictMode>

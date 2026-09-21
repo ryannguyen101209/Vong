@@ -13,6 +13,8 @@ import { Faq } from './pages/Faq.jsx';
 import { Contact } from './pages/Contact.jsx';
 import { Admin } from './pages/Admin.jsx';
 import { NotFound } from './pages/NotFound.jsx';
+import { Messages } from './pages/Messages.jsx';
+import { SignInDialog } from './components/SignInDialog.jsx';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -37,6 +39,7 @@ export function App() {
           <Route path="/sell" element={<Sell />} />
           <Route path="/payment/:id" element={<Payment />} />
           <Route path="/saved" element={<Saved />} />
+          <Route path="/messages" element={<Messages />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
@@ -44,6 +47,7 @@ export function App() {
           <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
+      <SignInDialog />
       <Footer />
     </>
   );

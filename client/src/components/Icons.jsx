@@ -78,3 +78,23 @@ export const CheckIcon = ({ size = 18 }) => (
     <path d="m4.5 12.5 5 5 10-11" />
   </svg>
 );
+
+export const MessageIcon = ({ size = 20 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M5 18.2 3.8 21l3.5-1.2c1.3.8 2.9 1.2 4.7 1.2 5 0 9-3.8 9-8.5S17 4 12 4s-9 3.8-9 8.5c0 2.2.8 4.2 2 5.7Z" />
+    <path d="M8 12.5h.01M12 12.5h.01M16 12.5h.01" />
+  </svg>
+);
+
+export const UploadIcon = ({ size = 22 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M12 16V4m0 0L7.5 8.5M12 4l4.5 4.5" />
+    <path d="M5 14v5h14v-5" />
+  </svg>
+);
+
+export const ArrowUpRightIcon = ({ size = 18 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M7 17 17 7M8 7h9v9" />
+  </svg>
+);

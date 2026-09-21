@@ -3,22 +3,23 @@ import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { useSaved } from '../lib/saved.jsx';
 import { useTheme } from '../lib/theme.jsx';
+import { useAuth } from '../lib/auth.jsx';
 import { Logo } from './Logo.jsx';
-import { MenuIcon, CloseIcon, SunIcon, MoonIcon } from './Icons.jsx';
+import { MenuIcon, CloseIcon, SunIcon, MoonIcon, MessageIcon } from './Icons.jsx';
 
 const LINKS = [
   { to: '/browse', key: 'nav.browse' },
   { to: '/sell', key: 'nav.sell' },
   { to: '/saved', key: 'nav.saved', showCount: true },
+  { to: '/messages', key: 'nav.messages' },
   { to: '/about', key: 'nav.about' },
-  { to: '/faq', key: 'nav.faq' },
-  { to: '/contact', key: 'nav.contact' },
 ];
 
 export function Header() {
   const { t, toggleLang } = useI18n();
   const { count } = useSaved();
   const { theme, toggleTheme } = useTheme();
+  const { profile, openSignIn, signOut } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -55,6 +56,17 @@ export function Header() {
             {theme === 'dark' ? <SunIcon /> : <MoonIcon />}
             <span className="sr-only">{t('nav.themeToggle')}</span>
           </button>
+
+          {profile ? (
+            <button type="button" className="account-chip" onClick={signOut} title={t('auth.signOut')}>
+              {profile.picture ? <img src={profile.picture} alt="" referrerPolicy="no-referrer" /> : <MessageIcon size={16} />}
+              <span>{profile.name?.split(' ')[0] || t('auth.account')}</span>
+            </button>
+          ) : (
+            <button type="button" className="btn btn--accent btn--small header__signin" onClick={openSignIn}>
+              {t('auth.signIn')}
+            </button>
+          )}
 
           <button
             type="button"

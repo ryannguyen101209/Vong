@@ -6,7 +6,7 @@ import { formatPrice, formatDate } from '../lib/format.js';
 import { ListingImage } from '../components/ListingCard.jsx';
 import { SaveButton } from '../components/SaveButton.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
-import { ArrowLeftIcon, PhoneIcon } from '../components/Icons.jsx';
+import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 
 export function ListingDetail() {
   const { id } = useParams();
@@ -140,14 +140,22 @@ export function ListingDetail() {
             ) : (
               <>
                 <p className="small muted">{t('listing.sellerNote')}</p>
-                <div className="row">
+                <div className="seller-actions">
+                  <Link
+                    to={`/messages?listing=${listing.id}`}
+                    className={`btn btn--accent${listing.status !== 'published' ? ' is-disabled' : ''}`}
+                    aria-disabled={listing.status !== 'published'}
+                    onClick={(event) => listing.status !== 'published' && event.preventDefault()}
+                  >
+                    <MessageIcon /> {t('listing.messageSeller')}
+                  </Link>
                   <button
                     type="button"
-                    className="btn btn--accent"
+                    className="btn btn--ghost"
                     onClick={requestToBuy}
                     disabled={requesting || listing.status !== 'published'}
                   >
-                    {requesting ? t('listing.requesting') : t('listing.requestToBuy')}
+                    <PhoneIcon /> {requesting ? t('listing.requesting') : t('listing.requestPhone')}
                   </button>
                   <SaveButton listingId={listing.id} inline />
                 </div>
@@ -155,9 +163,13 @@ export function ListingDetail() {
             )}
           </div>
 
-          <div className="notice">
+          <div className="notice payment-choice">
             <p className="notice__title">{t('listing.safetyTitle')}</p>
             <p className="small" style={{ margin: 0 }}>{t('listing.safetyBody')}</p>
+            <div className="payment-choice__modes">
+              <span>{t('listing.payInPerson')}</span>
+              <span>{t('listing.payBankTransfer')}</span>
+            </div>
           </div>
         </aside>
       </div>
