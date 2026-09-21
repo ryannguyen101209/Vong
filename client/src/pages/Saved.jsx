@@ -36,7 +36,7 @@ export function Saved() {
 
   if (items.length === 0) {
     return (
-      <div className="shell section">
+      <div className="shell section editorial-page saved-page">
         <div className="section-head">
           <h1>{t('saved.title')}</h1>
           <p className="lead">{t('saved.lead')}</p>
@@ -49,7 +49,7 @@ export function Saved() {
   }
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page saved-page">
       <div className="section-head">
         <h1>{t('saved.title')}</h1>
         <p className="lead">{t('saved.lead')}</p>

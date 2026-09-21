@@ -17,7 +17,7 @@ export function Faq() {
   const items = tList('faq.items', { fee: fee == null ? '…' : formatPrice(fee, lang) });
 
   return (
-    <div className="shell section" style={{ maxWidth: 820 }}>
+    <div className="shell section editorial-page faq-page">
       <div className="section-head">
         <h1>{t('faq.title')}</h1>
         <p className="lead">{t('faq.lead')}</p>

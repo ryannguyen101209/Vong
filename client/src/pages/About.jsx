@@ -16,7 +16,7 @@ export function About() {
   const feeLabel = fee == null ? '…' : formatPrice(fee, lang);
 
   return (
-    <div className="shell section" style={{ maxWidth: 780 }}>
+    <div className="shell section editorial-page about-page">
       <div className="section-head">
         <LogoTile size={64} />
         <h1 style={{ marginTop: 24 }}>{t('about.title')}</h1>

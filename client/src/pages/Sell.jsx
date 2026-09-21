@@ -113,7 +113,7 @@ export function Sell() {
   const hasErrors = Object.keys(errors).length > 0;
 
   return (
-    <div className="shell section sell-page">
+    <div className="shell section sell-page editorial-page">
       <header className="sell-intro reveal-on-scroll">
         <div>
           <p className="eyebrow">{t('sell.eyebrow')}</p>

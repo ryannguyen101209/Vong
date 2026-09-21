@@ -49,7 +49,7 @@ export function Messages() {
 
   if (!profile) {
     return (
-      <div className="shell section messages-gate">
+      <div className="shell section messages-gate editorial-page messages-page">
         <div className="messages-gate__icon"><MessageIcon size={28} /></div>
         <h1>{t('messages.signInTitle')}</h1>
         <p className="lead">{t('messages.signInBody')}</p>
@@ -60,7 +60,7 @@ export function Messages() {
 
   if (!listingId) {
     return (
-      <div className="shell section messages-gate">
+      <div className="shell section messages-gate editorial-page messages-page">
         <div className="messages-gate__icon"><MessageIcon size={28} /></div>
         <h1>{t('messages.emptyTitle')}</h1>
         <p className="lead">{t('messages.emptyBody')}</p>
@@ -70,7 +70,7 @@ export function Messages() {
   }
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page messages-page">
       <div className="message-layout">
         <aside className="message-context">
           <p className="eyebrow">{t('messages.contextLabel')}</p>

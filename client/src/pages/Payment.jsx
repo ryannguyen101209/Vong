@@ -89,17 +89,17 @@ export function Payment() {
   };
 
   if (status === 'loading') {
-    return <div className="shell section"><p className="muted">{t('common.loading')}</p></div>;
+    return <div className="shell section editorial-page payment-page"><p className="muted">{t('common.loading')}</p></div>;
   }
   if (status === 'unconfigured') {
     return (
-      <div className="shell section">
+      <div className="shell section editorial-page payment-page">
         <div className="notice notice--warning">{t('payment.notConfigured')}</div>
       </div>
     );
   }
   if (status !== 'ready') {
-    return <div className="shell section"><ErrorState onRetry={load} /></div>;
+    return <div className="shell section editorial-page payment-page"><ErrorState onRetry={load} /></div>;
   }
 
   const { listing, payment } = data;
@@ -107,7 +107,7 @@ export function Payment() {
 
   if (listing.status === 'awaiting_approval') {
     return (
-      <div className="shell section" style={{ maxWidth: 680 }}>
+      <div className="shell section editorial-page payment-page payment-page--status">
         <div className="card panel">
           <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusAwaitingTitle')}</p>
           <h1>{t('payment.markedTitle')}</h1>
@@ -127,7 +127,7 @@ export function Payment() {
 
   if (listing.status === 'published') {
     return (
-      <div className="shell section" style={{ maxWidth: 680 }}>
+      <div className="shell section editorial-page payment-page payment-page--status">
         <div className="card panel">
           <p className="eyebrow">{t('payment.statusPublishedTitle')}</p>
           <h1>{title}</h1>
@@ -142,7 +142,7 @@ export function Payment() {
   }
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page payment-page">
       <div className="section-head">
         <p className="eyebrow">
           {listing.status === 'rejected' ? t('payment.statusRejectedTitle') : t('payment.statusPendingTitle')}

@@ -29,11 +29,11 @@ export function ListingDetail() {
   }, [id]);
 
   if (status === 'loading') {
-    return <div className="shell section"><p className="muted">{t('common.loading')}</p></div>;
+    return <div className="shell section editorial-page listing-page"><p className="muted">{t('common.loading')}</p></div>;
   }
   if (status === 'missing') {
     return (
-      <div className="shell section">
+      <div className="shell section editorial-page listing-page">
         <EmptyState title={t('listing.notFoundTitle')} body={t('listing.notFoundBody')}>
           <Link to="/browse" className="btn">{t('nav.browse')}</Link>
         </EmptyState>
@@ -41,7 +41,7 @@ export function ListingDetail() {
     );
   }
   if (status === 'error') {
-    return <div className="shell section"><ErrorState /></div>;
+    return <div className="shell section editorial-page listing-page"><ErrorState /></div>;
   }
 
   const title = localized(listing, 'title');
@@ -58,7 +58,7 @@ export function ListingDetail() {
   };
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page listing-page">
       <Link to="/browse" className="link-quiet row" style={{ marginBottom: 24, gap: 6 }}>
         <ArrowLeftIcon /> {t('listing.backToBrowse')}
       </Link>

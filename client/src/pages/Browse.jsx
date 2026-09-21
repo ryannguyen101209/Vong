@@ -72,7 +72,7 @@ export function Browse() {
   );
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page browse-page">
       <div className="section-head">
         <h1>{t('browse.title')}</h1>
         <p className="lead">{t('browse.lead')}</p>

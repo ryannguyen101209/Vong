@@ -43,7 +43,7 @@ function LoginForm({ onSuccess }) {
   };
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page admin-page admin-page--login">
       <div className="card panel admin-login">
         <h1 style={{ fontSize: '1.7rem' }}>{t('admin.loginTitle')}</h1>
         <p className="muted small" style={{ marginBottom: 24 }}>{t('admin.loginLead')}</p>
@@ -505,7 +505,7 @@ export function Admin() {
   if (!token) return <LoginForm onSuccess={setToken} />;
 
   return (
-    <div className="shell section">
+    <div className="shell section editorial-page admin-page">
       <div className="spread" style={{ marginBottom: 28 }}>
         <h1 style={{ margin: 0 }}>{t('admin.loginTitle')}</h1>
         <button type="button" className="btn btn--ghost btn--small" onClick={signOut}>

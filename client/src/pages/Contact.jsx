@@ -39,7 +39,7 @@ export function Contact() {
   };
 
   return (
-    <div className="shell section" style={{ maxWidth: 820 }}>
+    <div className="shell section editorial-page contact-page">
       <div className="section-head">
         <h1>{t('contact.title')}</h1>
         <p className="lead">{t('contact.lead')}</p>
