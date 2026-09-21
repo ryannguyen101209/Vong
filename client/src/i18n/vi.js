@@ -45,6 +45,10 @@ export default {
     heroLocation: 'Thành phố Hồ Chí Minh',
     heroEdition: 'Đồ đạc đang lưu chuyển',
     heroLeadShort: 'Đồ tốt không cần chủ đầu tiên. Tìm thấy, chuyền tay, tiếp tục sử dụng.',
+    posterMarket: 'Vòng / Chợ đồ cũ',
+    posterCycle: 'Mua / bán / lặp lại',
+    posterKeepMoving: 'Để đồ tốt tiếp tục lưu chuyển',
+    posterLoop: 'Vòng trao đổi của sinh viên',
     heroEyebrow: 'Thành phố Hồ Chí Minh',
     heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
     heroLead:

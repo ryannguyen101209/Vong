@@ -45,6 +45,10 @@ export default {
     heroLocation: 'Ho Chi Minh City',
     heroEdition: 'Objects in circulation',
     heroLeadShort: 'Good things do not need a first owner. Find them, pass them on, keep them moving.',
+    posterMarket: 'Vòng / Secondhand market',
+    posterCycle: 'Buy / sell / repeat',
+    posterKeepMoving: 'Keep good things moving',
+    posterLoop: 'The student resale loop',
     heroEyebrow: 'Ho Chi Minh City',
     heroTitle: 'Give your things a second round.',
     heroLead:

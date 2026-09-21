@@ -1688,6 +1688,266 @@ h3 { letter-spacing: -0.025em; }
   }
 }
 
+/* Poster hero — an original Vòng composition inspired by kinetic design posters. */
+.poster-hero {
+  position: relative;
+  min-height: max(820px, calc(100dvh - 66px));
+  overflow: hidden;
+  isolation: isolate;
+  border-bottom: 2px solid var(--home-ink);
+  background: var(--home-signal);
+  color: var(--home-ink);
+}
+
+.poster-hero::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: 12% 14% 18%;
+  border: 1px solid color-mix(in srgb, var(--home-ink) 24%, transparent);
+  border-radius: 50%;
+  transform: rotate(-9deg);
+}
+
+.poster-hero__masthead {
+  position: absolute;
+  z-index: 8;
+  top: 0;
+  right: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 20px;
+  padding: 20px 2.4vw;
+  border-bottom: 1px solid var(--home-ink);
+  font-size: .64rem;
+  font-weight: 800;
+  letter-spacing: .11em;
+  text-transform: uppercase;
+}
+
+.poster-hero__masthead span:last-child { text-align: right; }
+
+.poster-hero__word {
+  position: absolute;
+  z-index: 1;
+  color: var(--home-ink);
+  font-family: var(--display);
+  font-size: clamp(7.5rem, 19.6vw, 20rem);
+  font-weight: 850;
+  letter-spacing: -.105em;
+  line-height: .68;
+  white-space: nowrap;
+  pointer-events: none;
+  will-change: transform;
+}
+
+.poster-hero__word--top { top: 13%; left: -1.5vw; }
+.poster-hero__word--bottom { right: -1vw; bottom: 20%; color: var(--home-paper); }
+
+.poster-hero__art {
+  position: absolute;
+  z-index: 3;
+  inset: 7% 10% 11%;
+  margin: 0;
+  pointer-events: none;
+}
+
+.poster-hero__halo {
+  position: absolute;
+  top: 49%;
+  left: 50%;
+  width: min(48vw, 650px);
+  aspect-ratio: 1;
+  border: 1px solid color-mix(in srgb, var(--home-paper) 62%, transparent);
+  border-radius: 50%;
+  background: radial-gradient(circle at 48% 42%, rgba(239, 238, 233, .35), rgba(239, 238, 233, .08) 48%, transparent 70%);
+  box-shadow: 0 0 0 28px rgba(239, 238, 233, .04), 0 0 0 56px rgba(239, 238, 233, .025);
+  transform: translate(-50%, -50%);
+  animation: poster-breathe 5s ease-in-out infinite;
+}
+
+.poster-hero__cluster {
+  position: absolute;
+  z-index: 3;
+  top: 49%;
+  left: 50%;
+  width: min(61vw, 880px);
+  max-height: 71vh;
+  object-fit: contain;
+  filter: drop-shadow(0 40px 34px rgba(10, 10, 10, .23));
+  transform: translate(-50%, -50%);
+  animation: poster-cluster-in 1200ms var(--motion-ease-in-out) both, poster-float 7s ease-in-out 1.2s infinite;
+  will-change: transform;
+}
+
+.poster-hero__orbit {
+  position: absolute;
+  z-index: 4;
+  object-fit: contain;
+  filter: drop-shadow(0 20px 20px rgba(10, 10, 10, .2));
+  animation: poster-orbit-in 900ms var(--motion-ease-out) 600ms both;
+  will-change: transform;
+}
+
+.poster-hero__orbit--camera { top: 20%; left: 12%; width: min(14vw, 180px); transform: rotate(-12deg); }
+.poster-hero__orbit--tote { right: 9%; bottom: 20%; width: min(15vw, 205px); transform: rotate(10deg); }
+
+.poster-hero__dot {
+  position: absolute;
+  z-index: 2;
+  width: 17px;
+  aspect-ratio: 1;
+  border: 3px solid var(--home-paper);
+  border-radius: 50%;
+  box-shadow: 0 26px 0 -3px var(--home-paper), 0 52px 0 -3px var(--home-paper), 0 78px 0 -3px var(--home-paper);
+}
+
+.poster-hero__dot--one { top: 25%; right: 22%; }
+.poster-hero__dot--two { bottom: 31%; left: 22%; transform: rotate(90deg); }
+
+.poster-hero__vertical {
+  position: absolute;
+  z-index: 7;
+  top: 28%;
+  display: flex;
+  gap: 18px;
+  font-size: .68rem;
+  font-weight: 800;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  writing-mode: vertical-rl;
+}
+
+.poster-hero__vertical--left { left: 2.4vw; transform: rotate(180deg); }
+.poster-hero__vertical--right { right: 2.4vw; }
+
+.poster-hero__message {
+  position: absolute;
+  z-index: 7;
+  top: 18%;
+  right: 3vw;
+  width: min(20vw, 270px);
+  padding-left: 14px;
+  border-left: 2px solid var(--home-ink);
+}
+
+.poster-hero__message span {
+  display: block;
+  margin-bottom: 10px;
+  font-size: .61rem;
+  font-weight: 800;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+}
+
+.poster-hero__message p { margin: 0; font-size: clamp(.78rem, 1vw, .95rem); font-weight: 650; line-height: 1.42; }
+
+.poster-hero__footer {
+  position: absolute;
+  z-index: 9;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  display: grid;
+  grid-template-columns: minmax(190px, .54fr) minmax(190px, .54fr) 1.35fr;
+  min-height: 92px;
+  border-top: 2px solid var(--home-ink);
+  background: var(--home-paper);
+  animation: hero-footer-in 700ms var(--motion-ease-out) 850ms both;
+}
+
+.poster-hero__primary,
+.poster-hero__secondary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 18px 2.4vw;
+  border-right: 1px solid var(--home-ink);
+  color: var(--home-ink);
+  font-size: clamp(1rem, 1.45vw, 1.3rem);
+  font-weight: 800;
+  letter-spacing: -.035em;
+  text-decoration: none;
+  transition: background 220ms ease, color 220ms ease;
+}
+
+.poster-hero__primary { background: var(--home-ink); color: var(--home-paper); }
+.poster-hero__primary:hover { background: var(--home-signal); color: var(--home-ink); }
+.poster-hero__secondary:hover { background: #fff; }
+
+.poster-hero__facts { display: grid; grid-template-columns: repeat(3, 1fr); }
+.poster-hero__facts span {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 3px;
+  padding: 14px 1.8vw;
+  border-left: 1px solid var(--home-ink);
+  font-size: .6rem;
+  font-weight: 760;
+  letter-spacing: .075em;
+  text-transform: uppercase;
+}
+.poster-hero__facts strong { font-size: clamp(1rem, 1.4vw, 1.25rem); letter-spacing: -.035em; }
+
+@keyframes poster-cluster-in {
+  from { opacity: 0; transform: translate(-50%, -40%) scale(.72) rotate(-8deg); }
+  to { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(0); }
+}
+
+@keyframes poster-orbit-in {
+  from { opacity: 0; scale: .55; }
+  to { opacity: 1; scale: 1; }
+}
+
+@keyframes poster-float {
+  0%, 100% { margin-top: 0; }
+  50% { margin-top: -16px; }
+}
+
+@keyframes poster-breathe {
+  0%, 100% { opacity: .72; scale: 1; }
+  50% { opacity: 1; scale: 1.035; }
+}
+
+@media (max-width: 900px) {
+  .poster-hero__word { font-size: clamp(7rem, 23vw, 13rem); }
+  .poster-hero__cluster { width: min(78vw, 760px); }
+  .poster-hero__message { width: 24vw; }
+  .poster-hero__orbit--camera { left: 8%; width: 18vw; }
+  .poster-hero__orbit--tote { right: 6%; width: 19vw; }
+  .poster-hero__footer { grid-template-columns: 1fr 1fr; }
+  .poster-hero__facts { display: none; }
+}
+
+@media (max-width: 680px) {
+  .poster-hero { min-height: 760px; }
+  .poster-hero__masthead { grid-template-columns: 1fr 1fr; padding: 16px 18px; }
+  .poster-hero__masthead span:nth-child(2) { display: none; }
+  .poster-hero__word { font-size: clamp(5rem, 27vw, 8rem); }
+  .poster-hero__word--top { top: 13%; left: -2vw; }
+  .poster-hero__word--bottom { bottom: 25%; }
+  .poster-hero__art { inset: 10% 0 15%; }
+  .poster-hero__cluster { top: 48%; width: 108vw; max-width: none; }
+  .poster-hero__halo { width: 76vw; }
+  .poster-hero__orbit--camera { top: 26%; left: 1%; width: 25vw; }
+  .poster-hero__orbit--tote { right: 0; bottom: 24%; width: 27vw; }
+  .poster-hero__message { top: auto; right: 18px; bottom: 16%; width: 54vw; padding: 10px; border: 1px solid var(--home-ink); background: color-mix(in srgb, var(--home-signal) 86%, transparent); backdrop-filter: blur(8px); }
+  .poster-hero__vertical--left { top: 30%; left: 8px; }
+  .poster-hero__vertical--right { display: none; }
+  .poster-hero__footer { grid-template-columns: 1fr 1fr; min-height: 74px; }
+  .poster-hero__primary, .poster-hero__secondary { padding: 15px 16px; font-size: .92rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .poster-hero__cluster,
+  .poster-hero__orbit,
+  .poster-hero__halo,
+  .poster-hero__footer { animation: none; }
+}
+
 /* ========================================================================
    Secondary routes — one editorial system, distinct page compositions
    ======================================================================== */

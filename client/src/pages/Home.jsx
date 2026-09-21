@@ -58,10 +58,11 @@ export function Home() {
     motionItems.forEach((item) => observer.observe(item));
 
     const progress = root.querySelector('.scroll-progress__fill');
-    const hero = root.querySelector('.manifesto');
-    const heroTop = root.querySelector('.manifesto__line--top');
-    const heroBottom = root.querySelector('.manifesto__line--bottom');
-    const heroImage = root.querySelector('.manifesto__image img');
+    const hero = root.querySelector('.poster-hero');
+    const heroTop = root.querySelector('.poster-hero__word--top');
+    const heroBottom = root.querySelector('.poster-hero__word--bottom');
+    const heroImage = root.querySelector('.poster-hero__cluster');
+    const heroOrbits = [...root.querySelectorAll('[data-hero-orbit]')];
     const parallaxCopy = [...root.querySelectorAll('[data-parallax]')];
     let frame = 0;
 
@@ -73,9 +74,13 @@ export function Home() {
 
       const heroRect = hero.getBoundingClientRect();
       const heroTravel = Math.min(1, Math.max(0, -heroRect.top / heroRect.height));
-      heroTop.style.transform = `translate3d(${heroTravel * 13}vw, 0, 0)`;
-      heroBottom.style.transform = `translate3d(${-heroTravel * 11}vw, 0, 0)`;
-      heroImage.style.transform = `scale(${1.02 + heroTravel * 0.12})`;
+      heroTop.style.transform = `translate3d(${heroTravel * 9}vw, 0, 0)`;
+      heroBottom.style.transform = `translate3d(${-heroTravel * 8}vw, 0, 0)`;
+      heroImage.style.transform = `translate3d(-50%, calc(-50% - ${heroTravel * 7}vh), 0) rotate(${heroTravel * 2.5}deg) scale(${1 + heroTravel * 0.08})`;
+      heroOrbits.forEach((item, index) => {
+        const direction = index % 2 === 0 ? 1 : -1;
+        item.style.transform = `translate3d(0, ${heroTravel * direction * 9}vh, 0) rotate(${heroTravel * direction * 10}deg)`;
+      });
 
       parallaxCopy.forEach((item) => {
         const rect = item.getBoundingClientRect();
@@ -113,35 +118,53 @@ export function Home() {
       <div className="scroll-progress" aria-hidden="true">
         <span className="scroll-progress__fill" />
       </div>
-      <section className="manifesto" aria-labelledby="manifesto-title">
-        <div className="manifesto__line manifesto__line--top" aria-hidden="true">
+      <section className="poster-hero" aria-labelledby="poster-hero-title">
+        <div className="poster-hero__masthead">
+          <span>{t('home.posterMarket')}</span>
+          <span>Saigon — 2026</span>
+          <span>{total ?? 0} {t('home.heroStatListings')}</span>
+        </div>
+
+        <div className="poster-hero__word poster-hero__word--top" aria-hidden="true">
           {t('home.heroWordTop')}
         </div>
-        <figure className="manifesto__image">
-          <img src="/vong-editorial-still-life.png" alt={t('home.heroImageAlt')} />
+        <figure className="poster-hero__art" aria-hidden="true">
+          <span className="poster-hero__halo" />
+          <img className="poster-hero__cluster" src="/vong-higgsfield-resale-cluster.webp" alt="" />
+          <img className="poster-hero__orbit poster-hero__orbit--camera" data-hero-orbit src="/vong-higgsfield-camera.webp" alt="" />
+          <img className="poster-hero__orbit poster-hero__orbit--tote" data-hero-orbit src="/vong-higgsfield-tote.webp" alt="" />
+          <span className="poster-hero__dot poster-hero__dot--one" />
+          <span className="poster-hero__dot poster-hero__dot--two" />
         </figure>
-        <h1 id="manifesto-title" className="sr-only">{t('home.heroTitle')}</h1>
-        <div className="manifesto__line manifesto__line--bottom" aria-hidden="true">
+        <h1 id="poster-hero-title" className="sr-only">{t('home.heroTitle')}</h1>
+        <div className="poster-hero__word poster-hero__word--bottom" aria-hidden="true">
           {t('home.heroWordBottom')}
         </div>
 
-        <div className="manifesto__side manifesto__side--left">
+        <div className="poster-hero__vertical poster-hero__vertical--left">
           <span>{t('home.heroLocation')}</span>
           <span>{t('home.heroEdition')}</span>
         </div>
-        <div className="manifesto__side manifesto__side--right">
-          <p>{t('home.heroLeadShort')}</p>
-          <Link to="/browse" className="text-link">
-            {t('home.heroCtaSecondary')} <ArrowUpRightIcon />
-          </Link>
+        <div className="poster-hero__vertical poster-hero__vertical--right">
+          <span>{t('home.posterCycle')}</span>
+          <span>{t('home.posterKeepMoving')}</span>
         </div>
 
-        <div className="manifesto__footer">
-          <Link to="/sell" className="manifesto__primary">
+        <div className="poster-hero__message">
+          <span>01 — {t('home.posterLoop')}</span>
+          <p>{t('home.heroLeadShort')}</p>
+        </div>
+
+        <div className="poster-hero__footer">
+          <Link to="/browse" className="poster-hero__primary">
+            <span>{t('home.heroCtaSecondary')}</span>
+            <ArrowUpRightIcon size={24} />
+          </Link>
+          <Link to="/sell" className="poster-hero__secondary">
             <span>{t('home.heroCtaPrimary')}</span>
             <ArrowUpRightIcon size={24} />
           </Link>
-          <div className="manifesto__facts">
+          <div className="poster-hero__facts">
             <span><strong>{total ?? 0}</strong> {t('home.heroStatListings')}</span>
             <span><strong>{fee == null ? '10,000₫' : formatPrice(fee, lang)}</strong> {t('home.heroStatFee')}</span>
             <span><strong>0%</strong> {t('home.heroStatCut')}</span>
