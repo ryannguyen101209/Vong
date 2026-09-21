@@ -73,6 +73,8 @@ export function Home() {
     const storyIntro = root.querySelector('.scroll-story__intro');
     const parallaxCopy = [...root.querySelectorAll('[data-parallax]')];
     let frame = 0;
+    let scrollStopTimer = 0;
+    let storyIsScrolling = false;
 
     const smoothStep = (start, end, value) => {
       const progress = Math.min(1, Math.max(0, (value - start) / (end - start)));
@@ -104,7 +106,7 @@ export function Home() {
       storyPhone.style.transform = `translate3d(-50%, calc(-50% + ${(1 - phoneProgress) * 24}%), 0) scale(${0.92 + phoneProgress * 0.08})`;
       storyIntro.style.opacity = `${1 - introExit}`;
       storyIntro.style.transform = `translate3d(0, ${introExit * -18}%, 0)`;
-      if (storyProgress >= 0.56 && storyProgress < 0.99) {
+      if (storyIsScrolling && storyProgress >= 0.56 && storyProgress < 0.99) {
         if (storyVideo.paused) storyVideo.play().catch(() => {});
       } else {
         if (!storyVideo.paused) storyVideo.pause();
@@ -123,15 +125,27 @@ export function Home() {
       if (!frame) frame = window.requestAnimationFrame(updateMotion);
     };
 
+    const handleScroll = () => {
+      storyIsScrolling = true;
+      window.clearTimeout(scrollStopTimer);
+      scrollStopTimer = window.setTimeout(() => {
+        storyIsScrolling = false;
+        if (!storyVideo.paused) storyVideo.pause();
+      }, 160);
+      requestMotion();
+    };
+
     updateMotion();
-    window.addEventListener('scroll', requestMotion, { passive: true });
+    window.addEventListener('scroll', handleScroll, { passive: true });
     window.addEventListener('resize', requestMotion);
 
     return () => {
       observer.disconnect();
       root.classList.remove('motion-ready');
-      window.removeEventListener('scroll', requestMotion);
+      window.removeEventListener('scroll', handleScroll);
       window.removeEventListener('resize', requestMotion);
+      window.clearTimeout(scrollStopTimer);
+      storyVideo.pause();
       if (frame) window.cancelAnimationFrame(frame);
     };
   }, [loading, listings.length]);
