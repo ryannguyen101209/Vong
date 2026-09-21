@@ -231,6 +231,11 @@ see each listing in the approval queue — that is the moderation.
 
 ## Deploying it
 
+**See [DEPLOY.md](DEPLOY.md) for the full walkthrough — and read it before you
+try Vercel or Netlify.** Vòng is a running Node server with a database file, not
+a static site, so those hosts give you a frontend with nothing behind it: empty
+dropdowns and "Something went wrong" on every page.
+
 The simplest version that keeps working: one small VPS (a $5 box is plenty),
 where the disk persists.
 

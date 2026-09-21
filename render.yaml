@@ -1,0 +1,26 @@
+# One-click deploy config for Render. Any host that runs a normal Node process
+# with a writable disk works the same way; this file just saves you filling the
+# same values into a web form.
+services:
+  - type: web
+    name: vong
+    runtime: node
+    plan: starter          # a plan with a persistent disk; free plans have none
+    buildCommand: npm install && npm run build
+    startCommand: npm start
+    healthCheckPath: /api/health
+    envVars:
+      - key: NODE_VERSION
+        value: "22"
+      - key: ADMIN_PASSWORD
+        sync: false        # set this yourself in the dashboard; never commit it
+      # Keep the database and uploaded photos on the mounted disk, so they
+      # survive a redeploy. Without this, every deploy wipes your listings.
+      - key: DATABASE_FILE
+        value: /var/vong-data/vong.db
+      - key: UPLOADS_DIR
+        value: /var/vong-data/uploads
+    disk:
+      name: vong-data
+      mountPath: /var/vong-data
+      sizeGB: 1

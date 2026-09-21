@@ -6,7 +6,12 @@ import Database from 'better-sqlite3';
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const SERVER_ROOT = path.join(here, '..');
 export const DATA_DIR = path.join(SERVER_ROOT, 'data');
-export const UPLOADS_DIR = path.join(SERVER_ROOT, 'uploads');
+// Both of these can point at a mounted disk in production. On hosts with an
+// ephemeral filesystem (Vercel, Netlify Functions) uploads and the database are
+// wiped on every deploy -- see DEPLOY.md.
+export const UPLOADS_DIR = process.env.UPLOADS_DIR
+  ? path.resolve(SERVER_ROOT, process.env.UPLOADS_DIR)
+  : path.join(SERVER_ROOT, 'uploads');
 
 fs.mkdirSync(DATA_DIR, { recursive: true });
 fs.mkdirSync(UPLOADS_DIR, { recursive: true });
