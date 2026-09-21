@@ -39,6 +39,12 @@ export default {
   },
 
   home: {
+    heroWordTop: 'SECOND',
+    heroWordBottom: 'ROUND',
+    heroImageAlt: 'Pre-owned furniture, clothes and everyday objects in afternoon light',
+    heroLocation: 'Ho Chi Minh City',
+    heroEdition: 'Objects in circulation',
+    heroLeadShort: 'Good things do not need a first owner. Find them, pass them on, keep them moving.',
     heroEyebrow: 'Ho Chi Minh City',
     heroTitle: 'Give your things a second round.',
     heroLead:
@@ -64,7 +70,12 @@ export default {
     recentTitle: 'Recently listed',
     recentLead: 'Fresh from apartments around the city.',
     recentViewAll: 'See everything',
+    introKicker: 'A marketplace for what is already here',
+    introTitle: 'Less new stuff. More good stuff finding the right room.',
+    emptyInventory: 'The next good thing has not been listed yet.',
     promiseTitle: 'What Vòng does not do',
+    promiseStatement: 'You buy the object. Not a platform fee, not a story, not a middleman.',
+    promiseBodyShort: 'Vòng never holds the buyer’s money. Meet in person or agree on a bank transfer directly in chat.',
     promiseBody:
       'We do not take a cut of your sale, and we never hold the buyer’s money. Escrow requires a payment intermediary licence in Vietnam, which we do not have. You and your buyer agree on payment and pickup yourselves — exactly like meeting through a Facebook group, but with a listing that is easier to find.',
     ctaTitle: 'Something in your room you never use?',

@@ -39,6 +39,12 @@ export default {
   },
 
   home: {
+    heroWordTop: 'VÒNG',
+    heroWordBottom: 'NỮA',
+    heroImageAlt: 'Bàn ghế, quần áo và đồ dùng cũ trong nắng chiều',
+    heroLocation: 'Thành phố Hồ Chí Minh',
+    heroEdition: 'Đồ đạc đang lưu chuyển',
+    heroLeadShort: 'Đồ tốt không cần chủ đầu tiên. Tìm thấy, chuyền tay, tiếp tục sử dụng.',
     heroEyebrow: 'Thành phố Hồ Chí Minh',
     heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
     heroLead:
@@ -64,7 +70,12 @@ export default {
     recentTitle: 'Tin mới đăng',
     recentLead: 'Vừa được dọn ra từ các căn nhà quanh thành phố.',
     recentViewAll: 'Xem tất cả',
+    introKicker: 'Chợ cho những gì đã có sẵn',
+    introTitle: 'Bớt mua đồ mới. Để đồ tốt tìm đúng căn phòng.',
+    emptyInventory: 'Món hay tiếp theo vẫn chưa được đăng.',
     promiseTitle: 'Những gì Vòng không làm',
+    promiseStatement: 'Bạn mua món đồ. Không mua phí nền tảng, câu chuyện hay người trung gian.',
+    promiseBodyShort: 'Vòng không giữ tiền người mua. Gặp trực tiếp hoặc tự thống nhất chuyển khoản trong tin nhắn.',
     promiseBody:
       'Tụi mình không ăn phần trăm giao dịch và không bao giờ giữ tiền của người mua. Muốn giữ tiền trung gian ở Việt Nam thì phải có giấy phép trung gian thanh toán, tụi mình không có. Người mua và người bán tự thoả thuận chuyện thanh toán và nhận hàng — y như khi gặp nhau trong group Facebook, chỉ khác là tin đăng dễ tìm hơn.',
     ctaTitle: 'Có món nào trong phòng bạn cả năm không đụng tới?',
