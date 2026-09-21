@@ -72,6 +72,7 @@ export default {
     recentViewAll: 'See everything',
     introKicker: 'A marketplace for what is already here',
     introTitle: 'Less new stuff. More good stuff finding the right room.',
+    motionRail: 'Buy less · use longer · pass it on',
     emptyInventory: 'The next good thing has not been listed yet.',
     promiseTitle: 'What Vòng does not do',
     promiseStatement: 'You buy the object. Not a platform fee, not a story, not a middleman.',

@@ -1484,3 +1484,206 @@ h3 { letter-spacing: -0.025em; }
 @media (prefers-reduced-motion: reduce) {
   .manifesto__image img { transform: none !important; }
 }
+
+/* ------------------------------------------------------------------------
+   Landing-page motion system
+   Purpose: explain the page's spatial rhythm and add rare marketing delight.
+   ------------------------------------------------------------------------ */
+
+.home-landing {
+  --motion-ease-out: cubic-bezier(.23, 1, .32, 1);
+  --motion-ease-in-out: cubic-bezier(.77, 0, .175, 1);
+  overflow-x: hidden;
+  overflow-x: clip;
+}
+
+.scroll-progress {
+  position: fixed;
+  z-index: 80;
+  top: 65px;
+  right: 0;
+  left: 0;
+  height: 4px;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.scroll-progress__fill {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background: var(--home-signal);
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.manifesto__line--top {
+  animation: hero-type-in 1100ms var(--motion-ease-in-out) 80ms both;
+  will-change: transform;
+}
+
+.manifesto__line--bottom {
+  animation: hero-type-in 1100ms var(--motion-ease-in-out) 220ms both;
+  will-change: transform;
+}
+
+.manifesto__image {
+  animation: hero-image-in 1200ms var(--motion-ease-in-out) both;
+}
+
+.manifesto__side--left,
+.manifesto__side--right {
+  animation: hero-meta-in 700ms var(--motion-ease-out) 720ms both;
+}
+
+.manifesto__footer {
+  animation: hero-footer-in 700ms var(--motion-ease-out) 820ms both;
+}
+
+@keyframes hero-type-in {
+  from { opacity: 0; clip-path: inset(0 100% 0 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes hero-image-in {
+  from { opacity: 0; clip-path: inset(0 0 100% 0); }
+  to { opacity: 1; clip-path: inset(0 0 0 0); }
+}
+
+@keyframes hero-meta-in {
+  from { opacity: 0; transform: translateY(18px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes hero-footer-in {
+  from { opacity: 0; transform: translateY(100%); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.home-landing.motion-ready .motion-reveal,
+.home-landing.motion-ready .motion-row,
+.home-landing.motion-ready .motion-product {
+  opacity: 0;
+  will-change: transform, opacity, clip-path;
+}
+
+.home-landing.motion-ready .motion-reveal {
+  transform: translateY(9vh);
+  transition:
+    opacity 800ms var(--motion-ease-out),
+    transform 1000ms var(--motion-ease-out),
+    clip-path 1000ms var(--motion-ease-in-out);
+}
+
+.home-landing.motion-ready .motion-reveal--wipe { clip-path: inset(0 0 28% 0); }
+
+.home-landing.motion-ready .motion-reveal.is-visible {
+  opacity: 1;
+  clip-path: inset(0 0 0 0);
+  transform: translateY(0);
+}
+
+.motion-rail {
+  overflow: hidden;
+  border-block: 2px solid var(--home-ink);
+  background: var(--home-signal);
+  color: var(--home-ink);
+}
+
+.motion-rail__track {
+  display: flex;
+  width: max-content;
+  padding-block: 16px;
+  font-size: clamp(1.25rem, 2.8vw, 2.7rem);
+  font-weight: 820;
+  letter-spacing: -.045em;
+  line-height: 1;
+  text-transform: uppercase;
+  animation: motion-rail 22s linear infinite;
+  will-change: transform;
+}
+
+.motion-rail__track span { white-space: nowrap; }
+.motion-rail__track b { padding-inline: .45em; font-weight: inherit; }
+
+@keyframes motion-rail {
+  to { transform: translateX(-50%); }
+}
+
+.home-products .motion-product {
+  min-width: 0;
+  border-right: 1px solid var(--home-ink);
+  transform: translateY(70px);
+  transition:
+    opacity 800ms var(--motion-ease-out),
+    transform 900ms var(--motion-ease-out);
+}
+
+.home-products .motion-product:nth-child(2) { transition-delay: 70ms; }
+.home-products .motion-product:nth-child(3) { transition-delay: 140ms; }
+.home-products .motion-product:nth-child(4) { transition-delay: 210ms; }
+.home-products .motion-product:last-child { border-right: 0; }
+.home-products .motion-product.is-visible { opacity: 1; transform: translateY(0); }
+.home-products .listing-card { height: 100%; border-right: 0; }
+
+.home-landing.motion-ready .motion-row {
+  transform: translateX(-8vw);
+  transition:
+    opacity 750ms var(--motion-ease-out),
+    transform 900ms var(--motion-ease-out),
+    background 240ms ease,
+    color 240ms ease;
+}
+
+.home-landing.motion-ready .motion-row:nth-child(even) { transform: translateX(8vw); }
+.home-landing.motion-ready .motion-row:nth-child(2) { transition-delay: 70ms; }
+.home-landing.motion-ready .motion-row:nth-child(3) { transition-delay: 140ms; }
+.home-landing.motion-ready .motion-row.is-visible { opacity: 1; transform: translateX(0); }
+
+[data-parallax] {
+  will-change: transform;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .manifesto__primary:hover svg,
+  .home-close__link:hover svg { transform: translate(4px, -4px); }
+
+  .manifesto__primary svg,
+  .home-close__link svg { transition: transform 240ms ease; }
+}
+
+@media (max-width: 900px) {
+  .home-products .motion-product:nth-child(2) { border-right: 0; }
+  .home-products .motion-product:nth-child(-n + 2) { border-bottom: 1px solid var(--home-ink); }
+}
+
+@media (max-width: 680px) {
+  .scroll-progress { top: 59px; }
+  .motion-rail__track { padding-block: 13px; animation-duration: 17s; }
+  .home-products .motion-product { min-width: 84vw; border-bottom: 0 !important; scroll-snap-align: start; }
+  .home-products .motion-product .listing-card { min-width: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .scroll-progress { display: none; }
+  .manifesto__line--top,
+  .manifesto__line--bottom,
+  .manifesto__image,
+  .manifesto__side--left,
+  .manifesto__side--right,
+  .manifesto__footer,
+  .motion-rail__track {
+    animation: none;
+  }
+  .motion-rail__track { transform: translateX(-8%); }
+  .motion-reveal,
+  .motion-row,
+  .motion-product,
+  [data-parallax] {
+    opacity: 1 !important;
+    clip-path: none !important;
+    transform: none !important;
+    transition: opacity 200ms ease !important;
+  }
+}

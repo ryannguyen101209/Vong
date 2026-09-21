@@ -72,6 +72,7 @@ export default {
     recentViewAll: 'Xem tất cả',
     introKicker: 'Chợ cho những gì đã có sẵn',
     introTitle: 'Bớt mua đồ mới. Để đồ tốt tìm đúng căn phòng.',
+    motionRail: 'Mua ít hơn · dùng lâu hơn · chuyền tay',
     emptyInventory: 'Món hay tiếp theo vẫn chưa được đăng.',
     promiseTitle: 'Những gì Vòng không làm',
     promiseStatement: 'Bạn mua món đồ. Không mua phí nền tảng, câu chuyện hay người trung gian.',
