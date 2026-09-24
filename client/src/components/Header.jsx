@@ -9,10 +9,8 @@ import { MenuIcon, CloseIcon, SunIcon, MoonIcon, MessageIcon } from './Icons.jsx
 
 const LINKS = [
   { to: '/browse', key: 'nav.browse' },
-  { to: '/sell', key: 'nav.sell' },
   { to: '/saved', key: 'nav.saved', showCount: true },
   { to: '/messages', key: 'nav.messages' },
-  { to: '/about', key: 'nav.about' },
 ];
 
 export function Header() {
@@ -39,6 +37,7 @@ export function Header() {
 
   return (
     <header className="header">
+      <a href="#main-content" className="skip-link">{t('market.skip')}</a>
       <div className="shell header__inner">
         <Link to="/" className="brand" aria-label={t('common.appName')}>
           <Logo />
@@ -47,6 +46,7 @@ export function Header() {
         <nav className="nav header__nav" aria-label={t('nav.menu')}>{links}</nav>
 
         <div className="header__tools">
+          <Link className="btn btn--accent btn--small header__sell" to="/sell">{t('market.sell')}</Link>
           <button type="button" className="icon-btn" onClick={toggleLang} title={t('nav.switchLanguage')}>
             <span aria-hidden="true">{t('nav.languageShort')}</span>
             <span className="sr-only">{t('nav.switchLanguage')}</span>
@@ -63,7 +63,7 @@ export function Header() {
               <span>{profile.name?.split(' ')[0] || t('auth.account')}</span>
             </button>
           ) : (
-            <button type="button" className="btn btn--accent btn--small header__signin" onClick={openSignIn}>
+            <button type="button" className="btn btn--ghost btn--small header__signin" onClick={openSignIn}>
               {t('auth.signIn')}
             </button>
           )}
@@ -87,6 +87,7 @@ export function Header() {
         aria-label={t('nav.menu')}
       >
         {links}
+        {!profile && <button type="button" className="btn btn--ghost" onClick={() => { setMenuOpen(false); openSignIn(); }}>{t('auth.signIn')}</button>}
       </nav>
     </header>
   );
