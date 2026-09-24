@@ -49,13 +49,9 @@ This repo has a `render.yaml`, so most of it is filled in for you.
    `npm install && npm run build`, then `npm start`.
 5. Open the URL it gives you. The site is live, but **empty** — your database
    starts blank.
-6. To load the 10 sample listings, open the **Shell** tab on your service and run:
-
-   ```bash
-   npm run seed
-   ```
-
-   Do this once. Skip it entirely if you would rather start with real listings.
+6. Leave the marketplace empty. Do not run the seed command. Visitors see
+   “Sell the first item” until a real seller publishes a listing. Configure
+   Google sign-in and messaging using [ACCOUNTS.md](ACCOUNTS.md).
 
 7. Go to `/admin`, sign in with the password from step 3, and put your **real
    bank details** in Settings. Then scan a listing's QR with your own banking
@@ -84,7 +80,7 @@ cd Vong
 npm install
 npm run build
 cp .env.example .env     # set ADMIN_PASSWORD
-npm run seed             # optional sample data
+# Configure GOOGLE_CLIENT_ID and CORS_ORIGIN; start without sample listings.
 npm start
 ```
 

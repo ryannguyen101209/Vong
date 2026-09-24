@@ -10,10 +10,18 @@ services:
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
+      - key: NODE_ENV
+        value: production
+      - key: TRUST_PROXY_HOPS
+        value: "1"
       - key: NODE_VERSION
         value: "22"
       - key: ADMIN_PASSWORD
         sync: false        # set this yourself in the dashboard; never commit it
+      - key: GOOGLE_CLIENT_ID
+        sync: false
+      - key: CORS_ORIGIN
+        sync: false        # exact public HTTPS origin; comma-separated if needed
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE

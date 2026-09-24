@@ -7,6 +7,7 @@ import { formatPrice } from '../lib/format.js';
 import { ErrorState } from '../components/States.jsx';
 import { LogoMark } from '../components/Logo.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
+import { useAuth } from '../lib/auth.jsx';
 
 function CopyButton({ value }) {
   const { t } = useI18n();
@@ -44,12 +45,14 @@ function Row({ label, value, mono = false, copyable = false }) {
 export function Payment() {
   const { id } = useParams();
   const { t, lang, localized } = useI18n();
+  const { profile, loading: authLoading, openSignIn } = useAuth();
   const [data, setData] = useState(null);
   const [qrImage, setQrImage] = useState(null);
   const [status, setStatus] = useState('loading');
   const [marking, setMarking] = useState(false);
 
   const load = useCallback(() => {
+    if (!profile) return;
     setStatus('loading');
     api
       .payment(id)
@@ -61,7 +64,7 @@ export function Payment() {
         if (error.payload?.error === 'payment_not_configured') setStatus('unconfigured');
         else setStatus(error.status === 404 ? 'missing' : 'error');
       });
-  }, [id]);
+  }, [id, profile]);
 
   useEffect(load, [load]);
 
@@ -88,6 +91,8 @@ export function Payment() {
     }
   };
 
+  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.title')}</h1><p className="lead">{t('auth.lead')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
   if (status === 'loading') {
     return <div className="shell section editorial-page payment-page"><p className="muted">{t('common.loading')}</p></div>;
   }

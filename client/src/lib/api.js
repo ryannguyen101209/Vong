@@ -12,11 +12,12 @@ export class ApiError extends Error {
 }
 
 async function request(path, options = {}) {
-  const response = await fetch(path, options);
+  const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+  const response = await fetch(`${base}${path}`, { ...options, credentials: 'include', headers: { 'X-Vong-Request': '1', ...options.headers } });
   const isJson = (response.headers.get('content-type') || '').includes('application/json');
   const payload = isJson ? await response.json() : null;
 
-  if (!response.ok) throw new ApiError(response.status, payload);
+  if (!response.ok || !payload) throw new ApiError(response.status, payload);
   return payload;
 }
 

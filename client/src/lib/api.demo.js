@@ -2,7 +2,7 @@
  * DEMO BACKEND — used only by `npm run demo`, never in a real install.
  *
  * It implements exactly the same surface as lib/api.js, but entirely in the
- * browser: listings live in memory (seeded from the real sample data) and
+ * browser: listings start empty, live in memory, and
  * survive a refresh via localStorage. There is no server, no database, and no
  * money involved. The VietQR payload is built with the same module the real
  * server uses, so the QR code on the payment page is genuinely valid.
@@ -10,7 +10,6 @@
  * Everything resets when the visitor clears the page's storage.
  */
 import { buildVietQrPayload, findBank, BANKS } from '../../../server/src/vietqr.js';
-import SEED from './demo-listings.json';
 
 const STORAGE_KEY = 'vong.demo.state';
 const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'hobby'];
@@ -28,11 +27,11 @@ const DEFAULT_SETTINGS = {
 function load() {
   try {
     const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || 'null');
-    if (saved?.listings?.length) return saved;
+    if (Array.isArray(saved?.listings)) return { ...saved, listings: saved.listings.filter((listing) => !listing.id?.startsWith('seed-') && !listing.is_seed) };
   } catch {
     /* fall through to a fresh state */
   }
-  return { listings: [...SEED], settings: { ...DEFAULT_SETTINGS }, messages: [] };
+  return { listings: [], settings: { ...DEFAULT_SETTINGS }, messages: [] };
 }
 
 let state = load();

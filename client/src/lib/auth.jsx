@@ -1,55 +1,55 @@
-import { createContext, useContext, useEffect, useMemo, useState } from 'react';
-
-const STORAGE_KEY = 'vong.google.profile';
-const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID;
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { sessionApi } from './session-api.js';
 
 const AuthContext = createContext(null);
 
-function decodeCredential(credential) {
-  try {
-    const payload = credential.split('.')[1].replace(/-/g, '+').replace(/_/g, '/');
-    return JSON.parse(decodeURIComponent(escape(atob(payload))));
-  } catch {
-    return null;
-  }
-}
-
-function loadProfile() {
-  try {
-    return JSON.parse(sessionStorage.getItem(STORAGE_KEY) || 'null');
-  } catch {
-    return null;
-  }
-}
-
 export function AuthProvider({ children }) {
-  const [profile, setProfile] = useState(loadProfile);
+  const [profile, setProfile] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [googleClientId, setGoogleClientId] = useState(null);
   const [signInOpen, setSignInOpen] = useState(false);
+  const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
-    if (profile) sessionStorage.setItem(STORAGE_KEY, JSON.stringify(profile));
-    else sessionStorage.removeItem(STORAGE_KEY);
-  }, [profile]);
+    let active = true;
+    Promise.all([sessionApi.me(), sessionApi.config()])
+      .then(([session, config]) => {
+        if (!active) return;
+        setProfile(session.profile);
+        setGoogleClientId(config.googleClientId);
+      })
+      .catch(() => {})
+      .finally(() => active && setLoading(false));
+    return () => { active = false; };
+  }, []);
 
-  const value = useMemo(
-    () => ({
-      profile,
-      signInOpen,
-      googleConfigured: Boolean(GOOGLE_CLIENT_ID),
-      openSignIn: () => setSignInOpen(true),
-      closeSignIn: () => setSignInOpen(false),
-      completeGoogleSignIn: (credential) => {
-        const claims = decodeCredential(credential);
-        if (!claims?.sub) return false;
-        setProfile({ id: claims.sub, name: claims.name, email: claims.email, picture: claims.picture });
-        setSignInOpen(false);
-        return true;
-      },
-      signOut: () => setProfile(null),
-    }),
-    [profile, signInOpen]
-  );
-
+  const openSignIn = useCallback(() => { setAuthError(false); setSignInOpen(true); }, []);
+  const closeSignIn = useCallback(() => setSignInOpen(false), []);
+  const completeGoogleSignIn = useCallback(async (credential) => {
+    try {
+      const { profile: user } = await sessionApi.google(credential);
+      setProfile(user);
+      setAuthError(false);
+      setSignInOpen(false);
+      return true;
+    } catch {
+      setAuthError(true);
+      return false;
+    }
+  }, []);
+  const signOut = useCallback(async () => {
+    try {
+      await sessionApi.logout();
+      setProfile(null);
+      setAuthError(false);
+      window.google?.accounts?.id?.disableAutoSelect();
+    } catch { setAuthError(true); }
+  }, []);
+  const value = useMemo(() => ({
+    profile, loading, signInOpen, googleClientId, authError,
+    googleConfigured: Boolean(googleClientId),
+    openSignIn, closeSignIn, completeGoogleSignIn, signOut,
+  }), [profile, loading, signInOpen, googleClientId, authError, openSignIn, closeSignIn, completeGoogleSignIn, signOut]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 
@@ -58,5 +58,3 @@ export function useAuth() {
   if (!value) throw new Error('useAuth must be used inside AuthProvider');
   return value;
 }
-
-export { GOOGLE_CLIENT_ID };
