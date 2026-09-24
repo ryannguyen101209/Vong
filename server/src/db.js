@@ -2,9 +2,11 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import Database from 'better-sqlite3';
+import dotenv from 'dotenv';
 
 const here = path.dirname(fileURLToPath(import.meta.url));
 export const SERVER_ROOT = path.join(here, '..');
+dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 export const DATA_DIR = path.join(SERVER_ROOT, 'data');
 // Both of these can point at a mounted disk in production. On hosts with an
 // ephemeral filesystem (Vercel, Netlify Functions) uploads and the database are
@@ -154,6 +156,42 @@ if (buyRequestsDdl.includes('listings_old')) {
     PRAGMA foreign_keys = ON;
   `);
 }
+
+// Accounts are linked by verified Google subject, never by a browser-supplied
+// profile or a listing's email. Old listings are not silently claimed.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS users (
+    id TEXT PRIMARY KEY, google_sub TEXT NOT NULL UNIQUE, name TEXT NOT NULL,
+    email TEXT NOT NULL, picture TEXT, created_at TEXT NOT NULL
+  );
+  CREATE TABLE IF NOT EXISTS user_sessions (
+    token_hash TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id) ON DELETE CASCADE,
+    expires_at INTEGER NOT NULL
+  );
+  CREATE INDEX IF NOT EXISTS idx_session_expiry ON user_sessions(expires_at);
+`);
+if (!columns.includes('seller_id')) db.exec('ALTER TABLE listings ADD COLUMN seller_id TEXT REFERENCES users(id)');
+db.exec(`
+  CREATE TABLE IF NOT EXISTS conversations (
+    id TEXT PRIMARY KEY,
+    listing_id TEXT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    buyer_id TEXT NOT NULL REFERENCES users(id),
+    seller_id TEXT NOT NULL REFERENCES users(id),
+    created_at TEXT NOT NULL, updated_at TEXT NOT NULL,
+    UNIQUE(listing_id, buyer_id), CHECK(buyer_id <> seller_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_conversation_buyer ON conversations(buyer_id, updated_at);
+  CREATE INDEX IF NOT EXISTS idx_conversation_seller ON conversations(seller_id, updated_at);
+  CREATE TABLE IF NOT EXISTS chat_messages (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    sender_id TEXT NOT NULL REFERENCES users(id),
+    body TEXT NOT NULL CHECK(length(body) BETWEEN 1 AND 2000),
+    client_id TEXT NOT NULL, created_at TEXT NOT NULL,
+    UNIQUE(conversation_id, sender_id, client_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_chat_conversation ON chat_messages(conversation_id, id);
+`);
 
 export const DEFAULT_SETTINGS = {
   bank_bin: '970436',

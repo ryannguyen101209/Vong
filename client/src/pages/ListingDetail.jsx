@@ -7,10 +7,12 @@ import { ListingImage } from '../components/ListingCard.jsx';
 import { SaveButton } from '../components/SaveButton.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
+import { useAuth } from '../lib/auth.jsx';
 
 export function ListingDetail() {
   const { id } = useParams();
   const { t, lang, localized } = useI18n();
+  const { profile, openSignIn } = useAuth();
   const [listing, setListing] = useState(null);
   const [status, setStatus] = useState('loading');
   const [contact, setContact] = useState(null);
@@ -49,6 +51,7 @@ export function ListingDetail() {
   const paragraphs = description.split(/\n\s*\n/).filter(Boolean);
 
   const requestToBuy = () => {
+    if (!profile) { openSignIn(); return; }
     setRequesting(true);
     api
       .buyRequest(listing.id)

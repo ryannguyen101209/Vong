@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { ListingCard } from '../components/ListingCard.jsx';
@@ -147,7 +148,8 @@ export function Browse() {
       {status === 'error' && <ErrorState onRetry={load} />}
       {status === 'ready' &&
         (listings.length === 0 ? (
-          <EmptyState title={t('browse.emptyTitle')} body={t('browse.emptyBody')}>
+          <EmptyState title={t(hasFilters ? 'browse.emptyTitle' : 'market.firstTitle')} body={t(hasFilters ? 'browse.emptyBody' : 'market.firstBody')}>
+            {!hasFilters && <Link to="/sell" className="btn btn--accent">{t('market.firstCta')}</Link>}
             {hasFilters && (
               <button type="button" className="btn btn--ghost" onClick={() => setParams({})}>
                 {t('browse.clearFilters')}

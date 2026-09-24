@@ -48,10 +48,6 @@ export function Home() {
             <Link to="/sell" className="btn btn--ghost">{t('market.sell')}</Link>
           </div>
         </div>
-        <div className="market-hero__image">
-          <img src="/vong-higgsfield-chair.webp" alt={t('market.imageAlt')} fetchPriority="high" />
-          <span>{t('market.imageCaption')}</span>
-        </div>
       </section>
 
       <section className="market-discover" aria-label={t('browse.searchLabel')}>
@@ -67,14 +63,14 @@ export function Home() {
         </nav>
       </section>
 
-      <section aria-labelledby="recent-title" className="market-listings">
-        <div className="market-section-head">
+      <section aria-label={t('home.recentTitle')} className="market-listings">
+        {(status !== 'ready' || listings.length > 0) && <div className="market-section-head">
           <div><h2 id="recent-title">{t('home.recentTitle')}</h2><p className="muted">{t('home.recentLead')}</p></div>
           <Link to="/browse" className="market-text-link">{t('home.recentViewAll')} <ArrowUpRightIcon size={18} /></Link>
-        </div>
+        </div>}
         {status === 'loading' && <LoadingGrid count={8} />}
         {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
-        {status === 'ready' && (listings.length ? <div className="grid-listings">{listings.map((listing) => <ListingCard listing={listing} key={listing.id} />)}</div> : <EmptyState title={t('home.emptyInventory')}><Link className="btn" to="/sell">{t('market.sell')}</Link></EmptyState>)}
+        {status === 'ready' && (listings.length ? <div className="grid-listings">{listings.map((listing) => <ListingCard listing={listing} key={listing.id} />)}</div> : <EmptyState title={t('market.firstTitle')} body={t('market.firstBody')}><Link className="btn btn--accent" to="/sell">{t('market.firstCta')}</Link></EmptyState>)}
       </section>
 
       <section className="market-sell" aria-labelledby="sell-title">

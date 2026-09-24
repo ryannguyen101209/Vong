@@ -8,16 +8,33 @@ import { db, getSettings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
 import { router as listingsRouter } from './routes/listings.js';
 import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
+import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
+import { router as conversationsRouter } from './routes/conversations.js';
+import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 dotenv.config({ path: path.join(SERVER_ROOT, '.env') });
 
 const app = express();
+// Set only to the known number of trusted reverse-proxy hops on the host.
+app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS) || false);
 const PORT = Number(process.env.PORT) || 4000;
 
-app.use(cors({ origin: process.env.CORS_ORIGIN || true }));
+const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174').split(',').map((origin) => origin.trim());
+app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
+app.use('/api', rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_requests' } }));
+app.use('/api', protectWrites, sessionUser);
+app.use('/api/auth', createAuthRouter());
+app.use('/api/conversations', conversationsRouter);
+app.use((req, res, next) => {
+  res.set('X-Content-Type-Options', 'nosniff');
+  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
+  res.set('X-Frame-Options', 'DENY');
+  res.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+  next();
+});
 
 // Uploaded and seed images. In production put these behind a CDN or object
 // store -- local disk does not survive a redeploy on most hosts.
@@ -35,7 +52,7 @@ app.get('/api/meta', (req, res) => {
 });
 
 app.get('/api/health', (req, res) => {
-  const { n } = db.prepare("SELECT COUNT(*) AS n FROM listings WHERE status = 'published'").get();
+  const { n } = db.prepare("SELECT COUNT(*) AS n FROM listings WHERE status = 'published' AND is_seed = 0").get();
   res.json({ ok: true, published_listings: n, admin_password_is_default: usingDefaultPassword() });
 });
 

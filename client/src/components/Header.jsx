@@ -58,7 +58,7 @@ export function Header() {
           </button>
 
           {profile ? (
-            <button type="button" className="account-chip" onClick={signOut} title={t('auth.signOut')}>
+            <button type="button" className="account-chip" onClick={signOut} title={t('auth.signOut')} aria-label={t('auth.signOut')}>
               {profile.picture ? <img src={profile.picture} alt="" referrerPolicy="no-referrer" /> : <MessageIcon size={16} />}
               <span>{profile.name?.split(' ')[0] || t('auth.account')}</span>
             </button>

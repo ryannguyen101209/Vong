@@ -6,6 +6,7 @@ import { formatPrice, digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { UploadIcon } from '../components/Icons.jsx';
 import { ErrorState } from '../components/States.jsx';
+import { useAuth } from '../lib/auth.jsx';
 
 const EMPTY = {
   title: '',
@@ -21,6 +22,7 @@ const EMPTY = {
 
 export function Sell() {
   const { t, lang } = useI18n();
+  const { profile, loading: authLoading, openSignIn } = useAuth();
   const navigate = useNavigate();
   const fileInput = useRef(null);
 
@@ -33,6 +35,10 @@ export function Sell() {
   const [dragging, setDragging] = useState(false);
   const [metaStatus, setMetaStatus] = useState('loading');
   const [metaAttempt, setMetaAttempt] = useState(0);
+
+  useEffect(() => {
+    if (profile) setValues((current) => ({ ...current, seller_name: current.seller_name || profile.name, seller_email: profile.email }));
+  }, [profile]);
 
   useEffect(() => {
     let active = true;
@@ -121,6 +127,9 @@ export function Sell() {
 
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
+
+  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.sellTitle')}</h1><p className="lead">{t('auth.sellBody')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
 
   if (metaStatus !== 'ready') {
     return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <p role="status">{t('common.loading')}</p>}</div>;
@@ -326,7 +335,7 @@ export function Sell() {
               type="email"
               autoComplete="email"
               value={values.seller_email}
-              onChange={set('seller_email')}
+              readOnly
               placeholder={t('sell.sellerEmailPlaceholder')}
               maxLength={120}
             />

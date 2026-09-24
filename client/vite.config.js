@@ -1,4 +1,3 @@
-import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { defineConfig } from 'vite';
@@ -8,7 +7,7 @@ const here = path.dirname(fileURLToPath(import.meta.url));
 
 // `npm run demo` builds a self-contained static copy with no backend: the API
 // module is replaced by an in-browser stand-in. Normal builds are untouched.
-const DEMO = process.env.VONG_DEMO === '1';
+const DEMO = process.env.VONG_DEMO === '1' && !process.env.VITE_API_BASE_URL;
 
 // The API runs separately on :4000 in dev; these proxies mean the client code
 // can just fetch('/api/...') and work the same in dev and in production.
@@ -27,19 +26,8 @@ const demoApiPlugin = {
   },
 };
 
-const demoAssetsPlugin = {
-  name: 'vong-demo-assets',
-  closeBundle() {
-    fs.cpSync(
-      path.resolve(here, '../server/uploads/seed'),
-      path.resolve(here, 'dist-demo/uploads/seed'),
-      { recursive: true },
-    );
-  },
-};
-
 export default defineConfig({
-  plugins: DEMO ? [demoApiPlugin, demoAssetsPlugin, react()] : [react()],
+  plugins: DEMO ? [demoApiPlugin, react()] : [react()],
   base: '/',
   define: {
     __VONG_DEMO__: JSON.stringify(DEMO),

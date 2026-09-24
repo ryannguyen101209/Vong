@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
-import { GOOGLE_CLIENT_ID, useAuth } from '../lib/auth.jsx';
+import { useAuth } from '../lib/auth.jsx';
 import { CloseIcon } from './Icons.jsx';
 
 const GOOGLE_SCRIPT = 'https://accounts.google.com/gsi/client';
@@ -19,15 +19,16 @@ function loadGoogleIdentity() {
     script.async = true;
     script.defer = true;
     script.onload = () => resolve(window.google);
-    script.onerror = reject;
+    script.onerror = (error) => { script.remove(); reject(error); };
     document.head.appendChild(script);
   });
 }
 
 export function SignInDialog() {
   const { t } = useI18n();
-  const { signInOpen, closeSignIn, completeGoogleSignIn, googleConfigured } = useAuth();
+  const { signInOpen, closeSignIn, completeGoogleSignIn, googleConfigured, googleClientId, authError } = useAuth();
   const buttonRef = useRef(null);
+  const dialogRef = useRef(null);
   const [status, setStatus] = useState('idle');
 
   useEffect(() => {
@@ -38,8 +39,13 @@ export function SignInDialog() {
       .then((google) => {
         if (!active) return;
         google.accounts.id.initialize({
-          client_id: GOOGLE_CLIENT_ID,
-          callback: ({ credential }) => completeGoogleSignIn(credential),
+          client_id: googleClientId,
+          callback: async ({ credential }) => {
+            if (!active) return;
+            setStatus('loading');
+            await completeGoogleSignIn(credential);
+            if (active) setStatus('ready');
+          },
           auto_select: false,
           cancel_on_tap_outside: true,
         });
@@ -58,13 +64,29 @@ export function SignInDialog() {
     return () => {
       active = false;
     };
-  }, [signInOpen, googleConfigured, completeGoogleSignIn]);
+  }, [signInOpen, googleConfigured, googleClientId, completeGoogleSignIn]);
+
+  useEffect(() => {
+    if (!signInOpen) return;
+    const previous = document.activeElement;
+    dialogRef.current?.querySelector('button')?.focus();
+    const keyboard = (event) => {
+      if (event.key === 'Escape') closeSignIn();
+      if (event.key !== 'Tab') return;
+      const items = [...dialogRef.current.querySelectorAll('button, iframe, [tabindex="0"]')];
+      const first = items[0], last = items[items.length - 1];
+      if (event.shiftKey && document.activeElement === first) { event.preventDefault(); last?.focus(); }
+      else if (!event.shiftKey && document.activeElement === last) { event.preventDefault(); first?.focus(); }
+    };
+    document.addEventListener('keydown', keyboard);
+    return () => { document.removeEventListener('keydown', keyboard); previous?.focus(); };
+  }, [signInOpen, closeSignIn]);
 
   if (!signInOpen) return null;
 
   return (
     <div className="dialog-backdrop auth-backdrop" role="presentation" onMouseDown={closeSignIn}>
-      <section className="dialog auth-dialog" role="dialog" aria-modal="true" aria-labelledby="signin-title" onMouseDown={(event) => event.stopPropagation()}>
+      <section ref={dialogRef} className="dialog auth-dialog" role="dialog" aria-modal="true" aria-labelledby="signin-title" onMouseDown={(event) => event.stopPropagation()}>
         <button type="button" className="dialog-close" onClick={closeSignIn} aria-label={t('common.close')}>
           <CloseIcon />
         </button>
@@ -82,9 +104,9 @@ export function SignInDialog() {
           <div className="auth-config-note">
             <strong>{t('auth.previewTitle')}</strong>
             <p>{t('auth.previewBody')}</p>
-            <code>VITE_GOOGLE_CLIENT_ID</code>
           </div>
         )}
+        {authError && <p role="alert" className="field__error">{t('auth.loadError')}</p>}
         <p className="auth-terms">{t('auth.terms')}</p>
       </section>
     </div>

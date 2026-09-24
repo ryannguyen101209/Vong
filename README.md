@@ -7,11 +7,11 @@ buyer's money.
 
 Fully bilingual (English / Tiếng Việt), light and dark themes, mobile first.
 
-The frontend now includes a Google Identity Services entry point and a
-conversation prototype. Add `VITE_GOOGLE_CLIENT_ID` in `client/.env` to render
-the official Google sign-in button. Credentials are not yet verified by the
-server, and messages remain on the current device until the account and
-messaging backend is added.
+Google sign-in is verified by the server, and buyer–seller conversations are
+stored in the database with participant-only access. New listings require a
+signed-in seller. See [ACCOUNTS.md](ACCOUNTS.md) for activation and verification.
+The public static demo starts empty; it does not enable accounts or messaging
+until a real backend and Google OAuth web client are configured.
 
 ---
 
@@ -28,8 +28,8 @@ npm install
 cp .env.example .env
 #    open .env and change ADMIN_PASSWORD to something only you know
 
-# 3. Load the 10 sample listings
-npm run seed
+# 3. Configure GOOGLE_CLIENT_ID in .env for sign-in.
+#    Start with an empty marketplace; do not seed example products.
 
 # 4. Start both the API and the website
 npm run dev
@@ -91,7 +91,7 @@ a home network or your phone's hotspot instead.
 
 Worth doing once so you know what your sellers will see:
 
-1. Go to **Sell**, fill in the form, submit.
+1. Sign in with Google, go to **Sell**, fill in the form, submit.
 2. You land on the **payment page** with a real VietQR code. Scan it with your
    banking app to check the amount and the transfer note appear correctly.
    **Don't actually pay yourself** — just look at the confirmation screen.
@@ -139,8 +139,8 @@ Postgres without touching the frontend.
 - **Uploaded photos** — `server/uploads/listings/`. Sample illustrations are in
   `server/uploads/seed/`.
 - **Saved items** — your visitor's browser (`localStorage`), not the server.
-  There are no user accounts yet, so there is nobody to attach them to. This
-  means saved items don't follow someone to another phone.
+  Saved items are not yet synced to accounts, so they do not follow someone
+  to another phone.
 - **Language and theme choice** — also `localStorage`.
 
 ---
@@ -208,19 +208,19 @@ address on a public listing page is a spam magnet. Only the admin views see them
 **Contact form messages are not emailed either.** They save to the database and
 print to the server log; you read them in the admin Settings tab.
 
-**No user accounts.** Sellers cannot edit or delete their own listings, and
-saved items live in one browser. This is why the FAQ tells people to contact you
-with their reference code. Adding accounts means a users table, password hashing,
-and sessions — a real chunk of work, worth doing only once you have sellers
-asking for it.
+**Google accounts and private messaging are implemented.** Deploy the full Node
+backend and configure `GOOGLE_CLIENT_ID` to activate them. Saved items still live
+in one browser, and sellers cannot edit/delete their listings yet. New listings
+are owned by the signed-in account; old listings are not automatically claimed.
 
 **Admin auth is one shared password** held in memory, so everyone signs out when
 the server restarts. Fine for one person. If a second person starts approving
 listings, give them real accounts.
 
-**Buyer and seller have no messaging.** "Request to buy" reveals the seller's
-phone number and logs that it happened. Everything after that is Zalo. This is
-deliberate — a messaging system is a large feature and people already use Zalo.
+**Buyer–seller messaging is stored on the server.** An inbox lists the account's
+conversations; messages refresh every three seconds while open. Only the buyer
+and seller can access each conversation. Email notifications, read receipts and
+blocking/reporting tools are not implemented.
 
 **Photos are stored on local disk.** This works in development and on a normal
 VPS, but most modern hosts (Vercel, Netlify Functions, Heroku) wipe the

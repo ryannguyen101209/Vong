@@ -6,6 +6,7 @@ import { db, getSettings, UPLOADS_DIR } from '../db.js';
 import { newId, newRef } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
+import { requireUser } from '../accounts.js';
 
 export const router = express.Router();
 
@@ -20,7 +21,7 @@ const upload = multer({
       cb(null, dir);
     },
     filename(req, file, cb) {
-      const ext = path.extname(file.originalname).toLowerCase().slice(0, 8) || '.jpg';
+      const ext = { 'image/jpeg': '.jpg', 'image/png': '.png', 'image/webp': '.webp', 'image/gif': '.gif' }[file.mimetype];
       cb(null, `${newId()}${ext}`);
     },
   }),
@@ -34,7 +35,7 @@ const upload = multer({
 const PUBLIC_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category,
   price_vnd, district, condition, seller_name, image_path, status,
-  reject_reason, fee_vnd, views, created_at, published_at
+  reject_reason, fee_vnd, views, created_at, published_at, seller_id
 `;
 
 const SORTS = {
@@ -59,6 +60,7 @@ router.get('/', (req, res) => {
   }
 
   where.push("status = 'published'");
+  where.push('is_seed = 0');
 
   if (category && CATEGORIES.includes(String(category))) {
     where.push('category = @category');
@@ -85,8 +87,9 @@ router.get('/', (req, res) => {
 
 /** GET /api/listings/:id — one listing. Views only count published views. */
 router.get('/:id', (req, res) => {
-  const row = db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE id = ?`).get(req.params.id);
+  const row = db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE id = ? AND is_seed = 0`).get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
+  if (row.status !== 'published' && row.seller_id !== req.user?.id) return res.status(404).json({ error: 'not_found' });
 
   if (row.status === 'published' && req.query.count !== '0') {
     db.prepare('UPDATE listings SET views = views + 1 WHERE id = ?').run(row.id);
@@ -120,8 +123,8 @@ function validateListing(body) {
 }
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
-router.post('/', upload.single('image'), (req, res) => {
-  const { errors, values } = validateListing(req.body);
+router.post('/', requireUser, upload.single('image'), (req, res) => {
+  const { errors, values } = validateListing({ ...req.body, seller_email: req.user.email });
   if (Object.keys(errors).length > 0) {
     if (req.file) fs.unlink(req.file.path, () => {});
     return res.status(400).json({ error: 'validation_failed', fields: errors });
@@ -139,11 +142,11 @@ router.post('/', upload.single('image'), (req, res) => {
     INSERT INTO listings (
       id, ref, title_en, title_vi, description_en, description_vi, category,
       price_vnd, district, condition, seller_name, seller_phone, seller_email,
-      image_path, status, fee_vnd, created_at
+      image_path, status, fee_vnd, created_at, seller_id
     ) VALUES (
       @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
       @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email,
-      @image_path, 'pending_payment', @fee_vnd, @created_at
+      @image_path, 'pending_payment', @fee_vnd, @created_at, @seller_id
     )
   `).run({
     id,
@@ -162,16 +165,17 @@ router.post('/', upload.single('image'), (req, res) => {
     image_path: imagePath,
     fee_vnd: fee,
     created_at: new Date().toISOString(),
+    seller_id: req.user.id,
   });
 
   res.status(201).json({ id, ref, status: 'pending_payment', fee_vnd: fee });
 });
 
 /** GET /api/listings/:id/payment — the VietQR payload for this listing's fee. */
-router.get('/:id/payment', (req, res) => {
+router.get('/:id/payment', requireUser, (req, res) => {
   const row = db
-    .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason FROM listings WHERE id = ?')
-    .get(req.params.id);
+    .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0')
+    .get(req.params.id, req.user.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
 
   const settings = getSettings();
@@ -215,8 +219,8 @@ router.get('/:id/payment', (req, res) => {
  * POST /api/listings/:id/mark-paid — the seller says they sent the transfer.
  * This claim is not verified anywhere: a human checks the bank app and approves.
  */
-router.post('/:id/mark-paid', (req, res) => {
-  const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);
+router.post('/:id/mark-paid', requireUser, (req, res) => {
+  const row = db.prepare('SELECT id, status FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0').get(req.params.id, req.user.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
   if (row.status !== 'pending_payment' && row.status !== 'rejected') {
     return res.status(409).json({ error: 'wrong_status', status: row.status });
@@ -233,9 +237,9 @@ router.post('/:id/mark-paid', (req, res) => {
  * POST /api/listings/:id/buy-request — reveals the seller's phone/Zalo and logs
  * the interest. Vong does not carry messages or money between the two people.
  */
-router.post('/:id/buy-request', (req, res) => {
+router.post('/:id/buy-request', requireUser, (req, res) => {
   const row = db
-    .prepare("SELECT id, seller_name, seller_phone FROM listings WHERE id = ? AND status = 'published'")
+    .prepare("SELECT id, seller_name, seller_phone FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0")
     .get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
 
