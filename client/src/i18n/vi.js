@@ -38,6 +38,21 @@ export default {
     themeDark: 'Tối',
   },
 
+  market: {
+    eyebrow: 'Chợ đồ cũ quanh bạn',
+    title: 'Đồ hay. Khởi đầu mới.',
+    lead: 'Mua món đồ bạn thích. Bán món đồ không còn dùng. Ngay tại Sài Gòn.',
+    sell: 'Đăng bán',
+    search: 'Tìm kiếm',
+    categories: 'Mua theo danh mục',
+    imageAlt: 'Chiếc ghế đã qua sử dụng trong căn phòng đầy nắng',
+    imageCaption: 'Nhà mới. Câu chuyện mới.',
+    sellEyebrow: 'Dọn chỗ cho điều mới',
+    sellTitle: 'Có người sẽ thích món đồ của bạn.',
+    sellBody: 'Thêm ảnh, đặt giá và kết nối với người mua gần bạn. Phí đăng tin nhỏ. Không thu hoa hồng.',
+    skip: 'Đến nội dung chính',
+  },
+
   home: {
     heroWordTop: 'VÒNG',
     heroWordBottom: 'NỮA',

@@ -31,7 +31,7 @@ export function App() {
     <>
       <ScrollToTop />
       <Header />
-      <main>
+      <main id="main-content" tabIndex={-1}>
         <Routes>
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />

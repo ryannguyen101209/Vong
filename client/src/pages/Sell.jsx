@@ -5,6 +5,7 @@ import { api } from '../lib/api.js';
 import { formatPrice, digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { UploadIcon } from '../components/Icons.jsx';
+import { ErrorState } from '../components/States.jsx';
 
 const EMPTY = {
   title: '',
@@ -30,10 +31,19 @@ export function Sell() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [dragging, setDragging] = useState(false);
+  const [metaStatus, setMetaStatus] = useState('loading');
+  const [metaAttempt, setMetaAttempt] = useState(0);
 
   useEffect(() => {
-    api.meta().then(setMeta).catch(() => {});
-  }, []);
+    let active = true;
+    setMetaStatus('loading');
+    api.meta().then((data) => {
+      if (!active) return;
+      setMeta(data);
+      setMetaStatus('ready');
+    }).catch(() => active && setMetaStatus('error'));
+    return () => { active = false; };
+  }, [metaAttempt]);
 
   // Object URLs have to be released or the tab leaks memory on every re-pick.
   useEffect(() => {
@@ -111,6 +121,10 @@ export function Sell() {
 
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
+
+  if (metaStatus !== 'ready') {
+    return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <p role="status">{t('common.loading')}</p>}</div>;
+  }
 
   return (
     <div className="shell section sell-page editorial-page">

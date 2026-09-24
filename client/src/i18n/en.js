@@ -38,6 +38,21 @@ export default {
     themeDark: 'Dark',
   },
 
+  market: {
+    eyebrow: 'Your local secondhand market',
+    title: 'Good finds. A fresh start.',
+    lead: 'Buy pre-loved pieces. Sell what you no longer need. Right here in Saigon.',
+    sell: 'Sell an item',
+    search: 'Search',
+    categories: 'Shop by category',
+    imageAlt: 'A pre-loved chair in a sunlit room',
+    imageCaption: 'Another home. Another chapter.',
+    sellEyebrow: 'Make a little room',
+    sellTitle: 'Someone else will love it.',
+    sellBody: 'Add a photo, set your price, and connect with local buyers. A small publishing fee. No sales commission.',
+    skip: 'Skip to content',
+  },
+
   home: {
     heroWordTop: 'SECOND',
     heroWordBottom: 'ROUND',

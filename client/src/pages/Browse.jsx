@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useState } from 'react';
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
@@ -24,6 +24,7 @@ export function Browse() {
   const [categories, setCategories] = useState([]);
   const [listings, setListings] = useState([]);
   const [status, setStatus] = useState('loading');
+  const requestId = useRef(0);
 
   useEffect(() => {
     api.meta().then((meta) => setCategories(meta.categories)).catch(() => setCategories([]));
@@ -45,17 +46,24 @@ export function Browse() {
   }, [searchInput]);
 
   const load = useCallback(() => {
+    const currentRequest = ++requestId.current;
     setStatus('loading');
     api
       .listings({ search, category, sort })
       .then((data) => {
+        if (currentRequest !== requestId.current) return;
         setListings(data.listings);
         setStatus('ready');
       })
-      .catch(() => setStatus('error'));
+      .catch(() => {
+        if (currentRequest === requestId.current) setStatus('error');
+      });
   }, [search, category, sort]);
 
-  useEffect(load, [load]);
+  useEffect(() => {
+    load();
+    return () => { requestId.current += 1; };
+  }, [load]);
 
   const update = (key, value) => {
     const next = new URLSearchParams(params);
