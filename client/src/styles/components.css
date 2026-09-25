@@ -71,7 +71,7 @@
 
 .input, .textarea, .select, .field select {
   width: 100%; min-height: 48px; padding: 11px 14px;
-  border: 1px solid var(--line-strong); border-radius: var(--r-md);
+  border: 1px solid var(--line-field); border-radius: var(--r-md);
   background: var(--page); color: var(--ink);
   transition: border-color 0.15s var(--ease), box-shadow 0.15s var(--ease);
 }
@@ -361,7 +361,7 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
 .key-area__form { display: flex; flex-wrap: wrap; gap: var(--s-2); }
 .key-input {
   flex: 1 1 220px; min-width: 0; height: 52px; padding: 0 var(--s-4);
-  border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--page);
+  border: 1px solid var(--line-field); border-radius: var(--r-md); background: var(--page);
   font-size: 1.375rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.2em; text-align: center; text-transform: uppercase;
 }
 .key-input::placeholder { color: var(--ink-faint); }

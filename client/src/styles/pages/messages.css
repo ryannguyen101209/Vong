@@ -55,7 +55,7 @@
 }
 .msg--mine { align-self: flex-end; border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble); background: var(--blue); color: #fff; }
 .msg time { display: block; margin-top: 2px; color: var(--ink-faint); font-size: 0.75rem; text-align: right; }
-.msg--mine time { color: rgb(255 255 255 / 82%); }
+.msg--mine time { color: #fff; }
 .msg--new { animation: msg-in 0.18s var(--ease); }
 @keyframes msg-in { from { opacity: 0.5; transform: translateY(8px); } }
 

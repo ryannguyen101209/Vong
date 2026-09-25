@@ -13,6 +13,7 @@
   --bubble: #f1f3f6;          /* a received bubble, a quiet field */
   --line: #e3e7ed;
   --line-strong: #cdd4de;
+  --line-field: #838e9d; /* a field's only edge, so it keeps 3:1 */
 
   /* Ink */
   --ink: #15202b;
