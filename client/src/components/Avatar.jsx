@@ -7,7 +7,7 @@ function tintFor(name = '') {
   return (hash % 6) + 1;
 }
 
-/** First and last initials, which reads right for "Linh Trần" and "Trần Thị Linh" alike. */
+/** First and last initials, which works for Vietnamese and Western name order alike. */
 function initialFor(name = '') {
   const parts = name.trim().split(/\s+/).filter(Boolean);
   if (parts.length === 0) return '?';
