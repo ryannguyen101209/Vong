@@ -16,12 +16,14 @@
 }
 .btn:hover { background: var(--bubble); color: var(--ink); }
 .btn:active:not(:disabled) { background: var(--line); }
-.btn:disabled, .btn.is-disabled { opacity: 0.5; cursor: not-allowed; }
+/* Disabled stays readable: grey fill and grey text instead of a faded colour. */
+.btn:disabled, .btn.is-disabled { border-color: var(--line); background: var(--bubble); color: var(--ink-faint); cursor: not-allowed; }
 .btn svg { flex: none; }
 
 .btn--primary { border-color: var(--blue); background: var(--blue); color: #fff; }
 .btn--primary:hover { border-color: var(--blue-press); background: var(--blue-press); color: #fff; }
 .btn--primary:active:not(:disabled) { background: var(--blue-press); }
+.btn--primary:disabled, .btn--primary.is-disabled { border-color: var(--line); background: var(--bubble); color: var(--ink-faint); }
 
 .btn--danger { border-color: #efc2bd; color: var(--bad); }
 .btn--danger:hover { background: var(--bad-soft); color: var(--bad); }
@@ -293,6 +295,13 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
   .account-menu { position: fixed; top: calc(var(--header-h) + 6px); right: var(--gutter); left: var(--gutter); min-width: 0; }
   .header__sell { padding: 0 var(--s-3); }
 }
+@media (max-width: 400px) {
+  .header__inner { gap: var(--s-1); }
+  .header__tools { gap: 2px; }
+  .brand__word { font-size: 1.25rem; }
+  .lang-btn { min-width: 36px; }
+  .icon-btn { width: 38px; }
+}
 
 /* -------------------------------------------------------------- footer --- */
 
@@ -304,6 +313,7 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
 .footer__links a { color: var(--ink-soft); font-size: var(--text-sm); text-decoration: none; }
 .footer__links a:hover { color: var(--ink); text-decoration: underline; }
 .footer__legal { padding-block: var(--s-4); border-top: 1px solid var(--line); color: var(--ink-faint); font-size: var(--text-xs); }
+.footer__legal p { max-width: 80ch; }
 
 /* -------------------------------------------------------------- dialog --- */
 
@@ -361,6 +371,7 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
 .key-area__form .btn { height: 52px; }
 .key-area__help { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 6px; color: var(--ink-faint); font-size: var(--text-sm); }
 .key-area__status { flex-basis: 100%; color: var(--ink-soft); }
+.key-area__help a, .key-area__help .link-btn { display: inline-flex; align-items: center; min-height: 44px; }
 @media (max-width: 560px) {
   .key-input { font-size: 1.125rem; letter-spacing: 0.14em; }
   .key-area__form .btn { width: 100%; }

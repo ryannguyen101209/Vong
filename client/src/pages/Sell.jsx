@@ -4,6 +4,7 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
+import { Avatar } from '../components/Avatar.jsx';
 import { UploadIcon } from '../components/Icons.jsx';
 import { ErrorState } from '../components/States.jsx';
 import { useAuth } from '../lib/auth.jsx';
@@ -128,230 +129,276 @@ export function Sell() {
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
 
-  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
-  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.sellTitle')}</h1><p className="lead">{t('auth.sellBody')}</p><button className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
-
-  if (metaStatus !== 'ready') {
-    return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <p role="status">{t('common.loading')}</p>}</div>;
+  if (authLoading) return <div className="shell page"><p className="system-msg" role="status">{t('common.loading')}</p></div>;
+  if (!profile) {
+    return (
+      <div className="shell gate">
+        <h1>{t('auth.sellTitle')}</h1>
+        <p>{t('auth.sellBody')}</p>
+        <button type="button" className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button>
+      </div>
+    );
   }
 
-  return (
-    <div className="shell section sell-page editorial-page">
-      <header className="sell-intro reveal-on-scroll">
-        <div>
-          <p className="eyebrow">{t('sell.eyebrow')}</p>
-          <h1>{t('sell.title')}</h1>
-          <p className="lead">{t('sell.lead')}</p>
-        </div>
-        <div className="sell-fee-lockup">
-          <span>{feeLabel}</span>
-          <small>{t('common.perListing')}</small>
-        </div>
-      </header>
-
-      <div className="notice notice--info fee-notice">
-        <p className="notice__title">{t('sell.feeNoticeTitle', { fee: feeLabel })}</p>
-        <p style={{ margin: 0 }}>{t('sell.feeNoticeBody')}</p>
+  const head = (
+    <div className="sell__top">
+      <div className="shell sell__col">
+        <h1>{t('sell.title')}</h1>
+        <p>{t('sell.intro')}</p>
       </div>
+    </div>
+  );
 
-      {hasErrors && (
-        <div className="notice notice--bad" style={{ marginBottom: 24 }} role="alert">
-          <p className="notice__title">{t('sell.errorTitle')}</p>
-          {errors.image === 'too_large' && <p style={{ margin: 0 }}>{t('sell.errorImage')}</p>}
-          {errors.form && <p style={{ margin: 0 }}>{t('common.error')}</p>}
+  if (metaStatus !== 'ready') {
+    return (
+      <div className="sell">
+        {head}
+        <div className="sell__thread">
+          <div className="shell sell__col">
+            {metaStatus === 'error'
+              ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} />
+              : <p className="system-msg" role="status">{t('common.loading')}</p>}
+          </div>
         </div>
-      )}
+      </div>
+    );
+  }
 
-      <form className="form sell-form" onSubmit={onSubmit} noValidate>
-        <div className="field">
-          <span className="field__label">{t('sell.photoLabel')}</span>
-          <div
-            className={`uploader${dragging ? ' is-dragging' : ''}${preview ? ' has-preview' : ''}`}
-            onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
-            onDragOver={(event) => event.preventDefault()}
-            onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDragging(false); }}
-            onDrop={onDrop}
-          >
-            {preview ? (
-              <div className="uploader__preview"><img src={preview} alt={t('sell.photoPreviewAlt')} /></div>
-            ) : (
-              <div className="uploader__drop-icon"><UploadIcon size={28} /></div>
-            )}
-            <div className="uploader__copy">
-              <input
-                ref={fileInput}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={(event) => chooseImage(event.target.files?.[0])}
-              />
-              <strong>{image ? image.name : t('sell.photoDropTitle')}</strong>
-              <span className="field__hint">{t('sell.photoHint')}</span>
-              <div className="row">
-                <button type="button" className="btn btn--small" onClick={() => fileInput.current?.click()}>
-                  {image ? t('sell.photoChange') : t('sell.photoChoose')}
-                </button>
-                {image && (
-                  <button
-                    type="button"
-                    className="link-btn"
-                    onClick={() => {
-                      setImage(null);
-                      if (fileInput.current) fileInput.current.value = '';
-                    }}
-                  >
-                    {t('sell.photoRemove')}
+  const author = values.seller_name.trim() || profile.name;
+
+  return (
+    <div className="sell">
+      {head}
+
+      <div className="sell__thread">
+        <div className="shell sell__col">
+          <p className="system-msg sell__fee">{t('sell.feeLine', { fee: feeLabel })}</p>
+
+          {hasErrors && (
+            <div className="notice notice--bad sell__alert" role="alert">
+              <p className="notice__title">{t('sell.errorTitle')}</p>
+              {errors.image === 'too_large' && <p>{t('sell.errorImageSize')}</p>}
+              {errors.form && <p>{t('common.error')}</p>}
+            </div>
+          )}
+
+          <form className="sell__form" onSubmit={onSubmit} noValidate>
+            {/* How the post will read in the feed: your name, then the district once chosen. */}
+            <div className="sell__author" aria-hidden="true">
+              <Avatar name={author} picture={profile.picture} />
+              <p className="post__meta">
+                <strong>{author}</strong>
+                {values.district && <span>{t(`districts.${values.district}`)}</span>}
+              </p>
+            </div>
+
+            <div className="bubble sell__bubble">
+              <div className="sell-photo" role="group" aria-labelledby="sell-photo-label">
+                <span id="sell-photo-label" className="sr-only">{t('sell.photoLabel')}</span>
+                <input
+                  ref={fileInput}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  className="sr-only"
+                  tabIndex={-1}
+                  onChange={(event) => chooseImage(event.target.files?.[0])}
+                />
+                <div
+                  className={`sell-photo__frame${dragging ? ' is-dragging' : ''}${preview ? ' has-preview' : ''}`}
+                  onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
+                  onDragOver={(event) => event.preventDefault()}
+                  onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDragging(false); }}
+                  onDrop={onDrop}
+                >
+                  {preview ? (
+                    <img src={preview} alt={t('sell.photoPreviewAlt')} />
+                  ) : (
+                    // The empty frame opens the picker too; the button below is the keyboard path.
+                    <div className="sell-photo__empty" onClick={() => fileInput.current?.click()}>
+                      <UploadIcon size={26} />
+                      <p className="sell-photo__drop">{t('sell.photoDropTitle')}</p>
+                      <p className="sell-photo__hint">{t('sell.photoHint')}</p>
+                    </div>
+                  )}
+                </div>
+                <div className="sell-photo__bar">
+                  {image && <span className="sell-photo__name">{image.name}</span>}
+                  <button type="button" className="btn" onClick={() => fileInput.current?.click()}>
+                    {image ? t('sell.photoChange') : t('sell.photoChoose')}
                   </button>
+                  {image && (
+                    <button
+                      type="button"
+                      className="link-btn sell-photo__remove"
+                      onClick={() => {
+                        setImage(null);
+                        if (fileInput.current) fileInput.current.value = '';
+                      }}
+                    >
+                      {t('sell.photoRemove')}
+                    </button>
+                  )}
+                </div>
+                {errors.image && (
+                  <p className="field__error sell-photo__error">
+                    {errors.image === 'too_large' ? t('sell.errorImageSize') : t('sell.errorImageType')}
+                  </p>
                 )}
               </div>
+
+              <div className="sell__rows">
+                <Field label={t('sell.titleLabel')} error={errorFor('title')} required>
+                  {(props) => (
+                    <input
+                      {...props}
+                      className="input sell__title-input"
+                      value={values.title}
+                      onChange={set('title')}
+                      placeholder={t('sell.titlePlaceholder')}
+                      maxLength={120}
+                    />
+                  )}
+                </Field>
+
+                <Field label={t('sell.priceLabel')} hint={t('sell.priceNote')} error={errorFor('price_vnd')} required>
+                  {(props) => (
+                    <input
+                      {...props}
+                      className="input sell__price-input"
+                      inputMode="numeric"
+                      value={values.price_vnd}
+                      onChange={set('price_vnd')}
+                      placeholder={t('sell.pricePlaceholder')}
+                    />
+                  )}
+                </Field>
+
+                <div className="sell__split sell__split--3">
+                  <Field label={t('sell.categoryLabel')} error={errorFor('category')} required>
+                    {(props) => (
+                      <select {...props} value={values.category} onChange={set('category')}>
+                        <option value="">{t('sell.categoryPlaceholder')}</option>
+                        {meta.categories.map((value) => (
+                          <option key={value} value={value}>{t(`categories.${value}`)}</option>
+                        ))}
+                      </select>
+                    )}
+                  </Field>
+
+                  <Field label={t('sell.districtLabel')} error={errorFor('district')} required>
+                    {(props) => (
+                      <select {...props} value={values.district} onChange={set('district')}>
+                        <option value="">{t('sell.districtPlaceholder')}</option>
+                        {meta.districts.map((value) => (
+                          <option key={value} value={value}>{t(`districts.${value}`)}</option>
+                        ))}
+                      </select>
+                    )}
+                  </Field>
+
+                  <Field label={t('sell.conditionLabel')} error={errorFor('condition')} required>
+                    {(props) => (
+                      <select {...props} value={values.condition} onChange={set('condition')}>
+                        <option value="">{t('sell.conditionPlaceholder')}</option>
+                        {meta.conditions.map((value) => (
+                          <option key={value} value={value}>{t(`conditions.${value}`)}</option>
+                        ))}
+                      </select>
+                    )}
+                  </Field>
+                </div>
+
+                <Field
+                  label={t('sell.descriptionLabel')}
+                  hint={t('sell.descriptionHint')}
+                  error={errorFor('description')}
+                  required
+                >
+                  {(props) => (
+                    <textarea
+                      {...props}
+                      className="textarea sell__desc-input"
+                      value={values.description}
+                      onChange={set('description')}
+                      placeholder={t('sell.descriptionPlaceholder')}
+                      maxLength={6000}
+                    />
+                  )}
+                </Field>
+              </div>
             </div>
-          </div>
-          {errors.image && <span className="field__error">{errors.image === 'too_large' ? t('sell.errorImage') : t('sell.errorImageType')}</span>}
+
+            <section className="bubble sell__bubble sell__bubble--you" aria-labelledby="sell-you-title">
+              <h2 id="sell-you-title" className="sell__bubble-title">{t('sell.contactTitle')}</h2>
+              <div className="sell__rows">
+                <div className="sell__split">
+                  <Field label={t('sell.sellerNameLabel')} error={errorFor('seller_name')} required>
+                    {(props) => (
+                      <input
+                        {...props}
+                        className="input"
+                        value={values.seller_name}
+                        onChange={set('seller_name')}
+                        placeholder={t('sell.sellerNamePlaceholder')}
+                        maxLength={80}
+                      />
+                    )}
+                  </Field>
+
+                  <Field
+                    label={t('sell.sellerPhoneLabel')}
+                    hint={t('sell.sellerPhoneHint')}
+                    error={errorFor('seller_phone')}
+                    required
+                  >
+                    {(props) => (
+                      <input
+                        {...props}
+                        className="input"
+                        type="tel"
+                        value={values.seller_phone}
+                        onChange={set('seller_phone')}
+                        placeholder={t('sell.sellerPhonePlaceholder')}
+                        maxLength={20}
+                      />
+                    )}
+                  </Field>
+                </div>
+
+                <Field
+                  label={t('sell.sellerEmailLabel')}
+                  hint={t('sell.sellerEmailHint')}
+                  error={errorFor('seller_email')}
+                  required
+                >
+                  {(props) => (
+                    <input
+                      {...props}
+                      className="input"
+                      type="email"
+                      autoComplete="email"
+                      value={values.seller_email}
+                      onChange={set('seller_email')}
+                      placeholder={t('sell.sellerEmailPlaceholder')}
+                      maxLength={120}
+                    />
+                  )}
+                </Field>
+              </div>
+            </section>
+
+            <div className="sell__send">
+              <p className="sell__send-note">
+                <strong>{t('sell.submitSummary', { fee: feeLabel })}</strong>
+                <span>{t('sell.submitSummaryBody')}</span>
+              </p>
+              <button type="submit" className="btn btn--primary sell__submit" disabled={submitting}>
+                {submitting ? t('sell.submitting') : t('sell.submit')}
+              </button>
+            </div>
+          </form>
         </div>
-
-        <Field label={t('sell.titleLabel')} error={errorFor('title')} required>
-          {(props) => (
-            <input
-              {...props}
-              className="input"
-              value={values.title}
-              onChange={set('title')}
-              placeholder={t('sell.titlePlaceholder')}
-              maxLength={120}
-            />
-          )}
-        </Field>
-
-        <div className="form-grid">
-          <Field label={t('sell.categoryLabel')} error={errorFor('category')} required>
-            {(props) => (
-              <select {...props} value={values.category} onChange={set('category')}>
-                <option value="">{t('sell.categoryPlaceholder')}</option>
-                {meta.categories.map((value) => (
-                  <option key={value} value={value}>{t(`categories.${value}`)}</option>
-                ))}
-              </select>
-            )}
-          </Field>
-
-          <Field label={t('sell.priceLabel')} hint={t('sell.priceHint')} error={errorFor('price_vnd')} required>
-            {(props) => (
-              <input
-                {...props}
-                className="input"
-                inputMode="numeric"
-                value={values.price_vnd}
-                onChange={set('price_vnd')}
-                placeholder={t('sell.pricePlaceholder')}
-              />
-            )}
-          </Field>
-
-          <Field label={t('sell.districtLabel')} error={errorFor('district')} required>
-            {(props) => (
-              <select {...props} value={values.district} onChange={set('district')}>
-                <option value="">{t('sell.districtPlaceholder')}</option>
-                {meta.districts.map((value) => (
-                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
-                ))}
-              </select>
-            )}
-          </Field>
-
-          <Field label={t('sell.conditionLabel')} error={errorFor('condition')} required>
-            {(props) => (
-              <select {...props} value={values.condition} onChange={set('condition')}>
-                <option value="">{t('sell.conditionPlaceholder')}</option>
-                {meta.conditions.map((value) => (
-                  <option key={value} value={value}>{t(`conditions.${value}`)}</option>
-                ))}
-              </select>
-            )}
-          </Field>
-        </div>
-
-        <Field
-          label={t('sell.descriptionLabel')}
-          hint={t('sell.descriptionHint')}
-          error={errorFor('description')}
-          required
-        >
-          {(props) => (
-            <textarea
-              {...props}
-              className="textarea"
-              value={values.description}
-              onChange={set('description')}
-              placeholder={t('sell.descriptionPlaceholder')}
-              maxLength={6000}
-            />
-          )}
-        </Field>
-
-        <div className="form-grid">
-          <Field label={t('sell.sellerNameLabel')} error={errorFor('seller_name')} required>
-            {(props) => (
-              <input
-                {...props}
-                className="input"
-                value={values.seller_name}
-                onChange={set('seller_name')}
-                placeholder={t('sell.sellerNamePlaceholder')}
-                maxLength={80}
-              />
-            )}
-          </Field>
-
-          <Field
-            label={t('sell.sellerPhoneLabel')}
-            hint={t('sell.sellerPhoneHint')}
-            error={errorFor('seller_phone')}
-            required
-          >
-            {(props) => (
-              <input
-                {...props}
-                className="input"
-                type="tel"
-                value={values.seller_phone}
-                onChange={set('seller_phone')}
-                placeholder={t('sell.sellerPhonePlaceholder')}
-                maxLength={20}
-              />
-            )}
-          </Field>
-        </div>
-
-        <Field
-          label={t('sell.sellerEmailLabel')}
-          hint={t('sell.sellerEmailHint')}
-          error={errorFor('seller_email')}
-          required
-        >
-          {(props) => (
-            <input
-              {...props}
-              className="input"
-              type="email"
-              autoComplete="email"
-              value={values.seller_email}
-              onChange={set('seller_email')}
-              placeholder={t('sell.sellerEmailPlaceholder')}
-              maxLength={120}
-            />
-          )}
-        </Field>
-
-        <div className="sell-submit">
-          <div>
-            <strong>{t('sell.submitSummary', { fee: feeLabel })}</strong>
-            <span>{t('sell.submitSummaryBody')}</span>
-          </div>
-          <button type="submit" className="btn btn--primary" disabled={submitting}>
-          {submitting ? t('sell.submitting') : t('sell.submit')}
-          </button>
-        </div>
-      </form>
+      </div>
     </div>
   );
 }

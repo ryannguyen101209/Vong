@@ -1,1 +1,116 @@
-/* info: page styles. */
+/* About, FAQ, Contact and the not-found page: pages you read.
+   White, one reading column, hairlines and space for structure. The chat
+   grammar shows up only where it has a job: the money rule pinned as a note,
+   and each FAQ answer sitting under its question like a reply. */
+
+.info { padding-block: var(--s-8) var(--s-16); }
+.info__col { max-width: calc(680px + 2 * var(--gutter)); }
+.info__col--wide { max-width: calc(960px + 2 * var(--gutter)); }
+
+/* ---------------------------------------------------------------- head --- */
+
+.info__head {
+  display: flex; flex-direction: column; gap: var(--s-2);
+  padding-bottom: var(--s-6); border-bottom: 1px solid var(--line);
+}
+.info__head p { max-width: 56ch; color: var(--ink-soft); font-size: 1.0625rem; }
+
+/* About: the mark as the group's picture, name and one line beside it. */
+.info__head--group { flex-direction: row; align-items: center; gap: var(--s-4); }
+.info__mark { flex: none; }
+.info__intro { display: flex; flex-direction: column; gap: var(--s-1); min-width: 0; }
+
+.info__actions { display: flex; flex-wrap: wrap; gap: var(--s-3); margin-top: var(--s-10); }
+
+/* --------------------------------------------------------------- prose --- */
+
+.prose { display: flex; flex-direction: column; gap: var(--s-10); padding-top: var(--s-8); }
+.prose section { display: flex; flex-direction: column; gap: var(--s-3); max-width: 65ch; }
+.prose h2 { margin-bottom: var(--s-1); }
+.prose p { color: var(--ink-soft); line-height: 1.7; }
+
+/* A pinned note in the thread: tint, bubble shape, no border, no shadow. */
+.pinned {
+  padding: var(--s-5) var(--s-6) var(--s-6);
+  border-radius: var(--r-tail) var(--r-bubble) var(--r-bubble) var(--r-bubble);
+  background: var(--thread);
+}
+.pinned p { color: var(--ink); }
+
+/* ----------------------------------------------------------------- FAQ --- */
+
+.qa { margin: 0; padding: 0; list-style: none; }
+.qa__item { border-bottom: 1px solid var(--line); }
+.qa__q { font-size: inherit; text-wrap: pretty; }
+.qa__q button {
+  display: flex; align-items: center; justify-content: space-between; gap: var(--s-4);
+  width: 100%; min-height: 60px; padding: var(--s-4) 0;
+  border: 0; background: none; color: var(--ink);
+  font-size: 1.0625rem; font-weight: 600; letter-spacing: -0.01em; line-height: 1.4; text-align: left;
+  transition: color 0.15s var(--ease);
+}
+.qa__q button:hover { color: var(--blue-ink); }
+.qa__q button:focus-visible { outline-offset: 4px; }
+.qa__q svg { flex: none; color: var(--ink-faint); transition: transform 0.18s var(--ease), color 0.15s var(--ease); }
+.qa__q button[aria-expanded='true'] svg { color: var(--blue); transform: rotate(180deg); }
+
+/* The answer: a received bubble, tight corner toward the question. */
+.qa__a { padding-bottom: var(--s-5); }
+.qa__a p {
+  width: fit-content; max-width: 62ch; padding: var(--s-3) var(--s-4);
+  border-radius: var(--r-tail) var(--r-bubble) var(--r-bubble) var(--r-bubble);
+  background: var(--bubble); color: var(--ink); line-height: 1.65;
+  animation: qa-in 0.18s var(--ease);
+}
+@keyframes qa-in { from { opacity: 0.5; transform: translateY(8px); } }
+
+/* ------------------------------------------------------------- contact --- */
+
+.contact {
+  display: grid; grid-template-columns: minmax(0, 1fr) 260px; align-items: start;
+  gap: var(--s-16); padding-top: var(--s-8);
+}
+.contact__main { max-width: 600px; }
+.contact__form .textarea { min-height: 180px; }
+.contact__submit { align-self: flex-start; min-width: 180px; }
+
+.contact__sent { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-4); }
+.contact__sent .notice { width: 100%; padding: var(--s-4) var(--s-5); font-size: var(--text-base); }
+.contact__sent-title { display: flex; align-items: center; gap: var(--s-2); margin-bottom: var(--s-1); }
+
+.contact__ways { display: flex; flex-direction: column; gap: var(--s-3); }
+.contact__ways h2 { font-size: var(--text-md); }
+.contact__ways dl { margin: 0; }
+.contact__ways dl > div { display: flex; flex-direction: column; gap: 2px; padding-block: var(--s-3); border-top: 1px solid var(--line); }
+.contact__ways dt { color: var(--ink-faint); font-size: var(--text-xs); }
+.contact__ways dd { margin: 0; overflow-wrap: anywhere; }
+/* One tap selects the whole number, ready to paste into Zalo. */
+.contact__zalo { font-size: var(--text-md); font-weight: 600; font-variant-numeric: tabular-nums; user-select: all; }
+
+/* ----------------------------------------------------------- not found --- */
+
+.info--lost .empty { justify-content: center; min-height: 52vh; }
+.info--lost h1 { font-size: var(--text-xl); }
+
+/* ---------------------------------------------------------- breakpoints --- */
+
+@media (min-width: 721px) {
+  .prose p, .qa__a p { font-size: 1.0625rem; }
+  .qa__q button { font-size: var(--text-md); }
+}
+
+@media (max-width: 860px) {
+  .contact { grid-template-columns: minmax(0, 1fr); gap: var(--s-10); }
+  .contact__main { max-width: none; }
+}
+
+@media (max-width: 720px) {
+  .info { padding-block: var(--s-6) var(--s-12); }
+  .info__head p { font-size: var(--text-base); }
+  .info__head--group { align-items: flex-start; gap: var(--s-3); }
+  .info__mark { width: 48px; height: 48px; }
+  .prose { gap: var(--s-8); padding-top: var(--s-6); }
+  .pinned { padding: var(--s-4) var(--s-4) var(--s-5); }
+  .contact { padding-top: var(--s-6); }
+  .contact__submit { align-self: stretch; }
+}

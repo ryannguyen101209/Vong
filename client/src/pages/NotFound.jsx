@@ -1,14 +1,17 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
-import { EmptyState } from '../components/States.jsx';
 
 export function NotFound() {
   const { t } = useI18n();
   return (
-    <div className="shell section editorial-page not-found-page">
-      <EmptyState title={t('listing.notFoundTitle')} body={t('listing.notFoundBody')}>
-        <Link to="/browse" className="btn">{t('nav.browse')}</Link>
-      </EmptyState>
+    <div className="info info--lost">
+      <div className="shell info__col empty">
+        <h1>{t('notFound.title')}</h1>
+        <p>{t('notFound.body')}</p>
+        <div className="row">
+          <Link to="/browse" className="btn btn--primary">{t('nav.browse')}</Link>
+        </div>
+      </div>
     </div>
   );
 }

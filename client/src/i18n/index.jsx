@@ -62,25 +62,6 @@ export function LanguageProvider({ children }) {
     [lang]
   );
 
-  /** Arrays of objects (the FAQ), with {{vars}} filled in on every string. */
-  const tList = useCallback(
-    (key, vars) => {
-      const value = lookup(DICTIONARIES[lang], key) ?? lookup(DICTIONARIES.en, key);
-      if (!Array.isArray(value)) return [];
-      if (!vars) return value;
-      const fill = (str) =>
-        String(str).replace(/\{\{(\w+)\}\}/g, (match, name) =>
-          vars[name] === undefined ? match : String(vars[name])
-        );
-      return value.map((item) =>
-        typeof item === 'string'
-          ? fill(item)
-          : Object.fromEntries(Object.entries(item).map(([k, v]) => [k, fill(v)]))
-      );
-    },
-    [lang]
-  );
-
   /**
    * Listings carry both language variants when we wrote them, but only one when
    * a seller did. Prefer the current language, fall back to whatever exists.
@@ -96,8 +77,8 @@ export function LanguageProvider({ children }) {
   );
 
   const value = useMemo(
-    () => ({ lang, setLang, toggleLang, t, tList, localized }),
-    [lang, setLang, toggleLang, t, tList, localized]
+    () => ({ lang, setLang, toggleLang, t, localized }),
+    [lang, setLang, toggleLang, t, localized]
   );
 
   return <I18nContext.Provider value={value}>{children}</I18nContext.Provider>;

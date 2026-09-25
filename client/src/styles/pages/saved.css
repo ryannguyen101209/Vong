@@ -1,1 +1,49 @@
-/* saved: page styles. */
+/* Saved: each item is the seller's post with your reason under it as your own
+   reply. The page frame and the compact post bubble live in mine.css. */
+
+.saved__note { margin-bottom: var(--s-6); }
+
+.saved-list { display: flex; flex-direction: column; gap: var(--s-8); margin: 0; padding: 0; list-style: none; }
+
+.saved-post { display: grid; grid-template-columns: 36px minmax(0, 1fr); align-items: start; gap: var(--s-3); }
+.saved-post__ghost { visibility: hidden; }
+.saved-post__body { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+
+.mini-post--gone { color: var(--ink-faint); }
+.mini-post__gone { font-size: var(--text-sm); }
+
+/* Your reason: a sent bubble, right side, tight corner toward you. */
+.saved-post__reply { display: flex; flex-direction: column; align-items: flex-end; gap: 2px; margin-top: var(--s-1); }
+.saved-post__reason {
+  max-width: min(85%, 380px); padding: 8px 14px;
+  border-radius: var(--r-bubble) var(--r-bubble) var(--r-tail) var(--r-bubble);
+  background: var(--blue); color: #fff; line-height: 1.45; white-space: pre-wrap; overflow-wrap: anywhere;
+}
+.saved-post__meta {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 0 var(--s-4);
+  color: var(--ink-faint); font-size: var(--text-xs);
+}
+.saved-post__actions { display: flex; flex: none; gap: var(--s-4); }
+.saved-post__action {
+  min-height: 44px; padding: 0 2px; border: 0; background: none;
+  color: var(--blue-ink); font-size: var(--text-sm); font-weight: 600;
+}
+.saved-post__action:hover { color: var(--blue-press); text-decoration: underline; text-underline-offset: 3px; }
+.saved-post__action--remove { color: var(--ink-faint); }
+.saved-post__action--remove:hover { color: var(--bad); }
+
+/* ------------------------------------------------ save-reason dialog --- */
+
+.save-dialog__lead { color: var(--ink-soft); font-size: var(--text-sm); }
+.save-dialog__form { display: flex; flex-direction: column; gap: var(--s-5); margin-top: var(--s-5); }
+.save-dialog__chips { gap: var(--s-2); }
+/* Chips stay 36px to the eye but take a 44px tap, using the row gap. */
+.save-dialog__chips .chip { position: relative; }
+.save-dialog__chips .chip::after { content: ''; position: absolute; inset: -4px 0; }
+.save-dialog__optional { color: var(--ink-faint); font-weight: 400; }
+.save-dialog__note { min-height: 76px; }
+.save-dialog__actions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: var(--s-2); }
+
+@media (max-width: 480px) {
+  .save-dialog__actions .btn { flex: 1 1 0; }
+}

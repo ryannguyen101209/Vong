@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { SITE } from '../lib/site.js';
@@ -13,6 +13,12 @@ export function Contact() {
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [sent, setSent] = useState(false);
+  const sentRef = useRef(null);
+
+  // The form is replaced by the confirmation, so move focus onto it.
+  useEffect(() => {
+    if (sent) sentRef.current?.focus();
+  }, [sent]);
 
   const set = (key) => (event) => setValues((current) => ({ ...current, [key]: event.target.value }));
 
@@ -32,84 +38,88 @@ export function Contact() {
       setSent(true);
       setValues(EMPTY);
     } catch (error) {
-      setErrors(error.payload?.fields ?? { message: 'error' });
+      // Field problems go next to their fields; anything else is a failed send.
+      setErrors(error.payload?.fields ?? { form: 'error' });
     } finally {
       setSubmitting(false);
     }
   };
 
   return (
-    <div className="shell section editorial-page contact-page">
-      <div className="section-head">
-        <h1>{t('contact.title')}</h1>
-        <p className="lead">{t('contact.lead')}</p>
-      </div>
+    <div className="info">
+      <div className="shell info__col info__col--wide">
+        <div className="info__head">
+          <h1>{t('contact.title')}</h1>
+          <p>{t('contact.intro')}</p>
+        </div>
 
-      <div className="detail" style={{ gridTemplateColumns: 'minmax(0, 1.3fr) minmax(0, 0.7fr)' }}>
-        <div className="card panel">
-          {sent ? (
-            <div className="stack">
-              <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('contact.sentTitle')}</p>
-              <p>{t('contact.sentBody')}</p>
-              <div>
+        <div className="contact">
+          <div className="contact__main">
+            {sent ? (
+              <div className="contact__sent">
+                <div className="notice notice--ok" role="status" tabIndex={-1} ref={sentRef}>
+                  <p className="notice__title contact__sent-title"><CheckIcon /> {t('contact.sentTitle')}</p>
+                  <p>{t('contact.sentBody')}</p>
+                </div>
                 <button type="button" className="btn" onClick={() => setSent(false)}>
                   {t('contact.sentAnother')}
                 </button>
               </div>
-            </div>
-          ) : (
-            <form className="form" onSubmit={onSubmit} noValidate>
-              <Field label={t('contact.nameLabel')} error={errorFor('name')} required>
-                {(props) => (
-                  <input {...props} className="input" value={values.name} onChange={set('name')} maxLength={80} />
-                )}
-              </Field>
+            ) : (
+              <form className="form contact__form" onSubmit={onSubmit} noValidate>
+                {errors.form && <p className="notice notice--bad" role="alert">{t('common.error')}</p>}
+                <div className="form-grid">
+                  <Field label={t('contact.nameLabel')} error={errorFor('name')} required>
+                    {(props) => (
+                      <input {...props} className="input" autoComplete="name" value={values.name} onChange={set('name')} maxLength={80} />
+                    )}
+                  </Field>
 
-              <Field label={t('contact.emailLabel')} error={errorFor('email')} required>
-                {(props) => (
-                  <input {...props} className="input" type="email" value={values.email} onChange={set('email')} />
-                )}
-              </Field>
+                  <Field label={t('contact.emailLabel')} error={errorFor('email')} required>
+                    {(props) => (
+                      <input {...props} className="input" type="email" autoComplete="email" value={values.email} onChange={set('email')} />
+                    )}
+                  </Field>
+                </div>
 
-              <Field label={t('contact.messageLabel')} error={errorFor('message')} required>
-                {(props) => (
-                  <textarea
-                    {...props}
-                    className="textarea"
-                    value={values.message}
-                    onChange={set('message')}
-                    placeholder={t('contact.messagePlaceholder')}
-                    maxLength={4000}
-                  />
-                )}
-              </Field>
+                <Field label={t('contact.messageLabel')} error={errorFor('message')} required>
+                  {(props) => (
+                    <textarea
+                      {...props}
+                      className="textarea"
+                      value={values.message}
+                      onChange={set('message')}
+                      placeholder={t('contact.messagePlaceholder')}
+                      maxLength={4000}
+                    />
+                  )}
+                </Field>
 
-              <button type="submit" className="btn btn--primary" disabled={submitting}>
-                {submitting ? t('contact.submitting') : t('contact.submit')}
-              </button>
-            </form>
-          )}
-        </div>
-
-        <aside className="card panel">
-          <p className="eyebrow">{t('contact.otherWaysTitle')}</p>
-          <div className="detail-rows">
-            <div className="detail-row">
-              <span className="detail-row__label">{t('contact.zaloLabel')}</span>
-              <span className="detail-row__value">{SITE.zalo}</span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-row__label">{t('contact.emailUsLabel')}</span>
-              <span className="detail-row__value">
-                <a href={`mailto:${SITE.email}`}>{SITE.email}</a>
-              </span>
-            </div>
-            <div className="detail-row">
-              <span className="detail-row__label">{t('contact.hoursLabel')}</span>
-              <span className="detail-row__value">{t('contact.hoursValue')}</span>
-            </div>
+                <button type="submit" className="btn btn--primary contact__submit" disabled={submitting}>
+                  {submitting ? t('contact.submitting') : t('contact.submit')}
+                </button>
+              </form>
+            )}
           </div>
-        </aside>
+
+          <aside className="contact__ways" aria-labelledby="contact-ways">
+            <h2 id="contact-ways">{t('contact.otherWaysTitle')}</h2>
+            <dl>
+              <div>
+                <dt>{t('contact.zaloLabel')}</dt>
+                <dd className="contact__zalo">{SITE.zalo}</dd>
+              </div>
+              <div>
+                <dt>{t('contact.emailUsLabel')}</dt>
+                <dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
+              </div>
+              <div>
+                <dt>{t('contact.hoursLabel')}</dt>
+                <dd>{t('contact.replyHours')}</dd>
+              </div>
+            </dl>
+          </aside>
+        </div>
       </div>
     </div>
   );

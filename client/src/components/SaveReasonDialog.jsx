@@ -30,17 +30,18 @@ export function SaveReasonDialog({ existing, onSubmit, onClose }) {
   return (
     <div className="dialog-backdrop" onMouseDown={(e) => e.target === e.currentTarget && onClose()}>
       <div
-        className="dialog"
+        className="dialog save-dialog"
         role="dialog"
         aria-modal="true"
         aria-labelledby="save-dialog-title"
+        aria-describedby="save-dialog-lead"
         ref={dialogRef}
       >
-        <h3 id="save-dialog-title" style={{ marginBottom: 6 }}>{t('saveDialog.title')}</h3>
-        <p className="small muted" style={{ marginBottom: 20 }}>{t('saveDialog.lead')}</p>
+        <h2 id="save-dialog-title">{t('saveDialog.title')}</h2>
+        <p id="save-dialog-lead" className="save-dialog__lead">{t('saveDialog.lead')}</p>
 
-        <form onSubmit={submit} className="stack">
-          <div className="chip-row">
+        <form onSubmit={submit} className="save-dialog__form">
+          <div className="chip-row save-dialog__chips" role="group" aria-labelledby="save-dialog-title">
             {SAVE_REASONS.map((key) => (
               <button
                 key={key}
@@ -59,13 +60,12 @@ export function SaveReasonDialog({ existing, onSubmit, onClose }) {
 
           <div className="field">
             <label className="field__label" htmlFor="save-note">
-              {t('saveDialog.noteLabel')} <span className="muted small">({t('common.optional')})</span>
+              {t('saveDialog.noteLabel')} <span className="save-dialog__optional">({t('common.optional')})</span>
             </label>
             <textarea
               id="save-note"
-              className="input"
+              className="textarea save-dialog__note"
               rows={2}
-              style={{ minHeight: 68, resize: 'vertical' }}
               placeholder={t('saveDialog.notePlaceholder')}
               value={note}
               maxLength={200}
@@ -73,7 +73,7 @@ export function SaveReasonDialog({ existing, onSubmit, onClose }) {
             />
           </div>
 
-          <div className="row" style={{ justifyContent: 'flex-end' }}>
+          <div className="save-dialog__actions">
             <button type="button" className="btn" onClick={onClose}>
               {t('common.cancel')}
             </button>

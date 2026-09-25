@@ -39,7 +39,7 @@ export function ListingPost({ listing }) {
             <ListingImage listing={listing} alt="" />
           </div>
           <div className="post__text">
-            <h3 className="post__title">{title}</h3>
+            <h2 className="post__title">{title}</h2>
             <p className="post__price">
               <strong>{formatPrice(listing.price_vnd, lang)}</strong>
               <span>{t(`conditions.${listing.condition}`)}</span>

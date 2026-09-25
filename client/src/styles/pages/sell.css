@@ -1,1 +1,112 @@
-/* sell: page styles. */
+/* Sell: writing a listing looks like the post it will become. A white head,
+   then the thread tint with your post as a bubble and your details under it. */
+
+.sell__col { max-width: calc(680px + 2 * var(--gutter)); }
+
+.sell__top { padding-block: var(--s-8) var(--s-6); background: var(--page); }
+.sell__top .sell__col { display: flex; flex-direction: column; gap: var(--s-2); }
+.sell__top p { max-width: 56ch; color: var(--ink-soft); font-size: 1.0625rem; }
+
+.sell__thread { padding-block: var(--s-6) var(--s-16); background: var(--thread); }
+.sell__thread .sell__col { display: flex; flex-direction: column; gap: var(--s-5); }
+.sell__fee { max-width: 60ch; }
+.sell__alert p + p { margin-top: 2px; }
+
+.sell__form { display: flex; flex-direction: column; gap: var(--s-3); }
+.sell__author { display: flex; align-items: center; gap: var(--s-3); }
+
+/* -------------------------------------------------------------- bubble --- */
+
+.sell__bubble { width: 100%; }
+.sell__bubble--you { padding-top: var(--s-4); }
+.sell__bubble-title { padding: 0 var(--s-4) var(--s-2); font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
+
+/* Rows inside a bubble: hairlines between them, no boxes around them. */
+.sell__rows { display: flex; flex-direction: column; padding: 0 var(--s-4) var(--s-1); }
+.sell__rows > * { border-top: 1px solid var(--line); }
+
+.sell__bubble .field { gap: 0; padding-block: 10px 6px; transition: box-shadow 0.15s var(--ease); }
+.sell__bubble .field__label { color: var(--ink-faint); font-size: var(--text-xs); transition: color 0.15s var(--ease); }
+.sell__bubble .field__hint, .sell__bubble .field__error { margin-bottom: 4px; }
+
+.sell__bubble .input,
+.sell__bubble .textarea,
+.sell__bubble .field select {
+  min-height: 44px; padding: 0;
+  border: 0; border-radius: 0; background-color: transparent; box-shadow: none;
+}
+.sell__bubble .field select { padding-right: 28px; background-position: right 2px center; }
+
+.sell__bubble .field:focus-within { box-shadow: inset 0 -2px 0 var(--blue); }
+.sell__bubble .field:focus-within .field__label { color: var(--blue-ink); }
+.sell__bubble .field:has([aria-invalid='true']) { box-shadow: inset 0 -2px 0 var(--bad); }
+.sell__bubble .field:has([aria-invalid='true']) .field__label { color: var(--bad); }
+
+.sell__title-input { font-size: var(--text-md); font-weight: 600; }
+.sell__price-input { font-size: var(--text-md); font-weight: 700; font-variant-numeric: tabular-nums; }
+.sell__desc-input { min-height: 132px; max-height: 60vh; padding-block: 10px 4px; line-height: 1.6; }
+.sell__title-input::placeholder, .sell__price-input::placeholder { font-weight: 400; }
+@supports (field-sizing: content) {
+  .sell__desc-input { field-sizing: content; resize: none; }
+}
+
+/* Two or three short fields side by side, split by a hairline. */
+.sell__split { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.sell__split--3 { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.sell__split > .field:not(:last-child) { padding-right: var(--s-4); }
+.sell__split > .field + .field { padding-left: var(--s-4); border-left: 1px solid var(--line); }
+
+/* --------------------------------------------------------------- photo --- */
+
+.sell-photo { display: flex; flex-direction: column; gap: var(--s-2); padding: 8px 8px var(--s-2); }
+.sell-photo__frame {
+  position: relative; overflow: hidden;
+  border-radius: 4px calc(var(--r-bubble) - 8px) var(--r-sm) var(--r-sm);
+  background: var(--bubble);
+  transition: background-color 0.15s var(--ease);
+}
+.sell-photo__frame.has-preview { aspect-ratio: 4 / 3; max-height: min(60vh, 440px); }
+.sell-photo__frame img { width: 100%; height: 100%; object-fit: cover; }
+.sell-photo__frame.is-dragging { background: var(--blue-soft); outline: 2px dashed var(--blue); outline-offset: -8px; }
+
+.sell-photo__empty {
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: var(--s-1);
+  min-height: 176px; padding: var(--s-6) var(--s-4); color: var(--ink-faint); text-align: center; cursor: pointer;
+}
+.sell-photo__empty svg { margin-bottom: var(--s-1); color: var(--ink-soft); }
+.sell-photo__frame:not(.has-preview):hover { background: var(--thread); }
+.sell-photo__drop { color: var(--ink); font-size: var(--text-sm); font-weight: 600; }
+.sell-photo__hint { font-size: var(--text-xs); }
+@media (hover: none), (pointer: coarse) {
+  .sell-photo__drop { display: none; }
+}
+
+.sell-photo__bar { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-4); padding-inline: var(--s-2); }
+.sell-photo__name { flex: 1 1 160px; min-width: 0; overflow: hidden; color: var(--ink-faint); font-size: var(--text-xs); text-overflow: ellipsis; white-space: nowrap; }
+.sell-photo__remove { min-height: 44px; font-size: var(--text-sm); }
+.sell-photo__error { padding-inline: var(--s-2); }
+
+/* ---------------------------------------------------------------- send --- */
+
+.sell__send { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--s-4); margin-top: var(--s-3); }
+.sell__send-note { display: flex; flex-direction: column; gap: 2px; max-width: 44ch; color: var(--ink-soft); font-size: var(--text-sm); }
+.sell__send-note strong { color: var(--ink); font-weight: 600; }
+.sell__submit { min-width: 220px; }
+
+/* -------------------------------------------------------------- phones --- */
+
+@media (max-width: 640px) {
+  .sell__top { padding-block: var(--s-5) var(--s-5); }
+  .sell__top p { font-size: var(--text-base); }
+  .sell__thread { padding-block: var(--s-5) var(--s-12); }
+  .sell__thread .sell__col { gap: var(--s-4); }
+  .sell__rows { padding-inline: var(--s-3); }
+  .sell__bubble-title { padding-inline: var(--s-3); }
+  .sell-photo__bar, .sell-photo__error { padding-inline: var(--s-1); }
+
+  .sell__split, .sell__split--3 { grid-template-columns: minmax(0, 1fr); }
+  .sell__split > .field:not(:last-child) { padding-right: 0; }
+  .sell__split > .field + .field { padding-left: 0; border-left: 0; border-top: 1px solid var(--line); }
+
+  .sell__submit { width: 100%; }
+}

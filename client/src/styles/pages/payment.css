@@ -1,1 +1,70 @@
-/* payment: page styles. */
+/* Payment: the QR on white, the transfer details large enough to read and copy
+   on a phone, and plain status pages for every step after. */
+
+.pay__col { max-width: calc(880px + 2 * var(--gutter)); }
+
+.pay__top { padding-block: var(--s-8) var(--s-6); background: var(--page); }
+.pay__top .pay__col { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-2); }
+.pay__lead { max-width: 56ch; color: var(--ink-soft); font-size: 1.0625rem; }
+.pay__rejected { max-width: 60ch; margin-top: var(--s-3); }
+.pay__rejected p + p { margin-top: 2px; }
+
+.pay__thread { padding-block: var(--s-6) var(--s-16); background: var(--thread); }
+.pay__grid { display: grid; grid-template-columns: 300px minmax(0, 1fr); align-items: start; gap: var(--s-6) var(--s-8); }
+
+/* ------------------------------------------------------------------ QR --- */
+
+.pay-qr { display: flex; flex-direction: column; gap: var(--s-3); margin: 0; }
+.pay-qr__tile { display: flex; flex-direction: column; align-items: center; gap: var(--s-2); padding: var(--s-4) var(--s-4) var(--s-3); border-radius: var(--r-bubble); background: #fff; }
+.pay-qr__code { display: grid; place-items: center; width: 100%; aspect-ratio: 1; }
+.pay-qr__code img { width: 100%; height: auto; image-rendering: pixelated; }
+.pay-qr__brand { display: inline-flex; align-items: center; gap: var(--s-2); color: var(--ink); font-size: var(--text-sm); font-weight: 600; }
+.pay-qr__brand svg { color: var(--blue); }
+.pay-qr__steps { padding-inline: var(--s-2); color: var(--ink-soft); font-size: var(--text-sm); text-align: center; }
+
+/* ------------------------------------------------------------- details --- */
+
+.pay__side { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
+.pay-details { padding: var(--s-4) var(--s-5) var(--s-5); border-radius: var(--r-bubble); background: var(--page); }
+.pay-details h2 { margin-bottom: var(--s-2); font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
+.pay-details dl { margin: 0; }
+
+.pay-detail { display: flex; flex-direction: column; gap: 2px; padding-block: var(--s-3); border-top: 1px solid var(--line); }
+.pay-detail dt { color: var(--ink-faint); font-size: var(--text-xs); }
+.pay-detail dd { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); min-height: 30px; margin: 0; }
+.pay-detail__value { min-width: 0; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.pay-detail--large .pay-detail__value { font-size: 1.25rem; font-weight: 700; letter-spacing: 0.01em; }
+/* One tap selects the whole value, for when the clipboard is blocked. */
+.pay-detail__value--copy { -webkit-user-select: all; user-select: all; }
+
+.pay-copy { display: inline-flex; flex: none; align-items: center; gap: 6px; min-height: 44px; margin-left: 0; padding: 0 var(--s-4); font-size: var(--text-sm); }
+.pay-copy[data-copied] { border-color: var(--ok); background: var(--ok-soft); color: var(--ok); }
+
+.pay-details__hint { padding-top: var(--s-3); border-top: 1px solid var(--line); color: var(--ink-soft); font-size: var(--text-sm); }
+
+.pay__mark { align-self: flex-start; min-width: 260px; }
+
+/* -------------------------------------------------------- status pages --- */
+
+.pay-status { display: flex; flex-direction: column; align-items: flex-start; gap: var(--s-3); max-width: calc(640px + 2 * var(--gutter)); min-height: 60vh; padding-block: var(--s-12) var(--s-16); }
+.pay-status h1 { overflow-wrap: anywhere; }
+.pay-status__body { max-width: 58ch; color: var(--ink-soft); font-size: 1.0625rem; }
+.pay-status__ref { color: var(--ink-faint); font-size: var(--text-sm); }
+.pay-status__actions { margin-top: var(--s-3); }
+.pay-status__key { align-self: stretch; margin-top: var(--s-3); }
+.pay-status .notice { max-width: 60ch; margin-top: var(--s-2); }
+
+/* -------------------------------------------------------------- phones --- */
+
+@media (max-width: 720px) {
+  .pay__top { padding-block: var(--s-5); }
+  .pay__lead { font-size: var(--text-base); }
+  .pay__thread { padding-block: var(--s-5) var(--s-12); }
+  .pay__grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
+  .pay-qr { width: min(100%, 252px); margin-inline: auto; }
+  .pay-details { padding: var(--s-3) var(--s-4) var(--s-4); }
+  .pay__mark { align-self: stretch; min-width: 0; }
+
+  .pay-status { min-height: 0; padding-block: var(--s-8) var(--s-12); }
+  .pay-status__body { font-size: var(--text-base); }
+}

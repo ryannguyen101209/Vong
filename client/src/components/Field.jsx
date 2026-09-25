@@ -9,7 +9,7 @@ export function Field({ label, hint, error, required = false, children }) {
     <div className="field">
       <label className="field__label" htmlFor={id}>
         {label}
-        {required && <span aria-hidden="true" style={{ color: 'var(--accent)' }}> *</span>}
+        {required && <span className="field__required" aria-hidden="true"> *</span>}
       </label>
       {children({ id, 'aria-required': required || undefined, 'aria-describedby': describedBy || undefined, 'aria-invalid': error ? 'true' : undefined })}
       {hint && !error && <span className="field__hint" id={`${id}-hint`}>{hint}</span>}

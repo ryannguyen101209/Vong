@@ -10,7 +10,7 @@ import { CheckIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { PublishKeyForm } from '../components/PublishKeyForm.jsx';
 
-function CopyButton({ value }) {
+function CopyButton({ value, label }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
 
@@ -25,20 +25,25 @@ function CopyButton({ value }) {
   };
 
   return (
-    <button type="button" className="copy-btn" onClick={copy}>
-      {copied ? t('common.copied') : t('common.copy')}
+    <button type="button" className="copy-btn pay-copy" data-copied={copied || undefined} onClick={copy}>
+      {copied ? (
+        <><CheckIcon size={16} /> {t('common.copied')}</>
+      ) : (
+        <>{t('common.copy')}<span className="sr-only"> {label}</span></>
+      )}
     </button>
   );
 }
 
-function Row({ label, value, mono = false, copyable = false }) {
+/** One transfer detail: the label, then the value large enough to read off a phone. */
+function Detail({ label, value, copyable = false, large = false }) {
   return (
-    <div className="detail-row">
-      <span className="detail-row__label">{label}</span>
-      <span className={`detail-row__value${mono ? ' detail-row__value--mono' : ''}`}>
-        {value}
-        {copyable && <CopyButton value={String(value)} />}
-      </span>
+    <div className={`pay-detail${large ? ' pay-detail--large' : ''}`}>
+      <dt>{label}</dt>
+      <dd>
+        <span className={`pay-detail__value${copyable ? ' pay-detail__value--copy' : ''}`}>{value}</span>
+        {copyable && <CopyButton value={String(value)} label={label} />}
+      </dd>
     </div>
   );
 }
@@ -76,7 +81,7 @@ export function Payment() {
       errorCorrectionLevel: 'M',
       margin: 1,
       width: 512,
-      color: { dark: '#0A2947', light: '#FFFFFF' },
+      color: { dark: '#15202B', light: '#FFFFFF' },
     })
       .then(setQrImage)
       .catch(() => setQrImage(null));
@@ -92,20 +97,29 @@ export function Payment() {
     }
   };
 
-  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
-  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.title')}</h1><p className="lead">{t('auth.lead')}</p><button className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
+  if (authLoading) return <div className="shell page"><p className="system-msg" role="status">{t('common.loading')}</p></div>;
+  if (!profile) {
+    return (
+      <div className="shell gate">
+        <h1>{t('auth.title')}</h1>
+        <p>{t('auth.lead')}</p>
+        <button type="button" className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button>
+      </div>
+    );
+  }
   if (status === 'loading') {
-    return <div className="shell section editorial-page payment-page"><p className="muted">{t('common.loading')}</p></div>;
+    return <div className="shell page"><p className="system-msg" role="status">{t('common.loading')}</p></div>;
   }
   if (status === 'unconfigured') {
     return (
-      <div className="shell section editorial-page payment-page">
-        <div className="notice notice--wait">{t('payment.notConfigured')}</div>
+      <div className="shell pay-status">
+        <h1>{t('payment.title')}</h1>
+        <p className="notice notice--wait">{t('payment.notSetUp')}</p>
       </div>
     );
   }
   if (status !== 'ready') {
-    return <div className="shell section editorial-page payment-page"><ErrorState onRetry={load} /></div>;
+    return <div className="shell page"><ErrorState onRetry={load} /></div>;
   }
 
   const { listing, payment } = data;
@@ -113,18 +127,14 @@ export function Payment() {
 
   if (listing.status === 'awaiting_approval') {
     return (
-      <div className="shell section editorial-page payment-page payment-page--status">
-        <div className="card panel">
-          <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusAwaitingTitle')}</p>
-          <h1>{t('payment.markedTitle')}</h1>
-          <p className="lead">{t('payment.markedBody', { email: listing.seller_email })}</p>
-          <p className="small muted" style={{ marginTop: 16 }}>
-            {t('payment.markedRef', { ref: listing.ref })}
-          </p>
-          <div className="row" style={{ marginTop: 24 }}>
-            <Link to="/my-listings" className="btn btn--primary">{t('mine.title')}</Link>
-            <Link to="/browse" className="btn">{t('nav.browse')}</Link>
-          </div>
+      <div className="shell pay-status">
+        <p className="status status--wait">{t('payment.statusAwaitingTitle')}</p>
+        <h1>{t('payment.checkingTitle')}</h1>
+        <p className="pay-status__body">{t('payment.checkingBody', { email: listing.seller_email })}</p>
+        <p className="pay-status__ref">{t('payment.refNote', { ref: listing.ref })}</p>
+        <div className="row pay-status__actions">
+          <Link to="/my-listings" className="btn btn--primary">{t('mine.title')}</Link>
+          <Link to="/browse" className="btn">{t('nav.browse')}</Link>
         </div>
       </div>
     );
@@ -132,11 +142,11 @@ export function Payment() {
 
   if (listing.status === 'approved') {
     return (
-      <div className="shell section editorial-page payment-page payment-page--status">
-        <div className="card panel">
-          <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusApprovedTitle')}</p>
-          <h1>{title}</h1>
-          <p className="lead">{t('payment.statusApprovedBody')}</p>
+      <div className="shell pay-status">
+        <p className="status status--ok">{t('payment.approvedTitle')}</p>
+        <h1>{title}</h1>
+        <p className="pay-status__body">{t('payment.statusApprovedBody')}</p>
+        <div className="pay-status__key">
           <PublishKeyForm listing={listing} keyInfo={data.key} onPublished={load} />
         </div>
       </div>
@@ -145,75 +155,74 @@ export function Payment() {
 
   if (listing.status === 'published') {
     return (
-      <div className="shell section editorial-page payment-page payment-page--status">
-        <div className="card panel">
-          <p className="eyebrow">{t('payment.statusPublishedTitle')}</p>
-          <h1>{title}</h1>
-          <p className="lead">{t('payment.statusPublishedBody')}</p>
-          <div className="row" style={{ marginTop: 24 }}>
-            <Link to={`/listing/${listing.id}`} className="btn btn--primary">{t('payment.viewListing')}</Link>
-            <Link to="/my-listings" className="btn">{t('mine.title')}</Link>
-          </div>
+      <div className="shell pay-status">
+        <p className="status status--ok">{t('payment.statusPublishedTitle')}</p>
+        <h1>{title}</h1>
+        <p className="pay-status__body">{t('payment.statusPublishedBody')}</p>
+        <div className="row pay-status__actions">
+          <Link to={`/listing/${listing.id}`} className="btn btn--primary">{t('payment.viewListing')}</Link>
+          <Link to="/my-listings" className="btn">{t('mine.title')}</Link>
         </div>
       </div>
     );
   }
 
+  const rejected = listing.status === 'rejected';
+
   return (
-    <div className="shell section editorial-page payment-page">
-      <div className="section-head">
-        <p className="eyebrow">
-          {listing.status === 'rejected' ? t('payment.statusRejectedTitle') : t('payment.statusPendingTitle')}
-        </p>
-        <h1>{t('payment.title')}</h1>
-        <p className="lead">{t('payment.lead')}</p>
+    <div className="pay">
+      <div className="pay__top">
+        <div className="shell pay__col">
+          <p className={`status ${rejected ? 'status--bad' : 'status--wait'}`}>
+            {rejected ? t('payment.statusRejectedTitle') : t('payment.statusPendingTitle')}
+          </p>
+          <h1>{t('payment.title')}</h1>
+          <p className="pay__lead">{t('payment.lead')}</p>
+          {rejected && (
+            <div className="notice notice--bad pay__rejected">
+              {listing.reject_reason && <p className="notice__title">{t('payment.statusRejectedBody', { reason: listing.reject_reason })}</p>}
+              <p>{t('payment.statusRejectedRetry')}</p>
+            </div>
+          )}
+        </div>
       </div>
 
-      {listing.status === 'rejected' && (
-        <div className="notice notice--bad" style={{ marginBottom: 28 }}>
-          <p className="notice__title">{t('payment.statusRejectedTitle')}</p>
-          <p>{t('payment.statusRejectedBody', { reason: data.listing.reject_reason || '—' })}</p>
-          <p className="small" style={{ margin: 0 }}>{t('payment.statusRejectedRetry')}</p>
-        </div>
-      )}
-
-      <div className="payment-grid">
-        <div className="qr-frame">
-          {qrImage ? (
-            <img src={qrImage} alt={t('payment.qrAlt')} />
-          ) : (
-            <p className="muted small">{t('common.loading')}</p>
-          )}
-          <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
-            <span style={{ color: '#0A2947' }}><LogoMark size={22} /></span>
-            <span className="qr-frame__brand">VietQR · {payment.bank_name}</span>
-          </div>
-        </div>
-
-        <div className="stack" style={{ gap: 24 }}>
-          <div className="card panel">
-            <div className="detail-rows">
-              <Row label={t('payment.amount')} value={formatPrice(payment.amount_vnd, lang)} />
-              <Row label={t('payment.reference')} value={payment.reference} mono copyable />
-              <Row label={t('payment.bank')} value={payment.bank_name} />
-              <Row label={t('payment.accountNumber')} value={payment.account_number} mono copyable />
-              <Row label={t('payment.accountHolder')} value={payment.account_holder} />
+      <div className="pay__thread">
+        <div className="shell pay__col pay__grid">
+          <figure className="pay-qr">
+            <div className="pay-qr__tile">
+              <div className="pay-qr__code">
+                {qrImage ? (
+                  <img src={qrImage} alt={t('payment.qrAlt')} width="512" height="512" />
+                ) : (
+                  <p className="muted small" role="status">{t('common.loading')}</p>
+                )}
+              </div>
+              <p className="pay-qr__brand">
+                <LogoMark size={20} />
+                <span>VietQR · {payment.bank_name}</span>
+              </p>
             </div>
-            <p className="small muted" style={{ marginTop: 16 }}>{t('payment.referenceHint')}</p>
-          </div>
+            <figcaption className="pay-qr__steps">{t('payment.qrSteps')}</figcaption>
+          </figure>
 
-          <div className="notice">
-            <p className="notice__title">{t('payment.manualTitle')}</p>
-            <p className="small" style={{ margin: 0 }}>{t('payment.manualBody')}</p>
-          </div>
+          <div className="pay__side">
+            <section className="pay-details" aria-labelledby="pay-details-title">
+              <h2 id="pay-details-title">{t('payment.manualTitle')}</h2>
+              {/* Same order a banking app asks for them: bank, account, name, amount, note. */}
+              <dl>
+                <Detail label={t('payment.bank')} value={payment.bank_name} />
+                <Detail label={t('payment.accountNumber')} value={payment.account_number} copyable large />
+                <Detail label={t('payment.accountHolder')} value={payment.account_holder} />
+                <Detail label={t('payment.amount')} value={formatPrice(payment.amount_vnd, lang)} large />
+                <Detail label={t('payment.reference')} value={payment.reference} copyable large />
+              </dl>
+              <p className="pay-details__hint">{t('payment.noteHint')}</p>
+            </section>
 
-          <div>
-            <button type="button" className="btn btn--primary btn--block" onClick={markPaid} disabled={marking}>
+            <button type="button" className="btn btn--primary pay__mark" onClick={markPaid} disabled={marking}>
               {marking ? t('payment.marking') : t('payment.markPaid')}
             </button>
-            <p className="small muted" style={{ marginTop: 12, textAlign: 'center' }}>
-              {t('payment.qrHint')}
-            </p>
           </div>
         </div>
       </div>
