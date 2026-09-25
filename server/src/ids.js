@@ -19,3 +19,8 @@ export function newId() {
 export function newRef() {
   return `VONG-${randomCode(6)}`;
 }
+
+/** The one-time key emailed to a seller once their listing is approved, e.g. K7RD-M4XP. */
+export function newPublishKey() {
+  return `${randomCode(4)}-${randomCode(4)}`;
+}

@@ -1,17 +1,18 @@
 # Vòng
 
 A secondhand marketplace for Ho Chi Minh City. Sellers list for free; a listing
-goes live once the seller transfers a small fee (10,000 ₫ by default) and a human
-confirms the transfer arrived. Vòng takes no commission and never touches the
-buyer's money.
+goes live once the seller transfers a small fee (10,000 ₫ by default), a human
+confirms the transfer arrived, and the seller enters the one-time key we email
+them. Vòng takes no commission and never touches the buyer's money.
 
 Fully bilingual (English / Tiếng Việt), light and dark themes, mobile first.
 
 Google sign-in is verified by the server, and buyer–seller conversations are
 stored in the database with participant-only access. New listings require a
 signed-in seller. See [ACCOUNTS.md](ACCOUNTS.md) for activation and verification.
-The public static demo starts empty; it does not enable accounts or messaging
-until a real backend and Google OAuth web client are configured.
+
+There is no sample inventory and no generated imagery. When nobody has listed
+anything, the site says so and invites the first seller.
 
 ---
 
@@ -28,8 +29,8 @@ npm install
 cp .env.example .env
 #    open .env and change ADMIN_PASSWORD to something only you know
 
-# 3. Configure GOOGLE_CLIENT_ID in .env for sign-in.
-#    Start with an empty marketplace; do not seed example products.
+# 3. Configure GOOGLE_CLIENT_ID in .env for sign-in, and optionally the
+#    SMTP_* settings so publish keys are emailed (see "Emailing publish keys").
 
 # 4. Start both the API and the website
 npm run dev
@@ -46,11 +47,9 @@ The admin page is at **http://localhost:5173/admin** — sign in with the
 |---|---|
 | `npm run dev` | Runs the API (port 4000) and the website (port 5173) together. |
 | `npm run dev:host` | Same, but also serves the site to your Wi-Fi network so you can open it on your phone. Vite prints a `Network:` address — use that one. |
-| `npm run seed` | Loads the 10 sample listings. Safe to run twice. |
-| `npm run reset` | Deletes the sample listings and reloads them. Your own listings are left alone. |
 | `npm run build` | Builds the website into `client/dist/` for deployment. |
 | `npm start` | Runs the API and serves the built website from one port (4000). |
-| `npm test` | Checks the VietQR generator against known values. |
+| `npm test` | Checks the VietQR generator, accounts and messaging, and the approval key flow. |
 
 ---
 
@@ -91,18 +90,30 @@ a home network or your phone's hotspot instead.
 
 Worth doing once so you know what your sellers will see:
 
-1. Sign in with Google, go to **Sell**, fill in the form, submit.
+1. Sign in with Google, go to **Sell**, fill in the form, submit. The email
+   field starts as your Google address; the publish key will be sent there.
 2. You land on the **payment page** with a real VietQR code. Scan it with your
    banking app to check the amount and the transfer note appear correctly.
    **Don't actually pay yourself** — just look at the confirmation screen.
 3. Press **"I've sent the payment"**. The listing moves to `awaiting_approval`.
 4. Go to **/admin**, sign in. The listing is in the queue with the exact amount
    and reference code to look for in your bank app.
-5. Press **Approve** — the listing appears on Browse. Or press **Reject** and
-   write a reason; the seller sees that reason on their payment page.
+5. Press **Approve & send key**. Vòng generates a one-time key (like `K7RD-M4XP`)
+   and emails it to the seller. If email is not set up, the key is shown to you
+   with a button that opens a prefilled email in your own mail app.
+6. As the seller, open **Your listings** (account menu → Your listings). The
+   listing says *Approved — enter key*. Type the key into the key box and press
+   **Publish listing**. It now appears on Browse.
+7. Or, in step 5, press **Reject** and write a reason; the seller sees that
+   reason on their listing page (and gets it by email when email is set up).
 
-A listing's life: `pending_payment` → `awaiting_approval` → `published` or `rejected`.
-A rejected seller can press "I've sent the payment" again to re-enter the queue.
+A listing's life: `pending_payment` → `awaiting_approval` → `approved` → `published`,
+or `rejected`. A rejected seller can press "I've sent the payment" again to
+re-enter the queue.
+
+The key is stored only as a hash, works for 7 days, and locks after 5 wrong
+tries. The seller can ask for a new one from the key box (when email is set up),
+and the admin can resend it from **All listings → Approved — enter key**.
 
 ---
 
@@ -119,11 +130,13 @@ vong/
 │       └── styles.css   the whole design system (colours, type, layout)
 └── server/              Express API + SQLite
     └── src/
-        ├── db.js        database schema and settings
-        ├── vietqr.js    the VietQR / EMVCo payload builder
-        ├── seed-data.js the 10 sample listings, both languages
-        ├── placeholders.js  generates the sample listing illustrations
-        └── routes/      listings.js (public) and admin.js (password-gated)
+        ├── db.js          database schema and settings
+        ├── vietqr.js      the VietQR / EMVCo payload builder
+        ├── catalog.js     categories, districts and conditions
+        ├── accounts.js    Google sign-in and sessions
+        ├── publish-key.js the emailed one-time key that publishes a listing
+        ├── mailer.js      SMTP email (optional)
+        └── routes/        listings.js, conversations.js and admin.js (password-gated)
 ```
 
 **Why this stack:** Vite gives an instant dev server and builds to plain static
@@ -136,8 +149,7 @@ Postgres without touching the frontend.
 
 - **Listings, settings, contact messages** — `server/data/vong.db` (SQLite).
   Delete that file to start completely fresh.
-- **Uploaded photos** — `server/uploads/listings/`. Sample illustrations are in
-  `server/uploads/seed/`.
+- **Uploaded photos** — `server/uploads/listings/`.
 - **Saved items** — your visitor's browser (`localStorage`), not the server.
   Saved items are not yet synced to accounts, so they do not follow someone
   to another phone.
@@ -187,39 +199,49 @@ that fire on an incoming transfer), then match the webhook's transfer note
 against the listing's reference code and approve automatically. Until then, the
 queue is the product.
 
-**Nothing is emailed automatically.** Sellers now give an email address when
-they post, and the admin queue shows it. After you approve or reject a listing,
-an "Email the seller" button appears that opens a **prefilled draft in your own
-mail app** — the right message, the listing title, the link and the reference
-code already filled in. You press send. That is a deliberate stopgap, not a
-pretence: the app itself sends nothing.
+**Emailing publish keys.** When you approve a listing, the seller's key is
+emailed over SMTP, in the language they wrote the listing in. Any mail provider
+works. With a Gmail account: turn on 2-Step Verification, create an **App
+password** (Google Account → Security → App passwords), and set in `.env`:
 
-To make it automatic you need a mail service — Resend and SendGrid both have
-free tiers big enough for a project this size. It is roughly an afternoon's
-work: add the API key to `.env`, and call the service from the approve and
-reject handlers in `server/src/routes/admin.js`, where the seller's email is
-already loaded. The message templates are already written, in both languages,
-in the `admin.emailApprovedBody` / `admin.emailRejectedBody` keys of
-`client/src/i18n/`.
+```bash
+SMTP_HOST=smtp.gmail.com
+SMTP_PORT=465
+SMTP_USER=you@gmail.com
+SMTP_PASS=the-16-character-app-password
+MAIL_FROM="Vòng <you@gmail.com>"
+PUBLIC_URL=https://your-domain.com
+```
+
+Resend, SendGrid, Brevo and Zoho all give you the same five values. Admin →
+Settings says whether email is connected. Rejection reasons are emailed too.
+
+Without SMTP nothing is sent automatically, and nothing is faked: after you
+approve, the admin page shows the key with an **Email the seller** button that
+opens a prefilled draft in your own mail app. You press send.
 
 Seller emails are stored but never sent to the browser on public pages — an
-address on a public listing page is a spam magnet. Only the admin views see them.
+address on a public listing page is a spam magnet. Only the seller and the admin
+views see them.
 
 **Contact form messages are not emailed either.** They save to the database and
 print to the server log; you read them in the admin Settings tab.
 
 **Google accounts and private messaging are implemented.** Deploy the full Node
-backend and configure `GOOGLE_CLIENT_ID` to activate them. Saved items still live
-in one browser, and sellers cannot edit/delete their listings yet. New listings
-are owned by the signed-in account; old listings are not automatically claimed.
+backend and configure `GOOGLE_CLIENT_ID` to activate them. Signed-in sellers see
+all their listings, and what each needs next, under **Your listings**. Saved
+items still live in one browser, and sellers cannot edit/delete their listings
+yet. New listings are owned by the signed-in account; old listings are not
+automatically claimed.
 
 **Admin auth is one shared password** held in memory, so everyone signs out when
 the server restarts. Fine for one person. If a second person starts approving
 listings, give them real accounts.
 
 **Buyer–seller messaging is stored on the server.** An inbox lists the account's
-conversations; messages refresh every three seconds while open. Only the buyer
-and seller can access each conversation. Email notifications, read receipts and
+conversations; messages refresh every three seconds while open, and the header
+shows a count of unread messages. Only the buyer and seller can access each
+conversation. Email notifications for new messages, read receipts and
 blocking/reporting tools are not implemented.
 
 **Photos are stored on local disk.** This works in development and on a normal
@@ -252,13 +274,14 @@ NODE_ENV=production npm start
 ```
 
 `npm start` serves the API *and* the built website from port 4000, so you only
-need one process. Put nginx or Caddy in front for HTTPS, and set `ADMIN_PASSWORD`
-and `CORS_ORIGIN` in `.env`.
+need one process. Put nginx or Caddy in front for HTTPS, and set `ADMIN_PASSWORD`,
+`CORS_ORIGIN`, `GOOGLE_CLIENT_ID` and the `SMTP_*` / `PUBLIC_URL` settings in `.env`.
 
 Before you go live:
 
 - [ ] Set a real `ADMIN_PASSWORD` in `.env` (the app warns you on every start until you do).
 - [ ] Put your real bank details in /admin → Settings.
+- [ ] Set up SMTP and approve a test listing to check the key email arrives.
 - [ ] Scan a real QR with your own banking app and confirm it works.
 - [ ] Replace the placeholder Zalo number and email in `client/src/lib/site.js`.
 - [ ] Back up `server/data/vong.db` somewhere. It is your entire business.

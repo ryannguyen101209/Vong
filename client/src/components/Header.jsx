@@ -1,25 +1,83 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { NavLink, Link, useLocation } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { useSaved } from '../lib/saved.jsx';
 import { useTheme } from '../lib/theme.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { Logo } from './Logo.jsx';
-import { MenuIcon, CloseIcon, SunIcon, MoonIcon, MessageIcon } from './Icons.jsx';
+import { MenuIcon, CloseIcon, SunIcon, MoonIcon, ChevronDownIcon } from './Icons.jsx';
 
 const LINKS = [
   { to: '/browse', key: 'nav.browse' },
-  { to: '/saved', key: 'nav.saved', showCount: true },
-  { to: '/messages', key: 'nav.messages' },
+  { to: '/saved', key: 'nav.saved', count: 'saved' },
+  { to: '/messages', key: 'nav.messages', count: 'unread' },
 ];
+
+function Avatar({ profile }) {
+  const [broken, setBroken] = useState(false);
+  if (profile.picture && !broken) {
+    return <img className="avatar-img" src={profile.picture} alt="" referrerPolicy="no-referrer" onError={() => setBroken(true)} />;
+  }
+  return <span className="avatar-img avatar-img--initial" aria-hidden="true">{(profile.name || profile.email || '?').trim()[0].toUpperCase()}</span>;
+}
+
+function AccountMenu({ profile, unread, signOut }) {
+  const { t } = useI18n();
+  const [open, setOpen] = useState(false);
+  const root = useRef(null);
+  const location = useLocation();
+
+  useEffect(() => setOpen(false), [location.pathname, location.search]);
+  useEffect(() => {
+    if (!open) return undefined;
+    const outside = (event) => { if (!root.current?.contains(event.target)) setOpen(false); };
+    const escape = (event) => { if (event.key === 'Escape') { setOpen(false); root.current?.querySelector('button')?.focus(); } };
+    document.addEventListener('mousedown', outside);
+    document.addEventListener('keydown', escape);
+    return () => { document.removeEventListener('mousedown', outside); document.removeEventListener('keydown', escape); };
+  }, [open]);
+
+  return (
+    <div className="account" ref={root}>
+      <button
+        type="button"
+        className="account-chip"
+        aria-expanded={open}
+        aria-haspopup="true"
+        aria-controls="account-menu"
+        onClick={() => setOpen((value) => !value)}
+      >
+        <Avatar profile={profile} />
+        <span className="account-chip__name">{profile.name?.split(' ')[0] || t('auth.account')}</span>
+        <ChevronDownIcon />
+        <span className="sr-only">{t('auth.accountMenu')}</span>
+      </button>
+      {open && (
+        <div className="account-menu" id="account-menu">
+          <div className="account-menu__who">
+            <strong>{profile.name}</strong>
+            <span>{profile.email}</span>
+          </div>
+          <Link to="/my-listings" className="account-menu__item" onClick={() => setOpen(false)}>{t('mine.title')}</Link>
+          <Link to="/messages" className="account-menu__item" onClick={() => setOpen(false)}>
+            {t('nav.messages')}
+            {unread > 0 && <span className="nav__count">{unread}</span>}
+          </Link>
+          <button type="button" className="account-menu__item" onClick={signOut}>{t('auth.signOut')}</button>
+        </div>
+      )}
+    </div>
+  );
+}
 
 export function Header() {
   const { t, toggleLang } = useI18n();
   const { count } = useSaved();
   const { theme, toggleTheme } = useTheme();
-  const { profile, openSignIn, signOut } = useAuth();
+  const { profile, openSignIn, signOut, unread } = useAuth();
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
+  const counts = { saved: count, unread };
 
   // Navigating on a phone should close the menu behind you.
   useEffect(() => setMenuOpen(false), [location.pathname]);
@@ -31,7 +89,12 @@ export function Header() {
       className={({ isActive }) => `nav__link${isActive ? ' is-active' : ''}`}
     >
       {t(link.key)}
-      {link.showCount && count > 0 && <span className="nav__count">{count}</span>}
+      {link.count && counts[link.count] > 0 && (
+        <span className="nav__count">
+          {counts[link.count]}
+          {link.count === 'unread' && <span className="sr-only"> {t('messages.unread')}</span>}
+        </span>
+      )}
     </NavLink>
   ));
 
@@ -58,10 +121,7 @@ export function Header() {
           </button>
 
           {profile ? (
-            <button type="button" className="account-chip" onClick={signOut} title={t('auth.signOut')} aria-label={t('auth.signOut')}>
-              {profile.picture ? <img src={profile.picture} alt="" referrerPolicy="no-referrer" /> : <MessageIcon size={16} />}
-              <span>{profile.name?.split(' ')[0] || t('auth.account')}</span>
-            </button>
+            <AccountMenu profile={profile} unread={unread} signOut={signOut} />
           ) : (
             <button type="button" className="btn btn--ghost btn--small header__signin" onClick={openSignIn}>
               {t('auth.signIn')}
@@ -76,6 +136,7 @@ export function Header() {
             aria-controls="mobile-nav"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            {!menuOpen && unread > 0 && <span className="header__burger-dot" aria-hidden="true" />}
             <span className="sr-only">{t('nav.menu')}</span>
           </button>
         </div>
@@ -87,7 +148,17 @@ export function Header() {
         aria-label={t('nav.menu')}
       >
         {links}
-        {!profile && <button type="button" className="btn btn--ghost" onClick={() => { setMenuOpen(false); openSignIn(); }}>{t('auth.signIn')}</button>}
+        {profile ? (
+          <>
+            <NavLink to="/my-listings" className={({ isActive }) => `nav__link${isActive ? ' is-active' : ''}`}>{t('mine.title')}</NavLink>
+            <div className="mobile-nav__account">
+              <span>{profile.email}</span>
+              <button type="button" className="btn btn--ghost btn--small" onClick={() => { setMenuOpen(false); signOut(); }}>{t('auth.signOut')}</button>
+            </div>
+          </>
+        ) : (
+          <button type="button" className="btn btn--ghost mobile-nav__signin" onClick={() => { setMenuOpen(false); openSignIn(); }}>{t('auth.signIn')}</button>
+        )}
       </nav>
     </header>
   );

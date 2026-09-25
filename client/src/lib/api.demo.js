@@ -211,6 +211,23 @@ export const api = {
     return reply({ id, status: 'awaiting_approval' });
   },
 
+  // The demo has no accounts, so these mirror the real endpoints' shapes only.
+  myListings: () => reply({ listings: [] }),
+
+  publish: (id, key) => {
+    const listing = state.listings.find((item) => item.id === id);
+    if (!listing) return Promise.reject(new DemoError(404, { error: 'not_found' }));
+    if (listing.status !== 'approved') return Promise.reject(new DemoError(409, { error: 'wrong_status' }));
+    if (String(key).toUpperCase().replace(/[^A-Z0-9]/g, '') !== listing.publish_key) {
+      return Promise.reject(new DemoError(400, { error: 'wrong_key', attempts_left: 4 }));
+    }
+    Object.assign(listing, { status: 'published', published_at: new Date().toISOString(), publish_key: null });
+    persist();
+    return reply({ id, status: 'published' });
+  },
+
+  resendKey: () => Promise.reject(new DemoError(503, { error: 'mail_not_configured' })),
+
   buyRequest: (id) => {
     const listing = state.listings.find((item) => item.id === id && item.status === 'published');
     if (!listing) return Promise.reject(new DemoError(404, { error: 'not_found' }));
@@ -230,18 +247,22 @@ export const api = {
         : Promise.reject(new DemoError(401, { error: 'bad_password' })),
 
     listings: (token, status) => {
-      const counts = { pending_payment: 0, awaiting_approval: 0, published: 0, rejected: 0 };
+      const counts = { pending_payment: 0, awaiting_approval: 0, approved: 0, published: 0, rejected: 0 };
       for (const listing of state.listings) counts[listing.status] += 1;
       return reply({ listings: state.listings.filter((listing) => listing.status === status), counts });
     },
 
+    // No mail in the demo: the key comes back for the admin to pass on.
     approve: (token, id) => {
       const listing = state.listings.find((item) => item.id === id);
+      const key = `${randomRef().slice(5, 9)}-${randomRef().slice(5, 9)}`;
       const now = new Date().toISOString();
-      Object.assign(listing, { status: 'published', published_at: now, reviewed_at: now, reject_reason: null });
+      Object.assign(listing, { status: 'approved', reviewed_at: now, publish_key_sent_at: now, reject_reason: null, publish_key: key.replace('-', '') });
       persist();
-      return reply({ id, status: 'published' });
+      return reply({ id, status: 'approved', delivery: 'not_configured', key, sent_to: listing.seller_email });
     },
+
+    resendKey: (token, id) => api.admin.approve(token, id),
 
     reject: (token, id, reason) => {
       const listing = state.listings.find((item) => item.id === id);
@@ -250,7 +271,7 @@ export const api = {
       return reply({ id, status: 'rejected', reject_reason: reason });
     },
 
-    settings: () => reply({ settings: state.settings, banks: BANKS, default_password: true }),
+    settings: () => reply({ settings: state.settings, banks: BANKS, default_password: true, mail_configured: false }),
 
     saveSettings: (token, patch) => {
       const bank = patch.bank_bin ? findBank(patch.bank_bin) : null;

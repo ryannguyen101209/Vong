@@ -98,3 +98,16 @@ export const ArrowUpRightIcon = ({ size = 18 }) => (
     <path d="M7 17 17 7M8 7h9v9" />
   </svg>
 );
+
+export const KeyIcon = ({ size = 22 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <circle cx="8" cy="15" r="4" />
+    <path d="m11 12 8.5-8.5M16 7l2.5 2.5M18.5 4.5 21 7" />
+  </svg>
+);
+
+export const ChevronDownIcon = ({ size = 16 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="m6 9 6 6 6-6" />
+  </svg>
+);

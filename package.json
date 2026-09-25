@@ -15,8 +15,6 @@
     "dev:client:host": "npm run dev:host --workspace client",
     "build": "npm run build --workspace client",
     "start": "npm run start --workspace server",
-    "seed": "npm run seed --workspace server",
-    "reset": "npm run reset --workspace server",
     "test": "npm run test --workspace server"
   },
   "devDependencies": {

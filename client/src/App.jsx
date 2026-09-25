@@ -14,6 +14,7 @@ import { Contact } from './pages/Contact.jsx';
 import { Admin } from './pages/Admin.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { Messages } from './pages/Messages.jsx';
+import { MyListings } from './pages/MyListings.jsx';
 import { SignInDialog } from './components/SignInDialog.jsx';
 
 function ScrollToTop() {
@@ -40,6 +41,7 @@ export function App() {
           <Route path="/payment/:id" element={<Payment />} />
           <Route path="/saved" element={<Saved />} />
           <Route path="/messages" element={<Messages />} />
+          <Route path="/my-listings" element={<MyListings />} />
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />

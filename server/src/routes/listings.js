@@ -5,8 +5,11 @@ import multer from 'multer';
 import { db, getSettings, UPLOADS_DIR } from '../db.js';
 import { newId, newRef } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
-import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
+import { CATEGORIES, DISTRICTS, CONDITIONS } from '../catalog.js';
 import { requireUser } from '../accounts.js';
+import { rateLimit } from 'express-rate-limit';
+import { checkPublishKey, issuePublishKey, keyStatus, MAX_KEY_ATTEMPTS, RESEND_COOLDOWN_MS, siteUrl } from '../publish-key.js';
+import { mailConfigured } from '../mailer.js';
 
 export const router = express.Router();
 
@@ -85,6 +88,18 @@ router.get('/', (req, res) => {
   res.json({ listings: rows });
 });
 
+/** GET /api/listings/mine — every listing the signed-in seller has created. */
+router.get('/mine', requireUser, (req, res) => {
+  const rows = db.prepare(`SELECT ${PUBLIC_COLUMNS}, seller_email, publish_key_sent_at, publish_key_expires_at, publish_key_attempts
+    FROM listings WHERE seller_id = ? AND is_seed = 0 ORDER BY created_at DESC`).all(req.user.id);
+  res.json({
+    listings: rows.map((row) => {
+      const { publish_key_sent_at, publish_key_expires_at, publish_key_attempts, ...listing } = row;
+      return { ...listing, key: keyStatus(row) };
+    }),
+  });
+});
+
 /** GET /api/listings/:id — one listing. Views only count published views. */
 router.get('/:id', (req, res) => {
   const row = db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE id = ? AND is_seed = 0`).get(req.params.id);
@@ -124,7 +139,10 @@ function validateListing(body) {
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
 router.post('/', requireUser, upload.single('image'), (req, res) => {
-  const { errors, values } = validateListing({ ...req.body, seller_email: req.user.email });
+  // The publish key is sent to this address, so the seller proves they can read
+  // it before anything goes live. It defaults to their Google address.
+  const sellerEmail = String(req.body.seller_email ?? '').trim() || req.user.email;
+  const { errors, values } = validateListing({ ...req.body, seller_email: sellerEmail });
   if (Object.keys(errors).length > 0) {
     if (req.file) fs.unlink(req.file.path, () => {});
     return res.status(400).json({ error: 'validation_failed', fields: errors });
@@ -174,7 +192,9 @@ router.post('/', requireUser, upload.single('image'), (req, res) => {
 /** GET /api/listings/:id/payment — the VietQR payload for this listing's fee. */
 router.get('/:id/payment', requireUser, (req, res) => {
   const row = db
-    .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0')
+    .prepare(`SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason, seller_email,
+      publish_key_sent_at, publish_key_expires_at, publish_key_attempts
+      FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0`)
     .get(req.params.id, req.user.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
 
@@ -191,7 +211,10 @@ router.get('/:id/payment', requireUser, (req, res) => {
     });
   } catch (err) {
     // Bad bank details are an admin misconfiguration, not the seller's fault.
-    return res.status(503).json({ error: 'payment_not_configured', detail: err.message });
+    // They only matter while the seller still has to pay.
+    if (row.status === 'pending_payment' || row.status === 'rejected') {
+      return res.status(503).json({ error: 'payment_not_configured', detail: err.message });
+    }
   }
 
   res.json({
@@ -202,7 +225,9 @@ router.get('/:id/payment', requireUser, (req, res) => {
       title_en: row.title_en,
       title_vi: row.title_vi,
       reject_reason: row.reject_reason,
+      seller_email: row.seller_email,
     },
+    key: keyStatus(row),
     payment: {
       qr_payload: payload,
       amount_vnd: row.fee_vnd,
@@ -247,4 +272,43 @@ router.post('/:id/buy-request', requireUser, (req, res) => {
     .run(row.id, new Date().toISOString());
 
   res.json({ seller_name: row.seller_name, seller_phone: row.seller_phone });
+});
+
+const keyLimit = rateLimit({ windowMs: 15 * 60 * 1000, limit: 20, keyGenerator: (req) => req.user.id, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_attempts' } });
+
+/**
+ * POST /api/listings/:id/publish — the seller enters the key from their email.
+ * This is what finally publishes an approved listing.
+ */
+router.post('/:id/publish', requireUser, keyLimit, (req, res) => {
+  const row = db.prepare('SELECT * FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0').get(req.params.id, req.user.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (row.status === 'published') return res.json({ id: row.id, status: 'published' });
+  if (row.status !== 'approved') return res.status(409).json({ error: 'wrong_status', status: row.status });
+
+  const result = checkPublishKey(row, req.body?.key);
+  if (result !== 'ok') {
+    const attemptsLeft = result === 'wrong_key' ? MAX_KEY_ATTEMPTS - row.publish_key_attempts - 1 : 0;
+    return res.status(400).json({ error: result, attempts_left: attemptsLeft });
+  }
+
+  db.prepare(`UPDATE listings SET status = 'published', published_at = ?, publish_key_hash = NULL,
+    publish_key_expires_at = NULL, publish_key_attempts = 0 WHERE id = ?`).run(new Date().toISOString(), row.id);
+  res.json({ id: row.id, status: 'published' });
+});
+
+/** POST /api/listings/:id/resend-key — a fresh key to the same address. */
+router.post('/:id/resend-key', requireUser, keyLimit, async (req, res, next) => {
+  try {
+    const row = db.prepare('SELECT * FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0').get(req.params.id, req.user.id);
+    if (!row) return res.status(404).json({ error: 'not_found' });
+    if (row.status !== 'approved') return res.status(409).json({ error: 'wrong_status', status: row.status });
+    if (!mailConfigured()) return res.status(503).json({ error: 'mail_not_configured' });
+    if (row.publish_key_sent_at && Date.now() - Date.parse(row.publish_key_sent_at) < RESEND_COOLDOWN_MS) {
+      return res.status(429).json({ error: 'resend_too_soon' });
+    }
+    const result = await issuePublishKey(row, siteUrl(req), { requireDelivery: true });
+    if (result.delivery !== 'sent') return res.status(502).json({ error: 'mail_failed' });
+    res.json({ delivery: 'sent', sent_to: result.sent_to });
+  } catch (error) { next(error); }
 });

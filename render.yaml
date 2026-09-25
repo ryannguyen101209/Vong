@@ -22,6 +22,19 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false        # exact public HTTPS origin; comma-separated if needed
+      - key: PUBLIC_URL
+        sync: false        # used for links in emails, e.g. https://vong.vn
+      # SMTP for emailing publish keys to sellers (see .env.example).
+      - key: SMTP_HOST
+        sync: false
+      - key: SMTP_PORT
+        sync: false
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: MAIL_FROM
+        sync: false
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE

@@ -2,26 +2,20 @@
 export default {
   common: {
     appName: 'Vòng',
-    tagline: 'Đồ cũ, vòng mới, Sài Gòn',
     loading: 'Đang tải…',
     error: 'Có lỗi xảy ra.',
     retry: 'Thử lại',
     cancel: 'Huỷ',
     close: 'Đóng',
     save: 'Lưu',
-    edit: 'Sửa',
     remove: 'Xoá',
     optional: 'không bắt buộc',
-    required: 'bắt buộc',
-    back: 'Quay lại',
     copy: 'Sao chép',
     copied: 'Đã sao chép',
-    free: 'Miễn phí',
     perListing: 'cho mỗi tin',
   },
 
   nav: {
-    home: 'Trang chủ',
     browse: 'Dạo xem',
     sell: 'Đăng bán',
     saved: 'Đã lưu',
@@ -34,8 +28,6 @@ export default {
     switchLanguage: 'Switch to English',
     languageShort: 'EN',
     themeToggle: 'Đổi giao diện',
-    themeLight: 'Sáng',
-    themeDark: 'Tối',
   },
 
   market: {
@@ -48,8 +40,6 @@ export default {
     sell: 'Đăng bán',
     search: 'Tìm kiếm',
     categories: 'Mua theo danh mục',
-    imageAlt: 'Chiếc ghế đã qua sử dụng trong căn phòng đầy nắng',
-    imageCaption: 'Nhà mới. Câu chuyện mới.',
     sellEyebrow: 'Dọn chỗ cho điều mới',
     sellTitle: 'Có người sẽ thích món đồ của bạn.',
     sellBody: 'Thêm ảnh, đặt giá và kết nối với người mua gần bạn. Phí đăng tin nhỏ. Không thu hoa hồng.',
@@ -57,60 +47,12 @@ export default {
   },
 
   home: {
-    heroWordTop: 'VÒNG',
-    heroWordBottom: 'NỮA',
-    heroImageAlt: 'Bàn ghế, quần áo và đồ dùng cũ trong nắng chiều',
     heroLocation: 'Thành phố Hồ Chí Minh',
-    heroEdition: 'Đồ đạc đang lưu chuyển',
-    heroLeadShort: 'Đồ tốt không cần chủ đầu tiên. Tìm thấy, chuyền tay, tiếp tục sử dụng.',
-    posterMarket: 'Vòng / Chợ đồ cũ',
-    posterCycle: 'Mua / bán / lặp lại',
-    posterKeepMoving: 'Để đồ tốt tiếp tục lưu chuyển',
-    posterLoop: 'Vòng trao đổi của sinh viên',
-    storyTitle: 'Đồ tốt xứng đáng với một căn phòng mới.',
-    storyStep1: 'Tìm một món đồ đáng để giữ lại.',
-    storyStep2: 'Nhắn tin cho người đang sở hữu nó.',
-    storyStep3: 'Gặp mặt hoặc hẹn chuyển khoản.',
-    storyStep4: 'Chuyền tay khi căn phòng của bạn đổi khác.',
-    storyScroll: 'Cuộn để theo hành trình của món đồ',
-    storyMessageSeller: 'Nhắn người bán',
-    heroEyebrow: 'Thành phố Hồ Chí Minh',
-    heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
-    heroLead:
-      'Vòng là nơi mua bán lại bàn ghế, quần áo và đồ đạc đang nằm không trong các căn hộ ở Sài Gòn. Đăng tin miễn phí. Bạn chỉ trả một khoản phí nhỏ khi tin được lên sóng — còn chuyện mua bán thì Vòng không xen vào.',
     heroCtaPrimary: 'Đăng tin ngay',
     heroCtaSecondary: 'Xem tin đang bán',
-    heroVisualLabel: 'Sản phẩm mới đăng',
-    heroFeeNote: 'Phí đăng cố định {{fee}}',
-    heroStatListings: 'tin đang bán',
-    heroStatFee: 'để đăng tin',
-    heroStatCut: 'hoa hồng trên giao dịch',
-    stepsTitle: 'Cách hoạt động',
-    stepsLead: 'Ba bước, không cần tạo tài khoản, không ai giữ tiền của bạn.',
-    step1Title: 'Viết tin đăng',
-    step1Body:
-      'Một tấm hình, giá, quận, và mô tả thật lòng cả những vết xước. Mất chừng hai phút và không tốn đồng nào.',
-    step2Title: 'Trả phí đăng tin',
-    step2Body:
-      'Quét mã VietQR bằng app ngân hàng. Nội dung chuyển khoản đã điền sẵn để tụi mình đối chiếu đúng tin của bạn.',
-    step3Title: 'Tụi mình duyệt và đăng',
-    step3Body:
-      'Một người thật kiểm tra tiền đã về chưa, thường trong vài tiếng. Sau đó tin lên sóng và người mua liên hệ thẳng với bạn.',
     recentTitle: 'Tin mới đăng',
     recentLead: 'Vừa được dọn ra từ các căn nhà quanh thành phố.',
     recentViewAll: 'Xem tất cả',
-    introKicker: 'Chợ cho những gì đã có sẵn',
-    introTitle: 'Bớt mua đồ mới. Để đồ tốt tìm đúng căn phòng.',
-    motionRail: 'Mua ít hơn · dùng lâu hơn · chuyền tay',
-    emptyInventory: 'Món hay tiếp theo vẫn chưa được đăng.',
-    promiseTitle: 'Những gì Vòng không làm',
-    promiseStatement: 'Bạn mua món đồ. Không mua phí nền tảng, câu chuyện hay người trung gian.',
-    promiseBodyShort: 'Vòng không giữ tiền người mua. Gặp trực tiếp hoặc tự thống nhất chuyển khoản trong tin nhắn.',
-    promiseBody:
-      'Tụi mình không ăn phần trăm giao dịch và không bao giờ giữ tiền của người mua. Muốn giữ tiền trung gian ở Việt Nam thì phải có giấy phép trung gian thanh toán, tụi mình không có. Người mua và người bán tự thoả thuận chuyện thanh toán và nhận hàng — y như khi gặp nhau trong group Facebook, chỉ khác là tin đăng dễ tìm hơn.',
-    ctaTitle: 'Có món nào trong phòng bạn cả năm không đụng tới?',
-    ctaBody: 'Cách đó hai quận đang có người tìm đúng món đó.',
-    ctaButton: 'Đăng tin bán',
   },
 
   browse: {
@@ -132,7 +74,6 @@ export default {
 
   listing: {
     backToBrowse: 'Quay lại danh sách',
-    detailsTitle: 'Thông tin',
     category: 'Danh mục',
     condition: 'Tình trạng',
     district: 'Khu vực',
@@ -141,14 +82,12 @@ export default {
     reference: 'Mã tin',
     descriptionTitle: 'Người bán nói gì',
     sellerTitle: 'Người bán',
-    sellerNote: 'Thông tin liên hệ sẽ hiện ra khi bạn bấm hỏi mua.',
-    requestToBuy: 'Hỏi mua',
+    sellerNote: 'Nhắn người bán ngay trên Vòng, hoặc xem số điện thoại của họ.',
     messageSeller: 'Nhắn người bán',
     requestPhone: 'Xem số điện thoại',
     requesting: 'Đang lấy thông tin…',
     contactTitle: 'Liên hệ {{name}} theo số này',
-    contactBody:
-      'Bạn nhắn hoặc gọi số này, số này dùng Zalo được luôn. Vòng không chuyển tin nhắn giùm, nên từ đây là chuyện giữa hai bạn với nhau.',
+    contactBody: 'Bạn gọi hoặc nhắn số này, số này dùng Zalo được luôn.',
     safetyTitle: 'Gặp nhau an toàn',
     safetyBody:
       'Nếu được thì hẹn chỗ đông người và vào ban ngày, xem kỹ món đồ trước khi trả tiền, và trả thẳng cho người bán. Vòng không bao giờ yêu cầu bạn chuyển tiền mua hàng cho tụi mình.',
@@ -157,6 +96,8 @@ export default {
     notFoundTitle: 'Tin này không còn xem được',
     notFoundBody: 'Có thể tin đã bị gỡ, hoặc vẫn đang chờ được duyệt.',
     statusNotice: 'Tin này chưa công khai — trạng thái: {{status}}.',
+    ownTitle: 'Đây là tin của bạn',
+    ownBody: 'Người mua nhắn cho bạn về món này sẽ hiện trong mục Tin nhắn.',
   },
 
   sell: {
@@ -165,8 +106,7 @@ export default {
     lead:
       'Cứ viết như đang kể cho bạn bè nghe. Nói luôn cả khuyết điểm — tin thật thà thường bán nhanh hơn tin bóng bẩy.',
     feeNoticeTitle: 'Viết tin miễn phí, {{fee}} để đăng',
-    feeNoticeBody:
-      'Trang kế tiếp sẽ hiện mã QR. Tin của bạn lên sóng ngay sau khi tụi mình kiểm tra thấy tiền về.',
+    feeNoticeBody: 'Trang kế tiếp sẽ hiện mã QR. Khi tụi mình kiểm tra thấy tiền về, tụi mình gửi mã kích hoạt qua email — bạn nhập mã là tin lên sóng.',
     photoLabel: 'Hình ảnh',
     photoDropTitle: 'Kéo ảnh sản phẩm vào đây',
     photoPreviewAlt: 'Xem trước ảnh sản phẩm đã chọn',
@@ -174,7 +114,6 @@ export default {
     photoChoose: 'Chọn hình',
     photoChange: 'Đổi hình khác',
     photoRemove: 'Bỏ hình',
-    photoMissing: 'Chưa có hình',
     titleLabel: 'Bạn muốn bán món gì?',
     titlePlaceholder: 'VD: Ghế ăn gỗ teak, dùng rất ít',
     categoryLabel: 'Danh mục',
@@ -194,10 +133,10 @@ export default {
     sellerNamePlaceholder: 'Người mua nên gọi bạn là gì',
     sellerPhoneLabel: 'Số điện thoại / Zalo',
     sellerPhonePlaceholder: '09xx xxx xxx',
-    sellerPhoneHint: 'Chỉ hiện với người bấm “Hỏi mua”.',
+    sellerPhoneHint: 'Chỉ hiện với người mua đã đăng nhập và bấm “Xem số điện thoại”.',
     sellerEmailLabel: 'Email',
     sellerEmailPlaceholder: 'ban@example.com',
-    sellerEmailHint: 'Không bao giờ hiện cho người mua. Tụi mình dùng để báo khi tin của bạn được duyệt.',
+    sellerEmailHint: 'Không bao giờ hiện cho người mua. Khi tin được duyệt, tụi mình gửi mã kích hoạt tới email này.',
     submit: 'Tiếp tục để thanh toán',
     submitting: 'Đang tạo tin đăng…',
     errorTitle: 'Bạn xem lại giúp mấy ô này',
@@ -224,6 +163,7 @@ export default {
     previewTitle: 'Đăng nhập chưa sẵn sàng.',
     previewBody: 'Tụi mình đang hoàn tất thiết lập tài khoản. Bạn quay lại sau nhé.',
     terms: 'Khi tiếp tục, bạn đồng ý giao dịch lịch sự và an toàn.',
+    accountMenu: 'Menu tài khoản',
   },
 
   messages: {
@@ -232,9 +172,6 @@ export default {
     signInBody: 'Tài khoản giúp cuộc trò chuyện gắn đúng người mua và người bán.',
     emptyTitle: 'Các cuộc trò chuyện sẽ nằm ở đây',
     emptyBody: 'Mở một tin đăng và chọn Nhắn người bán để bắt đầu.',
-    contextLabel: 'Về món đồ này',
-    sellerLabel: 'Người bán: {{name}}',
-    viewListing: 'Xem tin đăng',
     inbox: 'Tin nhắn',
     selectThread: 'Chọn một cuộc trò chuyện',
     privateNotice: 'Chỉ bạn và người còn lại có thể xem cuộc trò chuyện này.',
@@ -248,6 +185,40 @@ export default {
     startBody: 'Xác nhận món còn bán, tình trạng, cách nhận hàng và cách thanh toán.',
     placeholder: 'Viết tin nhắn',
     send: 'Gửi',
+    unread: 'chưa đọc',
+  },
+
+  key: {
+    title: 'Nhập mã kích hoạt',
+    lead: 'Tụi mình đã gửi mã 8 ký tự tới {{email}}. Nhập mã vào đây để tin được đăng.',
+    resent: 'Mã mới đang được gửi tới {{email}}. Các mã cũ không dùng được nữa.',
+    label: 'Mã kích hoạt',
+    submit: 'Đăng tin',
+    publishing: 'Đang đăng…',
+    errorWrong: 'Mã chưa đúng. Bạn còn {{count}} lần thử.',
+    errorLocked: 'Nhập sai quá nhiều lần nên mã này đã bị khoá. Bạn cần một mã mới.',
+    errorExpired: 'Mã này đã hết hạn. Bạn cần một mã mới.',
+    errorTooMany: 'Bạn thử nhiều quá rồi. Đợi vài phút rồi thử lại nhé.',
+    help: 'Không thấy email? Xem thư mục spam, hoặc',
+    resend: 'gửi mã mới',
+    resending: 'Đang gửi…',
+    resendTooSoon: 'Tụi mình vừa gửi xong. Đợi một phút nhé.',
+    resendFailed: 'Chưa gửi được. Bạn thử lại sau nhé.',
+    helpManual: 'Không thấy email? Xem thư mục spam, hoặc nhắn tụi mình kèm mã tin {{ref}}:',
+  },
+
+  mine: {
+    title: 'Tin của bạn',
+    lead: 'Mọi tin bạn đã đăng, và bước tiếp theo của từng tin.',
+    signInTitle: 'Đăng nhập để xem tin của bạn',
+    signInBody: 'Tin đăng được gắn với tài khoản Google của bạn.',
+    emptyTitle: 'Bạn chưa đăng tin nào',
+    emptyBody: 'Đăng món đồ bạn không dùng nữa. Tin lên sóng sau một bước kiểm tra nhanh.',
+    nextPay: 'Chuyển phí đăng tin {{fee}} để gửi tin đi duyệt.',
+    payCta: 'Thanh toán phí',
+    nextChecking: 'Tụi mình đang kiểm tra khoản chuyển của bạn. Khi được duyệt, mã kích hoạt sẽ được gửi tới {{email}}.',
+    nextLive: 'Đang hiển thị trên Vòng. Người mua có thể nhắn bạn về món này.',
+    rejectedCta: 'Mở tin đăng',
   },
 
   payment: {
@@ -267,8 +238,7 @@ export default {
     markPaid: 'Mình đã chuyển khoản',
     marking: 'Đang lưu…',
     markedTitle: 'Cảm ơn bạn — tụi mình đang kiểm tra',
-    markedBody:
-      'Một người thật sẽ đối chiếu với app ngân hàng, thường trong vài tiếng. Thấy tiền về là tin lên sóng ngay. Ở đây không có gì tự động cả, nên nếu bạn chuyển lúc 2 giờ sáng thì sáng hôm sau mới duyệt được.',
+    markedBody: 'Một người thật sẽ đối chiếu với app ngân hàng, thường trong vài tiếng. Khi được duyệt, tụi mình gửi mã kích hoạt tới {{email}} — bạn nhập mã là tin lên sóng. Ở đây không có gì tự động cả, nên nếu bạn chuyển lúc 2 giờ sáng thì sáng hôm sau mới duyệt được.',
     markedRef: 'Mã tin của bạn là {{ref}} — giữ lại phòng khi cần hỏi tụi mình.',
     statusPendingTitle: 'Đang chờ bạn chuyển khoản',
     statusAwaitingTitle: 'Đang chờ tụi mình kiểm tra',
@@ -279,10 +249,10 @@ export default {
     statusRejectedRetry:
       'Nếu bạn đã chuyển khoản sau đó, hoặc thấy có nhầm lẫn, bạn nhắn tụi mình để xem lại nhé.',
     viewListing: 'Xem tin đăng',
-    backHome: 'Về trang chủ',
     notConfigured:
       'Phần thanh toán chưa được thiết lập — chủ trang cần thêm thông tin ngân hàng trong phần quản trị.',
-    saveLink: 'Bạn lưu lại trang này để theo dõi trạng thái tin đăng sau nhé.',
+    statusApprovedTitle: 'Đã duyệt — còn một bước nữa',
+    statusApprovedBody: 'Tụi mình đã thấy tiền về. Bạn nhập mã trong email là tin lên sóng.',
   },
 
   saved: {
@@ -334,8 +304,7 @@ export default {
     teamBody:
       'Ba sinh viên ở Sài Gòn, làm dự án này giữa những buổi học. Tụi mình tự đọc và trả lời form liên hệ, cũng chính là mấy đứa mở app ngân hàng ra kiểm tra để duyệt tin cho bạn.',
     honestTitle: 'Những gì còn thiếu',
-    honestBody:
-      'Hiện chưa có tài khoản người dùng, nên danh sách đã lưu chỉ nằm trong trình duyệt của bạn và tin đăng rồi thì chưa sửa được. Việc duyệt thanh toán vẫn làm tay. Tụi mình thà làm một thứ nhỏ mà thật, còn hơn tỏ ra to hơn thực tế.',
+    honestBody: 'Danh sách đã lưu vẫn chỉ nằm trong trình duyệt của bạn, và tin đăng rồi thì chưa sửa được. Việc duyệt thanh toán vẫn làm tay. Tụi mình thà làm một thứ nhỏ mà thật, còn hơn tỏ ra to hơn thực tế.',
   },
 
   faq: {
@@ -352,7 +321,7 @@ export default {
       },
       {
         q: 'Bao lâu thì tin của mình lên sóng?',
-        a: 'Thường là vài tiếng. Một đứa trong tụi mình mở app ngân hàng kiểm tra rồi duyệt hàng chờ — không có hệ thống tự động dò tiền, nên tin đăng khuya thường sáng hôm sau mới được duyệt.',
+        a: 'Thường là vài tiếng. Một đứa trong tụi mình mở app ngân hàng kiểm tra rồi duyệt hàng chờ. Sau đó tụi mình gửi bạn một mã kích hoạt qua email: nhập mã trong mục Tin của bạn là tin lên sóng ngay. Không có hệ thống tự động dò tiền, nên tin đăng khuya thường sáng hôm sau mới được duyệt.',
       },
       {
         q: 'Vòng có giữ tiền giùm tới khi nhận hàng không?',
@@ -360,7 +329,7 @@ export default {
       },
       {
         q: 'Làm sao liên hệ người bán?',
-        a: 'Bạn mở tin đăng rồi bấm “Hỏi mua”. Số điện thoại người bán sẽ hiện ra, số đó thường dùng Zalo được luôn. Vòng không chuyển tin nhắn qua lại giùm hai bên.',
+        a: 'Bạn đăng nhập bằng Google, mở tin đăng rồi bấm “Nhắn người bán”. Cuộc trò chuyện chỉ hai bạn xem được. Bạn cũng có thể bấm “Xem số điện thoại” để gọi hoặc nhắn Zalo.',
       },
       {
         q: 'Lỡ bị lừa thì sao?',
@@ -368,11 +337,11 @@ export default {
       },
       {
         q: 'Mình sửa hoặc xoá tin đăng được không?',
-        a: 'Hiện thì chưa — chưa có tài khoản người dùng nên không có cách chứng minh tin đó là của bạn. Bạn nhắn qua trang liên hệ kèm mã tin (dạng VONG-A1B2C3), tụi mình làm giúp bạn.',
+        a: 'Hiện thì chưa. Mọi tin bạn đã đăng nằm trong mục Tin của bạn. Muốn sửa hoặc gỡ tin, bạn nhắn qua trang liên hệ kèm mã tin (dạng VONG-A1B2C3), tụi mình làm giúp bạn.',
       },
       {
         q: 'Mình chuyển khoản rồi mà tin vẫn chưa lên.',
-        a: 'Bạn kiểm tra lại xem nội dung chuyển khoản có đúng y mã tin không. Nếu đúng rồi mà đã qua vài tiếng, bạn nhắn tụi mình kèm mã tin và giờ chuyển khoản để tụi mình dò lại.',
+        a: 'Bạn xem mục Tin của bạn trước: nếu tin ghi Đã duyệt, hãy tìm email của tụi mình có mã kích hoạt và nhập vào đó. Nếu tin vẫn đang chờ, bạn kiểm tra lại xem nội dung chuyển khoản có đúng y mã tin không. Nếu đúng rồi mà đã qua vài tiếng, bạn nhắn tụi mình kèm mã tin và giờ chuyển khoản để tụi mình dò lại.',
       },
       {
         q: 'Vòng hoạt động ở khu vực nào?',
@@ -420,16 +389,16 @@ export default {
     tabQueue: 'Hàng chờ duyệt',
     tabAll: 'Tất cả tin',
     tabSettings: 'Cài đặt',
-    queueLead: 'Những người bán báo đã chuyển khoản. Bạn kiểm tra app ngân hàng rồi duyệt hoặc từ chối.',
+    queueLead: 'Những người bán báo đã chuyển khoản. Bạn kiểm tra app ngân hàng rồi duyệt hoặc từ chối. Khi duyệt, người bán nhận mã kích hoạt qua email; tin lên sóng khi họ nhập mã.',
     queueEmptyTitle: 'Hàng chờ trống',
     queueEmptyBody: 'Hiện không có tin nào đang chờ duyệt.',
     sellerClaims: 'Người bán báo đã chuyển lúc {{when}}',
     expectedAmount: 'Cần thấy {{amount}} với nội dung {{ref}}',
-    approve: 'Duyệt & đăng tin',
-    approving: 'Đang đăng…',
+    approve: 'Duyệt & gửi mã',
+    approving: 'Đang gửi mã…',
     reject: 'Từ chối',
     rejectTitle: 'Vì sao bạn từ chối tin này?',
-    rejectLead: 'Người bán sẽ thấy lý do này trên trang thanh toán của họ, nên viết cho họ đọc nhé.',
+    rejectLead: 'Người bán sẽ thấy lý do này trên trang tin của họ, nên viết cho họ đọc nhé.',
     rejectPlaceholder: 'VD: Chưa nhận được chuyển khoản nào với mã tin này.',
     rejectSubmit: 'Từ chối tin',
     rejectPresetNoPayment: 'Không tìm thấy chuyển khoản với mã tin này',
@@ -450,18 +419,29 @@ export default {
     settingsError: 'Không lưu được cài đặt.',
     previewTitle: 'Xem trước mã QR',
     previewBody: 'Đây là mã người bán sẽ quét. Bạn tự quét thử bằng app ngân hàng trước khi chạy thật nhé.',
-    sellerEmailLabel: 'Email',
     emailSeller: 'Gửi email cho người bán',
-    actionedApproved: 'Đã đăng “{{title}}”.',
+    actionedApproved: 'Đã duyệt “{{title}}”.',
     actionedRejected: 'Đã từ chối “{{title}}”.',
-    actionedHint: 'Hệ thống không tự gửi email — nút này mở sẵn thư trong app mail của bạn.',
+    actionedHint: 'Chưa thiết lập email nên hệ thống chưa gửi gì — nút này mở sẵn thư trong app mail của bạn.',
     noSellerEmail: 'Tin này đăng từ trước khi tụi mình hỏi email.',
-    emailApprovedSubject: 'Tin đăng trên Vòng của bạn đã lên sóng: {{title}}',
-    emailApprovedBody: 'Chào {{name}},\n\nTụi mình đã nhận được chuyển khoản và tin “{{title}}” của bạn đã lên sóng trên Vòng. Người mua xem tin ở đây:\n{{url}}\n\nMã tin của bạn là {{ref}}.\n\nChúc bạn bán được giá tốt,\nNhóm Vòng',
     emailRejectedSubject: 'Về tin đăng của bạn trên Vòng: {{title}}',
     emailRejectedBody: 'Chào {{name}},\n\nTin “{{title}}” của bạn hiện chưa được đăng.\n\nLý do: {{reason}}\n\nMã tin của bạn là {{ref}}. Nếu bạn thấy có nhầm lẫn, hoặc bạn đã chuyển khoản sau đó, bạn chỉ cần trả lời email này để tụi mình kiểm tra lại.\n\nNhóm Vòng',
     messagesTitle: 'Tin nhắn liên hệ',
     noMessages: 'Chưa có tin nhắn nào.',
+    keyEmailed: 'Đã gửi mã tới {{email}}. Tin lên sóng khi người bán nhập mã.',
+    keyNotEmailed: 'Chưa thiết lập email, nên bạn tự gửi mã này tới {{email}} nhé. Tin lên sóng khi người bán nhập mã.',
+    keyMailFailed: 'Không gửi được email tới {{email}}. Bạn tự gửi mã này nhé; tin lên sóng khi người bán nhập mã.',
+    rejectEmailed: 'Đã gửi lý do cho người bán qua email.',
+    emailKeySubject: 'Mã kích hoạt Vòng cho “{{title}}”',
+    emailKeyBody: 'Chào {{name}},\n\nTụi mình đã kiểm tra phí đăng tin “{{title}}” (mã tin {{ref}}) và duyệt tin của bạn. Để tin được hiển thị, hãy nhập mã sau trên Vòng:\n\n{{key}}\n\nNhập mã tại: {{url}}\n\nMã có hiệu lực trong 7 ngày.\n\nNhóm Vòng',
+    approvedLead: 'Tin đã duyệt nằm ở đây cho tới khi người bán nhập mã. Gửi lại sẽ thay mã cũ.',
+    keyColumn: 'Mã',
+    keySentAt: 'Gửi lúc {{when}}',
+    resendKey: 'Gửi lại mã',
+    mailOnTitle: 'Email đã kết nối',
+    mailOnBody: 'Mã kích hoạt và lý do từ chối được tự động gửi cho người bán.',
+    mailOffTitle: 'Chưa thiết lập email',
+    mailOffBody: 'Sau khi bạn duyệt tin, mã kích hoạt hiện ở đây để bạn tự gửi. Thêm cấu hình SMTP vào .env để gửi mã tự động.',
   },
 
   status: {
@@ -469,6 +449,7 @@ export default {
     awaiting_approval: 'Chờ duyệt',
     published: 'Đã đăng',
     rejected: 'Bị từ chối',
+    approved: 'Đã duyệt — chờ nhập mã',
   },
 
   categories: {
@@ -499,7 +480,6 @@ export default {
     blurb: 'Chợ đồ cũ cho Thành phố Hồ Chí Minh, do ba sinh viên làm ra.',
     exploreTitle: 'Khám phá',
     aboutTitle: 'Thông tin',
-    legalTitle: 'Nói rõ cho minh bạch',
     legalBody:
       'Vòng chỉ thu phí đăng tin từ người bán. Tụi mình không lấy hoa hồng và không bao giờ giữ tiền giữa người mua và người bán.',
     madeIn: 'Làm tại Sài Gòn',

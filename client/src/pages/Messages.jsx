@@ -68,15 +68,19 @@ function Inbox({ profile }) {
           {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
           {status === 'ready' && threads.length === 0 && <p className="muted">{t('messages.emptyBody')}</p>}
           {threads.map((thread) => (
-            <Link className="thread-link" aria-current={thread.id === conversationId ? 'page' : undefined} to={'/messages?conversation=' + thread.id} key={thread.id}>
-              <strong>{thread.other_name}</strong><span>{localized(thread, 'title')}</span>
+            <Link className={'thread-link' + (thread.unread > 0 && thread.id !== conversationId ? ' thread-link--unread' : '')} aria-current={thread.id === conversationId ? 'page' : undefined} to={'/messages?conversation=' + thread.id} key={thread.id}>
+              <span className="thread-link__top">
+                <strong>{thread.other_name}</strong>
+                {thread.unread > 0 && thread.id !== conversationId && <span className="nav__count">{thread.unread}<span className="sr-only"> {t('messages.unread')}</span></span>}
+              </span>
+              <span>{localized(thread, 'title')}</span>
               <small>{thread.last_message || t('messages.startTitle')}</small>
             </Link>
           ))}
         </nav>
         {conversationId
           ? <Conversation key={conversationId} id={conversationId} profile={profile} />
-          : <EmptyState title={t(threads.length ? 'messages.selectThread' : 'messages.emptyTitle')} body={t('messages.emptyBody')}><Link className="btn btn--ghost" to="/browse">{t('nav.browse')}</Link></EmptyState>}
+          : <div className={'inbox-placeholder' + (threads.length ? ' inbox-placeholder--has-threads' : '')}><EmptyState title={t(threads.length ? 'messages.selectThread' : 'messages.emptyTitle')} body={t('messages.emptyBody')}><Link className="btn btn--ghost" to="/browse">{t('nav.browse')}</Link></EmptyState></div>}
       </div>
     </div>
   );
@@ -84,6 +88,7 @@ function Inbox({ profile }) {
 
 function Conversation({ id, profile }) {
   const { t, localized, lang } = useI18n();
+  const { refreshUnread } = useAuth();
   const [conversation, setConversation] = useState(null);
   const [messages, setMessages] = useState([]);
   const [status, setStatus] = useState('loading');
@@ -114,7 +119,10 @@ function Conversation({ id, profile }) {
         setConversation(data.conversation);
         if (!initialized) { setMessages(data.messages); setHasOlder(data.hasMore); }
         else merge(data.messages);
-        cursor = Math.max(cursor, ...data.messages.map((message) => message.id));
+        const newest = Math.max(cursor, ...data.messages.map((message) => message.id));
+        // Loading messages marks them read on the server; update the badge.
+        if (!initialized || newest > cursor) refreshUnread();
+        cursor = newest;
         initialized = true;
         setStatus('ready'); setRefreshError(false);
         if (nearBottom) requestAnimationFrame(() => { if (live && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; });
@@ -125,7 +133,7 @@ function Conversation({ id, profile }) {
     }
     refresh();
     return () => { live = false; clearTimeout(timer); };
-  }, [id, attempt]);
+  }, [id, attempt, refreshUnread]);
 
   async function older() {
     setOlderLoading(true);

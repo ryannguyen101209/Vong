@@ -2,26 +2,20 @@
 export default {
   common: {
     appName: 'Vòng',
-    tagline: 'Secondhand, second round, Saigon',
     loading: 'Loading…',
     error: 'Something went wrong.',
     retry: 'Try again',
     cancel: 'Cancel',
     close: 'Close',
     save: 'Save',
-    edit: 'Edit',
     remove: 'Remove',
     optional: 'optional',
-    required: 'required',
-    back: 'Back',
     copy: 'Copy',
     copied: 'Copied',
-    free: 'Free',
     perListing: 'per listing',
   },
 
   nav: {
-    home: 'Home',
     browse: 'Browse',
     sell: 'Sell',
     saved: 'Saved',
@@ -34,8 +28,6 @@ export default {
     switchLanguage: 'Chuyển sang tiếng Việt',
     languageShort: 'VI',
     themeToggle: 'Switch theme',
-    themeLight: 'Light',
-    themeDark: 'Dark',
   },
 
   market: {
@@ -48,8 +40,6 @@ export default {
     sell: 'Sell an item',
     search: 'Search',
     categories: 'Shop by category',
-    imageAlt: 'A pre-loved chair in a sunlit room',
-    imageCaption: 'Another home. Another chapter.',
     sellEyebrow: 'Make a little room',
     sellTitle: 'Someone else will love it.',
     sellBody: 'Add a photo, set your price, and connect with local buyers. A small publishing fee. No sales commission.',
@@ -57,60 +47,12 @@ export default {
   },
 
   home: {
-    heroWordTop: 'SECOND',
-    heroWordBottom: 'ROUND',
-    heroImageAlt: 'Pre-owned furniture, clothes and everyday objects in afternoon light',
     heroLocation: 'Ho Chi Minh City',
-    heroEdition: 'Objects in circulation',
-    heroLeadShort: 'Good things do not need a first owner. Find them, pass them on, keep them moving.',
-    posterMarket: 'Vòng / Secondhand market',
-    posterCycle: 'Buy / sell / repeat',
-    posterKeepMoving: 'Keep good things moving',
-    posterLoop: 'The student resale loop',
-    storyTitle: 'Good things deserve another room.',
-    storyStep1: 'Find one object worth keeping.',
-    storyStep2: 'Message the person who owns it.',
-    storyStep3: 'Meet up or arrange a bank transfer.',
-    storyStep4: 'Pass it on when your room changes.',
-    storyScroll: 'Scroll to follow the object',
-    storyMessageSeller: 'Message seller',
-    heroEyebrow: 'Ho Chi Minh City',
-    heroTitle: 'Give your things a second round.',
-    heroLead:
-      'Vòng is a marketplace for the furniture, clothes and gear already sitting in Saigon apartments. Listing is free. You pay a small fee only when your listing goes live — and we never touch the sale itself.',
     heroCtaPrimary: 'Post something',
     heroCtaSecondary: 'Browse listings',
-    heroVisualLabel: 'Recently listed products',
-    heroFeeNote: '{{fee}} flat publishing fee',
-    heroStatListings: 'listings live',
-    heroStatFee: 'to publish',
-    heroStatCut: 'commission on sales',
-    stepsTitle: 'How it works',
-    stepsLead: 'Three steps, no accounts to create, no middleman holding your money.',
-    step1Title: 'Write your listing',
-    step1Body:
-      'Photo, price, district, and an honest description of the scratches. It takes about two minutes and costs nothing.',
-    step2Title: 'Pay the listing fee',
-    step2Body:
-      'Scan the VietQR code with your banking app. The transfer note is filled in for you, so we can match your payment.',
-    step3Title: 'We publish it',
-    step3Body:
-      'A real person checks the transfer arrived, usually within a few hours. Then your listing is live and buyers contact you directly.',
     recentTitle: 'Recently listed',
     recentLead: 'Fresh from apartments around the city.',
     recentViewAll: 'See everything',
-    introKicker: 'A marketplace for what is already here',
-    introTitle: 'Less new stuff. More good stuff finding the right room.',
-    motionRail: 'Buy less · use longer · pass it on',
-    emptyInventory: 'The next good thing has not been listed yet.',
-    promiseTitle: 'What Vòng does not do',
-    promiseStatement: 'You buy the object. Not a platform fee, not a story, not a middleman.',
-    promiseBodyShort: 'Vòng never holds the buyer’s money. Meet in person or agree on a bank transfer directly in chat.',
-    promiseBody:
-      'We do not take a cut of your sale, and we never hold the buyer’s money. Escrow requires a payment intermediary licence in Vietnam, which we do not have. You and your buyer agree on payment and pickup yourselves — exactly like meeting through a Facebook group, but with a listing that is easier to find.',
-    ctaTitle: 'Something in your room you never use?',
-    ctaBody: 'Someone two districts over is looking for exactly that.',
-    ctaButton: 'Post a listing',
   },
 
   browse: {
@@ -132,7 +74,6 @@ export default {
 
   listing: {
     backToBrowse: 'Back to browse',
-    detailsTitle: 'Details',
     category: 'Category',
     condition: 'Condition',
     district: 'District',
@@ -141,14 +82,12 @@ export default {
     reference: 'Reference',
     descriptionTitle: 'From the seller',
     sellerTitle: 'Seller',
-    sellerNote: 'Contact details are shown when you request to buy.',
-    requestToBuy: 'Request to buy',
+    sellerNote: 'Message the seller here on Vòng, or ask for their phone number.',
     messageSeller: 'Message seller',
     requestPhone: 'Show phone number',
     requesting: 'Getting contact…',
     contactTitle: 'Here is how to reach {{name}}',
-    contactBody:
-      'Message or call this number — it works on Zalo too. Vòng does not pass messages along, so this conversation is between the two of you from here.',
+    contactBody: 'Call or message this number — it works on Zalo too.',
     safetyTitle: 'Meeting safely',
     safetyBody:
       'Meet somewhere public and in daylight if you can, check the item before you pay, and pay the seller directly. Vòng never asks you to send money to us for an item.',
@@ -157,6 +96,8 @@ export default {
     notFoundTitle: 'This listing is not available',
     notFoundBody: 'It may have been taken down, or it is still waiting to be published.',
     statusNotice: 'This listing is not public yet — status: {{status}}.',
+    ownTitle: 'This is your listing',
+    ownBody: 'Buyers who message you about it show up in Messages.',
   },
 
   sell: {
@@ -165,8 +106,7 @@ export default {
     lead:
       'Write it the way you would tell a friend. Mention the flaws — honest listings sell faster than polished ones.',
     feeNoticeTitle: 'Free to write, {{fee}} to publish',
-    feeNoticeBody:
-      'You will see a QR code on the next page. Your listing goes live once we have checked the transfer.',
+    feeNoticeBody: 'You will see a QR code on the next page. Once we have checked the transfer, we email you a key — enter it and your listing goes live.',
     photoLabel: 'Photo',
     photoDropTitle: 'Drop a product photo here',
     photoPreviewAlt: 'Selected product preview',
@@ -174,7 +114,6 @@ export default {
     photoChoose: 'Choose a photo',
     photoChange: 'Change photo',
     photoRemove: 'Remove photo',
-    photoMissing: 'No photo yet',
     titleLabel: 'What are you selling?',
     titlePlaceholder: 'e.g. Teak dining chair, barely used',
     categoryLabel: 'Category',
@@ -194,10 +133,10 @@ export default {
     sellerNamePlaceholder: 'How buyers should address you',
     sellerPhoneLabel: 'Phone / Zalo',
     sellerPhonePlaceholder: '09xx xxx xxx',
-    sellerPhoneHint: 'Shown only to buyers who tap “Request to buy”.',
+    sellerPhoneHint: 'Shown only to signed-in buyers who tap “Show phone number”.',
     sellerEmailLabel: 'Email',
     sellerEmailPlaceholder: 'you@example.com',
-    sellerEmailHint: 'Never shown to buyers. We use it to tell you when your listing is approved.',
+    sellerEmailHint: 'Never shown to buyers. After we approve your listing, we email your publish key here.',
     submit: 'Continue to payment',
     submitting: 'Creating your listing…',
     errorTitle: 'Please check these fields',
@@ -224,6 +163,7 @@ export default {
     previewTitle: 'Sign-in is not available yet.',
     previewBody: 'We’re finishing account setup. Please check back soon.',
     terms: 'By continuing, you agree to keep transactions respectful and safe.',
+    accountMenu: 'Account menu',
   },
 
   messages: {
@@ -232,9 +172,6 @@ export default {
     signInBody: 'Your account will keep conversations attached to the right buyer and seller.',
     emptyTitle: 'Your conversations will live here',
     emptyBody: 'Open a listing and choose Message seller to start.',
-    contextLabel: 'About this item',
-    sellerLabel: 'Sold by {{name}}',
-    viewListing: 'View listing',
     inbox: 'Messages',
     selectThread: 'Choose a conversation',
     privateNotice: 'Only you and the other person can access this conversation.',
@@ -248,6 +185,40 @@ export default {
     startBody: 'Confirm availability, condition, pickup and how you want to pay.',
     placeholder: 'Write a message',
     send: 'Send',
+    unread: 'unread',
+  },
+
+  key: {
+    title: 'Enter your publish key',
+    lead: 'We emailed an 8-character key to {{email}}. Enter it here to put your listing live.',
+    resent: 'A new key is on its way to {{email}}. Earlier keys no longer work.',
+    label: 'Publish key',
+    submit: 'Publish listing',
+    publishing: 'Publishing…',
+    errorWrong: 'That key does not match. {{count}} tries left.',
+    errorLocked: 'Too many wrong tries, so this key is locked. You need a new one.',
+    errorExpired: 'This key has expired. You need a new one.',
+    errorTooMany: 'Too many tries. Wait a few minutes and try again.',
+    help: 'Not in your inbox? Check spam, or',
+    resend: 'send a new key',
+    resending: 'Sending…',
+    resendTooSoon: 'We just sent one. Give it a minute.',
+    resendFailed: 'We could not send it. Try again later.',
+    helpManual: 'Not in your inbox? Check spam, or ask us with your reference {{ref}}:',
+  },
+
+  mine: {
+    title: 'Your listings',
+    lead: 'Everything you have posted, and what each one needs next.',
+    signInTitle: 'Sign in to see your listings',
+    signInBody: 'Your listings are attached to your Google account.',
+    emptyTitle: 'You have not listed anything yet',
+    emptyBody: 'Post something you no longer use. It goes live after a quick check.',
+    nextPay: 'Pay the {{fee}} listing fee to send it for approval.',
+    payCta: 'Pay the fee',
+    nextChecking: 'We are checking your transfer. When it is approved we email a key to {{email}}.',
+    nextLive: 'Live on Vòng. Buyers can message you about it.',
+    rejectedCta: 'Open listing',
   },
 
   payment: {
@@ -267,8 +238,7 @@ export default {
     markPaid: 'I’ve sent the payment',
     marking: 'Saving…',
     markedTitle: 'Thanks — we’re checking for it',
-    markedBody:
-      'A real person compares this against our bank app, usually within a few hours. Your listing goes live as soon as we see the transfer. Nothing is automatic here, so if you sent it at 2am, expect the morning.',
+    markedBody: 'A real person compares this against our bank app, usually within a few hours. Once it is approved we email a key to {{email}} — enter it and the listing goes live. Nothing is automatic here, so if you sent it at 2am, expect the morning.',
     markedRef: 'Your reference is {{ref}} — keep it in case you need to ask us about it.',
     statusPendingTitle: 'Waiting for your transfer',
     statusAwaitingTitle: 'Waiting for us to check',
@@ -279,10 +249,10 @@ export default {
     statusRejectedRetry:
       'If you have paid since, or think this was a mistake, get in touch and we will look again.',
     viewListing: 'View the listing',
-    backHome: 'Back to home',
     notConfigured:
       'Payments are not set up yet — the site owner needs to add bank details in the admin settings.',
-    saveLink: 'Bookmark this page to check the status of your listing later.',
+    statusApprovedTitle: 'Approved — one step left',
+    statusApprovedBody: 'We found your transfer. Enter the key from your email and your listing goes live.',
   },
 
   saved: {
@@ -334,8 +304,7 @@ export default {
     teamBody:
       'Three university students in Saigon building this between classes. We answer the contact form ourselves, and we are the same people checking the bank app to approve your listing.',
     honestTitle: 'What we are still missing',
-    honestBody:
-      'There are no accounts yet, so saved items live in your browser and a listing cannot be edited after posting. Payment approval is manual. We would rather ship something honest and small than pretend to be bigger than we are.',
+    honestBody: 'Saved items still live in your browser, and a listing cannot be edited after posting yet. Payment approval is manual. We would rather ship something honest and small than pretend to be bigger than we are.',
   },
 
   faq: {
@@ -352,7 +321,7 @@ export default {
       },
       {
         q: 'How long until my listing goes live?',
-        a: 'Usually a few hours. One of us checks the bank app by hand and approves the queue — there is no automatic payment detection, so listings posted late at night are normally approved the next morning.',
+        a: 'Usually a few hours. One of us checks the bank app by hand and approves the queue. Then we email you a one-time key: enter it under Your listings and the listing goes live straight away. There is no automatic payment detection, so listings posted late at night are normally approved the next morning.',
       },
       {
         q: 'Does Vòng hold my money until the item is delivered?',
@@ -360,7 +329,7 @@ export default {
       },
       {
         q: 'How do I contact a seller?',
-        a: 'Open the listing and tap “Request to buy”. That reveals the seller’s phone number, which usually works on Zalo as well. Vòng does not carry messages between you.',
+        a: 'Sign in with Google, open the listing and tap “Message seller”. Only the two of you can see the conversation. You can also tap “Show phone number” to call them or message them on Zalo.',
       },
       {
         q: 'What if I get scammed?',
@@ -368,11 +337,11 @@ export default {
       },
       {
         q: 'Can I edit or delete my listing?',
-        a: 'Not yet — there are no user accounts, so there is no way to prove a listing is yours. Message us through the contact page with your reference code (it looks like VONG-A1B2C3) and we will do it for you.',
+        a: 'Not yet. Every listing you have posted is under Your listings. To change or remove one, message us through the contact page with your reference code (it looks like VONG-A1B2C3) and we will do it for you.',
       },
       {
         q: 'I paid but my listing is still not up.',
-        a: 'Check that the transfer note matched your reference code exactly. If it did and several hours have passed, contact us with the reference and the time you transferred, and we will find it.',
+        a: 'Look under Your listings first: if it says Approved, find our email with your key and enter it there. If it is still waiting, check that the transfer note matched your reference code exactly. If it did and several hours have passed, contact us with the reference and the time you transferred, and we will find it.',
       },
       {
         q: 'Which areas does Vòng cover?',
@@ -420,16 +389,16 @@ export default {
     tabQueue: 'Payment queue',
     tabAll: 'All listings',
     tabSettings: 'Settings',
-    queueLead: 'Sellers who say they have transferred. Check your bank app, then approve or reject.',
+    queueLead: 'Sellers who say they have transferred. Check your bank app, then approve or reject. Approving emails the seller a key; the listing goes live when they enter it.',
     queueEmptyTitle: 'Queue is empty',
     queueEmptyBody: 'Nothing is waiting for approval right now.',
     sellerClaims: 'Seller marked as paid {{when}}',
     expectedAmount: 'Expect {{amount}} with note {{ref}}',
-    approve: 'Approve & publish',
-    approving: 'Publishing…',
+    approve: 'Approve & send key',
+    approving: 'Sending key…',
     reject: 'Reject',
     rejectTitle: 'Why are you rejecting this?',
-    rejectLead: 'The seller sees this reason on their payment page, so write it for them.',
+    rejectLead: 'The seller sees this reason on their listing page, so write it for them.',
     rejectPlaceholder: 'e.g. No transfer with this reference has arrived yet.',
     rejectSubmit: 'Reject listing',
     rejectPresetNoPayment: 'No transfer found with this reference',
@@ -450,18 +419,29 @@ export default {
     settingsError: 'Could not save those settings.',
     previewTitle: 'QR preview',
     previewBody: 'This is what sellers will scan. Test it with your own banking app before going live.',
-    sellerEmailLabel: 'Email',
     emailSeller: 'Email the seller',
-    actionedApproved: 'Published “{{title}}”.',
+    actionedApproved: 'Approved “{{title}}”.',
     actionedRejected: 'Rejected “{{title}}”.',
-    actionedHint: 'Nothing is emailed automatically — this opens a message in your own mail app.',
+    actionedHint: 'Email is not set up, so nothing was sent — this opens a message in your own mail app.',
     noSellerEmail: 'This listing was posted before we asked for an email.',
-    emailApprovedSubject: 'Your Vòng listing is live: {{title}}',
-    emailApprovedBody: 'Hi {{name}},\n\nWe found your transfer and your listing “{{title}}” is now live on Vòng. Buyers can find it here:\n{{url}}\n\nYour reference is {{ref}}.\n\nGood luck with the sale,\nThe Vòng team',
     emailRejectedSubject: 'About your Vòng listing: {{title}}',
     emailRejectedBody: 'Hi {{name}},\n\nWe were not able to publish your listing “{{title}}” yet.\n\nReason: {{reason}}\n\nYour reference is {{ref}}. If you think this is a mistake, or you have paid since, just reply to this email and we will take another look.\n\nThe Vòng team',
     messagesTitle: 'Contact messages',
     noMessages: 'No messages yet.',
+    keyEmailed: 'We emailed the key to {{email}}. The listing goes live when they enter it.',
+    keyNotEmailed: 'Email is not set up, so send this key to {{email}} yourself. The listing goes live when they enter it.',
+    keyMailFailed: 'The email to {{email}} could not be sent. Send this key yourself; the listing goes live when they enter it.',
+    rejectEmailed: 'The seller was emailed the reason.',
+    emailKeySubject: 'Your Vòng key for “{{title}}”',
+    emailKeyBody: 'Hi {{name}},\n\nWe checked your listing fee for “{{title}}” (reference {{ref}}) and approved it. To put the listing live, enter this key on Vòng:\n\n{{key}}\n\nEnter it here: {{url}}\n\nThe key works for 7 days.\n\nThe Vòng team',
+    approvedLead: 'Approved listings wait here until the seller enters their key. Resending replaces the old key.',
+    keyColumn: 'Key',
+    keySentAt: 'Sent {{when}}',
+    resendKey: 'Resend key',
+    mailOnTitle: 'Email is connected',
+    mailOnBody: 'Publish keys and rejection reasons are emailed to sellers automatically.',
+    mailOffTitle: 'Email is not set up',
+    mailOffBody: 'After you approve a listing, its key is shown here so you can send it yourself. Add SMTP settings to .env to email keys automatically.',
   },
 
   status: {
@@ -469,6 +449,7 @@ export default {
     awaiting_approval: 'Awaiting approval',
     published: 'Published',
     rejected: 'Rejected',
+    approved: 'Approved — enter key',
   },
 
   categories: {
@@ -499,7 +480,6 @@ export default {
     blurb: 'A secondhand marketplace for Ho Chi Minh City, built by three students.',
     exploreTitle: 'Explore',
     aboutTitle: 'About',
-    legalTitle: 'The fine print',
     legalBody:
       'Vòng charges sellers a listing fee only. We take no commission and never hold payment between buyer and seller.',
     madeIn: 'Made in Saigon',

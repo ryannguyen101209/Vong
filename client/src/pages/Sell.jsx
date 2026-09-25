@@ -37,7 +37,7 @@ export function Sell() {
   const [metaAttempt, setMetaAttempt] = useState(0);
 
   useEffect(() => {
-    if (profile) setValues((current) => ({ ...current, seller_name: current.seller_name || profile.name, seller_email: profile.email }));
+    if (profile) setValues((current) => ({ ...current, seller_name: current.seller_name || profile.name, seller_email: current.seller_email || profile.email }));
   }, [profile]);
 
   useEffect(() => {
@@ -335,7 +335,7 @@ export function Sell() {
               type="email"
               autoComplete="email"
               value={values.seller_email}
-              readOnly
+              onChange={set('seller_email')}
               placeholder={t('sell.sellerEmailPlaceholder')}
               maxLength={120}
             />

@@ -23,6 +23,20 @@ export function AuthProvider({ children }) {
     return () => { active = false; };
   }, []);
 
+  // Unread messages for the header badge. Checked every 20 seconds while the
+  // tab is visible; the Messages page also asks for a refresh after reading.
+  const [unread, setUnread] = useState(0);
+  const refreshUnread = useCallback(() => {
+    sessionApi.unread().then(({ count }) => setUnread(count)).catch(() => {});
+  }, []);
+  useEffect(() => {
+    if (!profile) { setUnread(0); return undefined; }
+    refreshUnread();
+    const timer = setInterval(() => { if (document.visibilityState === 'visible') refreshUnread(); }, 20000);
+    document.addEventListener('visibilitychange', refreshUnread);
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', refreshUnread); };
+  }, [profile, refreshUnread]);
+
   const openSignIn = useCallback(() => { setAuthError(false); setSignInOpen(true); }, []);
   const closeSignIn = useCallback(() => setSignInOpen(false), []);
   const completeGoogleSignIn = useCallback(async (credential) => {
@@ -46,10 +60,10 @@ export function AuthProvider({ children }) {
     } catch { setAuthError(true); }
   }, []);
   const value = useMemo(() => ({
-    profile, loading, signInOpen, googleClientId, authError,
+    profile, loading, signInOpen, googleClientId, authError, unread,
     googleConfigured: Boolean(googleClientId),
-    openSignIn, closeSignIn, completeGoogleSignIn, signOut,
-  }), [profile, loading, signInOpen, googleClientId, authError, openSignIn, closeSignIn, completeGoogleSignIn, signOut]);
+    openSignIn, closeSignIn, completeGoogleSignIn, signOut, refreshUnread,
+  }), [profile, loading, signInOpen, googleClientId, authError, unread, openSignIn, closeSignIn, completeGoogleSignIn, signOut, refreshUnread]);
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }
 

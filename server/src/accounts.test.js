@@ -47,7 +47,13 @@ try {
   const listingId = created.body.id;
   const row = db.prepare('SELECT * FROM listings WHERE id = ?').get(listingId);
   assert.equal(row.seller_id, seller.body.profile.id);
-  assert.equal(row.seller_email, 'seller@example.test');
+  // The publish key goes to the address the seller gives, which proves they read it.
+  assert.equal(row.seller_email, 'spoof@example.test');
+  const defaulted = await request('/api/listings', { cookie: seller.cookie, body: { ...listingBody, seller_email: '' } });
+  assert.equal(db.prepare('SELECT seller_email FROM listings WHERE id = ?').get(defaulted.body.id).seller_email, 'seller@example.test');
+  assert.deepEqual((await request('/api/listings/mine', { cookie: seller.cookie })).body.listings.map((item) => item.id).sort(), [listingId, defaulted.body.id].sort());
+  assert.equal((await request('/api/listings/mine', { cookie: buyer.cookie })).body.listings.length, 0);
+  assert.equal((await request('/api/listings/mine')).status, 401);
   assert.equal((await request(`/api/listings/${listingId}`)).status, 404);
   assert.equal((await request(`/api/listings/${listingId}/payment`, { cookie: buyer.cookie })).status, 404);
   assert.equal((await request(`/api/listings/${listingId}/mark-paid`, { cookie: buyer.cookie, body: {} })).status, 404);
@@ -66,9 +72,16 @@ try {
   assert.equal(sent.body.message.sender_id, buyer.body.profile.id);
   const retried = await request(`/api/conversations/${id}/messages`, { cookie: buyer.cookie, body: { body: 'Is this available?', clientId: 'buyer-message-1' } });
   assert.equal(retried.body.message.id, sent.body.message.id);
+  assert.equal((await request('/api/conversations/unread', { cookie: seller.cookie })).body.count, 1);
+  assert.equal((await request('/api/conversations/unread', { cookie: buyer.cookie })).body.count, 0);
+  assert.equal((await request('/api/conversations', { cookie: seller.cookie })).body.conversations[0].unread, 1);
   assert.equal((await request(`/api/conversations/${id}/messages`, { cookie: seller.cookie })).body.messages[0].body, 'Is this available?');
+  assert.equal((await request('/api/conversations/unread', { cookie: seller.cookie })).body.count, 0);
   assert.equal((await request(`/api/conversations/${id}/messages`, { cookie: seller.cookie, body: { body: 'Yes, it is.', clientId: 'seller-message-1' } })).status, 201);
+  assert.equal((await request('/api/conversations/unread', { cookie: buyer.cookie })).body.count, 1);
+  assert.equal((await request('/api/conversations/unread', { cookie: stranger.cookie })).body.count, 0);
   assert.equal((await request(`/api/conversations/${id}/messages?after=${sent.body.message.id}`, { cookie: buyer.cookie })).body.messages.length, 1);
+  assert.equal((await request('/api/conversations/unread', { cookie: buyer.cookie })).body.count, 0);
   assert.equal((await request(`/api/conversations/${id}/messages`, { cookie: buyer.cookie, body: { body: 'a'.repeat(2001), clientId: 'oversize-test' } })).status, 400);
   assert.equal((await request(`/api/conversations/${id}/messages?before=bad`, { cookie: buyer.cookie })).status, 400);
   const insert = db.prepare('INSERT INTO chat_messages(conversation_id, sender_id, body, client_id, created_at) VALUES (?, ?, ?, ?, ?)');
@@ -89,7 +102,7 @@ try {
   assert.match(secureLogin.cookie, /Secure/);
   db.prepare('UPDATE user_sessions SET expires_at = 0').run();
   assert.equal((await request('/api/conversations', { cookie: secureLogin.cookie })).status, 401);
-  console.log('accounts/messaging: passed authentication, origin protection, ownership, conversation isolation, two-way delivery, retry deduplication, pagination, seed exclusion, logout and expiry tests.');
+  console.log('accounts/messaging: passed authentication, origin protection, ownership, seller email, conversation isolation, two-way delivery, unread counts, retry deduplication, pagination, seed exclusion, logout and expiry tests.');
 } finally {
   await new Promise((resolve) => server.close(resolve));
   db.close();

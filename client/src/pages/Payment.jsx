@@ -8,6 +8,7 @@ import { ErrorState } from '../components/States.jsx';
 import { LogoMark } from '../components/Logo.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { PublishKeyForm } from '../components/PublishKeyForm.jsx';
 
 function CopyButton({ value }) {
   const { t } = useI18n();
@@ -116,15 +117,27 @@ export function Payment() {
         <div className="card panel">
           <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusAwaitingTitle')}</p>
           <h1>{t('payment.markedTitle')}</h1>
-          <p className="lead">{t('payment.markedBody')}</p>
+          <p className="lead">{t('payment.markedBody', { email: listing.seller_email })}</p>
           <p className="small muted" style={{ marginTop: 16 }}>
             {t('payment.markedRef', { ref: listing.ref })}
           </p>
-          <p className="small muted">{t('payment.saveLink')}</p>
           <div className="row" style={{ marginTop: 24 }}>
-            <Link to="/" className="btn btn--ghost">{t('payment.backHome')}</Link>
+            <Link to="/my-listings" className="btn btn--accent">{t('mine.title')}</Link>
             <Link to="/browse" className="btn btn--ghost">{t('nav.browse')}</Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  if (listing.status === 'approved') {
+    return (
+      <div className="shell section editorial-page payment-page payment-page--status">
+        <div className="card panel">
+          <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusApprovedTitle')}</p>
+          <h1>{title}</h1>
+          <p className="lead">{t('payment.statusApprovedBody')}</p>
+          <PublishKeyForm listing={listing} keyInfo={data.key} onPublished={load} />
         </div>
       </div>
     );
@@ -139,7 +152,7 @@ export function Payment() {
           <p className="lead">{t('payment.statusPublishedBody')}</p>
           <div className="row" style={{ marginTop: 24 }}>
             <Link to={`/listing/${listing.id}`} className="btn btn--accent">{t('payment.viewListing')}</Link>
-            <Link to="/" className="btn btn--ghost">{t('payment.backHome')}</Link>
+            <Link to="/my-listings" className="btn btn--ghost">{t('mine.title')}</Link>
           </div>
         </div>
       </div>

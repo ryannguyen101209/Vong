@@ -49,11 +49,16 @@ This repo has a `render.yaml`, so most of it is filled in for you.
    `npm install && npm run build`, then `npm start`.
 5. Open the URL it gives you. The site is live, but **empty** — your database
    starts blank.
-6. Leave the marketplace empty. Do not run the seed command. Visitors see
+6. The marketplace starts empty — there is no sample data. Visitors see
    “Sell the first item” until a real seller publishes a listing. Configure
    Google sign-in and messaging using [ACCOUNTS.md](ACCOUNTS.md).
 
-7. Go to `/admin`, sign in with the password from step 3, and put your **real
+7. Add your email settings (`SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`,
+   `MAIL_FROM`, `PUBLIC_URL`) in the Render dashboard so approved sellers get
+   their publish key by email. Without them, the admin page shows each key for
+   you to send yourself. See "Emailing publish keys" in the README.
+
+8. Go to `/admin`, sign in with the password from step 3, and put your **real
    bank details** in Settings. Then scan a listing's QR with your own banking
    app and confirm it fills in correctly, **before** you tell anyone the site is
    open.
@@ -80,7 +85,7 @@ cd Vong
 npm install
 npm run build
 cp .env.example .env     # set ADMIN_PASSWORD
-# Configure GOOGLE_CLIENT_ID and CORS_ORIGIN; start without sample listings.
+# Configure GOOGLE_CLIENT_ID, CORS_ORIGIN, and the SMTP_* settings for publish keys.
 npm start
 ```
 
@@ -94,6 +99,7 @@ so it restarts if the machine reboots.
 - [ ] `ADMIN_PASSWORD` set to something real (the server warns on every start until you do)
 - [ ] A persistent disk attached, and `DATABASE_FILE` / `UPLOADS_DIR` pointing at it
 - [ ] Real bank details saved in /admin → Settings
+- [ ] SMTP set up, and a test approval's key email received
 - [ ] A test QR scanned with your own banking app
 - [ ] Your Zalo number and email updated in `client/src/lib/site.js`
 - [ ] `CORS_ORIGIN` in `.env` set to your domain

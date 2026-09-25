@@ -132,7 +132,16 @@ export function ListingDetail() {
               </div>
             </div>
 
-            {contact?.seller_phone ? (
+            {profile && profile.id === listing.seller_id ? (
+              <div className="notice notice--accent">
+                <p className="notice__title">{t('listing.ownTitle')}</p>
+                <p className="small" style={{ margin: '0 0 12px' }}>{t('listing.ownBody')}</p>
+                <div className="row">
+                  <Link to="/my-listings" className="btn btn--small">{t('mine.title')}</Link>
+                  <Link to="/messages" className="btn btn--ghost btn--small">{t('nav.messages')}</Link>
+                </div>
+              </div>
+            ) : contact?.seller_phone ? (
               <div className="notice notice--accent">
                 <p className="notice__title">{t('listing.contactTitle', { name: contact.seller_name })}</p>
                 <p className="contact-reveal row" style={{ gap: 8, margin: '6px 0 10px' }}>

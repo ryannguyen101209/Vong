@@ -120,22 +120,67 @@ function RejectDialog({ onClose, onSubmit }) {
 }
 
 /**
- * Builds a mailto: link with the approval or rejection message filled in.
- * The app sends nothing itself -- this opens a draft in the admin's own mail
- * app, which is the honest way to do it until a mail service is wired up.
+ * Builds a mailto: link with the key or rejection message filled in, for when
+ * the server could not email it itself. This opens a draft in the admin's own
+ * mail app.
  */
-function sellerMailto({ listing, action, reason, title, t }) {
-  const key = action === 'approve' ? 'Approved' : 'Rejected';
+function sellerMailto({ listing, action, reason, title, key, link, t }) {
+  const name = action === 'approve' ? 'Key' : 'Rejected';
   const vars = {
     name: listing.seller_name,
     title,
     ref: listing.ref,
     reason: reason || listing.reject_reason || '—',
-    url: `${window.location.origin}/listing/${listing.id}`,
+    key,
+    url: link || `${window.location.origin}/payment/${listing.id}`,
   };
-  const subject = t(`admin.email${key}Subject`, vars);
-  const body = t(`admin.email${key}Body`, vars);
+  const subject = t(`admin.email${name}Subject`, vars);
+  const body = t(`admin.email${name}Body`, vars);
   return `mailto:${encodeURIComponent(listing.seller_email)}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+}
+
+/** What happened after Approve / Resend key, including a key to pass on by hand. */
+function KeyResult({ listing, result }) {
+  const { t, localized } = useI18n();
+  const title = localized(listing, 'title');
+  if (result.delivery === 'sent') {
+    return (
+      <div className="notice notice--positive" role="status">
+        <p className="notice__title">{t('admin.actionedApproved', { title })}</p>
+        <p className="small" style={{ margin: 0 }}>{t('admin.keyEmailed', { email: result.sent_to })}</p>
+      </div>
+    );
+  }
+  return (
+    <div className="notice notice--warning" role="status">
+      <p className="notice__title">{t('admin.actionedApproved', { title })}</p>
+      <p className="small" style={{ margin: '0 0 12px' }}>
+        {t(result.delivery === 'failed' ? 'admin.keyMailFailed' : 'admin.keyNotEmailed', { email: result.sent_to })}
+      </p>
+      <div className="admin-key">
+        <span className="admin-key__value">{result.key}</span>
+        <CopyText value={result.key} />
+        <a className="btn btn--small" href={sellerMailto({ listing, action: 'approve', title, key: result.key, link: result.link, t })}>
+          {t('admin.emailSeller')}
+        </a>
+      </div>
+    </div>
+  );
+}
+
+function CopyText({ value }) {
+  const { t } = useI18n();
+  const [copied, setCopied] = useState(false);
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(value);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1800);
+    } catch {
+      /* The key is on screen anyway. */
+    }
+  };
+  return <button type="button" className="copy-btn" onClick={copy}>{copied ? t('common.copied') : t('common.copy')}</button>;
 }
 
 function Queue({ token, onAuthError }) {
@@ -147,6 +192,7 @@ function Queue({ token, onAuthError }) {
   const [rejecting, setRejecting] = useState(null);
   // What you just did, so the seller can be emailed at the moment it happens.
   const [lastAction, setLastAction] = useState(null);
+  const [actionError, setActionError] = useState(false);
 
   const load = useCallback(() => {
     setLoading(true);
@@ -165,14 +211,17 @@ function Queue({ token, onAuthError }) {
   const act = async (id, action, reason) => {
     const listing = listings.find((item) => item.id === id);
     setBusyId(id);
+    setActionError(false);
     try {
-      if (action === 'approve') await api.admin.approve(token, id);
-      else await api.admin.reject(token, id, reason);
+      const result = action === 'approve'
+        ? await api.admin.approve(token, id)
+        : await api.admin.reject(token, id, reason);
       setRejecting(null);
-      setLastAction({ listing, action, reason });
+      setLastAction({ listing, action, reason, result });
       load();
     } catch (error) {
       if (error.status === 401) onAuthError();
+      else setActionError(true);
     } finally {
       setBusyId(null);
     }
@@ -185,37 +234,42 @@ function Queue({ token, onAuthError }) {
       <p className="lead" style={{ marginBottom: 24 }}>{t('admin.queueLead')}</p>
 
       <div className="row" style={{ marginBottom: 24, gap: 8 }}>
-        {['awaiting_approval', 'published', 'pending_payment', 'rejected'].map((key) => (
+        {['awaiting_approval', 'approved', 'published', 'pending_payment', 'rejected'].map((key) => (
           <span className="badge" key={key}>
             {t(`status.${key}`)}: {counts[key] ?? 0}
           </span>
         ))}
       </div>
 
-      {lastAction && (
-        <div
-          className={`notice notice--${lastAction.action === 'approve' ? 'positive' : 'danger'}`}
-          style={{ marginBottom: 20 }}
-        >
+      {actionError && <div className="notice notice--danger" role="alert" style={{ marginBottom: 20 }}>{t('common.error')}</div>}
+
+      {lastAction?.action === 'approve' && (
+        <div style={{ marginBottom: 20 }}>
+          <KeyResult listing={lastAction.listing} result={lastAction.result} />
+        </div>
+      )}
+
+      {lastAction?.action === 'reject' && (
+        <div className="notice notice--danger" role="status" style={{ marginBottom: 20 }}>
           <p className="notice__title">
-            {t(lastAction.action === 'approve' ? 'admin.actionedApproved' : 'admin.actionedRejected', {
-              title: localized(lastAction.listing, 'title'),
-            })}
+            {t('admin.actionedRejected', { title: localized(lastAction.listing, 'title') })}
           </p>
-          {lastAction.listing.seller_email ? (
+          {lastAction.result.delivery === 'sent' ? (
+            <p className="small" style={{ margin: 0 }}>{t('admin.rejectEmailed')}</p>
+          ) : lastAction.listing.seller_email ? (
             <>
               <p className="small" style={{ margin: '0 0 12px' }}>{t('admin.actionedHint')}</p>
               <a
                 className="btn btn--small"
                 href={sellerMailto({
                   listing: lastAction.listing,
-                  action: lastAction.action,
+                  action: 'reject',
                   reason: lastAction.reason,
                   title: localized(lastAction.listing, 'title'),
                   t,
                 })}
               >
-                {t('admin.emailSeller')} →
+                {t('admin.emailSeller')}
               </a>
             </>
           ) : (
@@ -263,7 +317,8 @@ function Queue({ token, onAuthError }) {
                   <button
                     type="button"
                     className="btn btn--small"
-                    disabled={busyId === listing.id}
+                    disabled={busyId === listing.id || !listing.seller_email}
+                    title={listing.seller_email ? undefined : t('admin.noSellerEmail')}
                     onClick={() => act(listing.id, 'approve')}
                   >
                     {busyId === listing.id ? t('admin.approving') : t('admin.approve')}
@@ -297,24 +352,48 @@ function AllListings({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [status, setStatus] = useState('published');
   const [listings, setListings] = useState([]);
+  const [resent, setResent] = useState(null);
+  const [busyId, setBusyId] = useState(null);
 
   useEffect(() => {
+    setResent(null);
     api.admin
       .listings(token, status)
       .then((data) => setListings(data.listings))
       .catch((error) => error.status === 401 && onAuthError());
   }, [token, status, onAuthError]);
 
+  const resendKey = async (listing) => {
+    setBusyId(listing.id);
+    try {
+      setResent({ listing, result: await api.admin.resendKey(token, listing.id) });
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      else setResent({ listing, error: true });
+    } finally {
+      setBusyId(null);
+    }
+  };
+
   return (
     <>
       <div className="row" style={{ marginBottom: 20 }}>
         <span className="small muted">{t('admin.statusFilter')}</span>
         <select className="select" value={status} onChange={(event) => setStatus(event.target.value)}>
-          {['published', 'awaiting_approval', 'pending_payment', 'rejected'].map((key) => (
+          {['published', 'approved', 'awaiting_approval', 'pending_payment', 'rejected'].map((key) => (
             <option key={key} value={key}>{t(`status.${key}`)}</option>
           ))}
         </select>
       </div>
+
+      {status === 'approved' && <p className="small muted" style={{ marginBottom: 16 }}>{t('admin.approvedLead')}</p>}
+      {resent && (
+        <div style={{ marginBottom: 20 }}>
+          {resent.error
+            ? <div className="notice notice--danger" role="alert">{t('common.error')}</div>
+            : <KeyResult listing={resent.listing} result={resent.result} />}
+        </div>
+      )}
 
       <div className="card panel table-scroll">
         <table className="admin-table">
@@ -326,6 +405,7 @@ function AllListings({ token, onAuthError }) {
               <th>{t('listing.district')}</th>
               <th>{t('listing.views')}</th>
               <th>{t('listing.posted')}</th>
+              {status === 'approved' && <th>{t('admin.keyColumn')}</th>}
             </tr>
           </thead>
           <tbody>
@@ -342,6 +422,14 @@ function AllListings({ token, onAuthError }) {
                 <td>{t(`districts.${listing.district}`)}</td>
                 <td>{listing.views}</td>
                 <td>{formatDateTime(listing.created_at, lang)}</td>
+                {status === 'approved' && (
+                  <td>
+                    <div className="small muted">{t('admin.keySentAt', { when: formatDateTime(listing.publish_key_sent_at, lang) })}</div>
+                    <button type="button" className="link-quiet" disabled={busyId === listing.id} onClick={() => resendKey(listing)}>
+                      {busyId === listing.id ? t('key.resending') : t('admin.resendKey')}
+                    </button>
+                  </td>
+                )}
               </tr>
             ))}
           </tbody>
@@ -359,6 +447,7 @@ function Settings({ token, onAuthError }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [mailConfigured, setMailConfigured] = useState(null);
 
   useEffect(() => {
     api.admin
@@ -366,6 +455,7 @@ function Settings({ token, onAuthError }) {
       .then((data) => {
         setBanks(data.banks);
         setForm(data.settings);
+        setMailConfigured(Boolean(data.mail_configured));
       })
       .catch((error) => error.status === 401 && onAuthError());
     api.admin.messages(token).then((data) => setMessages(data.messages)).catch(() => {});
@@ -454,6 +544,11 @@ function Settings({ token, onAuthError }) {
           {saving ? t('admin.savingSettings') : t('admin.saveSettings')}
         </button>
       </form>
+
+      <div className={`notice notice--${mailConfigured ? 'positive' : 'warning'}`} style={{ marginTop: 28, maxWidth: 620 }}>
+        <p className="notice__title">{t(mailConfigured ? 'admin.mailOnTitle' : 'admin.mailOffTitle')}</p>
+        <p className="small" style={{ margin: 0 }}>{t(mailConfigured ? 'admin.mailOnBody' : 'admin.mailOffBody')}</p>
+      </div>
 
       <div className="card panel" style={{ marginTop: 28, maxWidth: 620 }}>
         <p className="eyebrow">{t('admin.previewTitle')}</p>

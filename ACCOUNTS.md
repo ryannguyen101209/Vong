@@ -6,18 +6,20 @@ Google Identity Services returns an ID token to the browser. The API verifies it
 
 The API creates a seven-day random session stored as a hash in SQLite and sent in an HttpOnly cookie (Secure in production). Logout invalidates the server session. Mutations require a custom request header and an allowed Origin; CORS uses an explicit allowlist.
 
-New listings require authentication and store the seller account ID. Seller email comes from the verified account. Old listings are not claimed based on matching email. Payment information and marking a listing paid require its owner. Publishing still requires the existing manual admin approval.
+New listings require authentication and store the seller account ID. The seller gives the email their publish key goes to; it defaults to their verified Google address. Old listings are not claimed based on matching email. Payment information, marking a listing paid, and entering the publish key require its owner.
 
-Each published listing can have one conversation per buyer. Only that buyer and the listing owner can list, read or send messages in the conversation. Messages persist in SQLite, refresh every three seconds while the conversation is open, support earlier-message pagination, and use a client request ID to avoid duplicate sends after network retries. No email/push notifications or read receipts are included.
+Publishing takes two steps: an admin approves the listing after checking the transfer, which generates a one-time key and emails it to the seller (or shows it to the admin to send by hand when SMTP is not configured). The listing goes live when its owner enters that key. Keys are stored as SHA-256 hashes, expire after 7 days, lock after 5 wrong attempts, and are replaced when resent. Signed-in sellers see all their listings and their status at `/my-listings`.
 
-Sample listings are excluded from public API results and detail pages. The static demo starts empty and filters legacy `seed-*` records from browser storage. Existing real records are preserved.
+Each published listing can have one conversation per buyer. Only that buyer and the listing owner can list, read or send messages in the conversation. Messages persist in SQLite, refresh every three seconds while the conversation is open, support earlier-message pagination, and use a client request ID to avoid duplicate sends after network retries. Each side's last-read message is tracked so the header and inbox show unread counts. No email/push notifications for new messages or read receipts are included.
+
+There is no sample inventory. Sample listings left in an older database are deleted when the server starts; real listings are preserved. The static demo starts empty and filters legacy `seed-*` records from browser storage.
 
 ## Activate on a real host
 
-1. Deploy the full Node application using `render.yaml` (or the Dockerfile), with persistent storage. Run `npm install && npm run build` and `npm start`. Do not run `npm run seed`.
-2. Set `ADMIN_PASSWORD`, `GOOGLE_CLIENT_ID`, and `CORS_ORIGIN` to the site's exact public HTTPS origin. Set `NODE_ENV=production`. Keep `DATABASE_FILE` and `UPLOADS_DIR` on the persistent disk.
+1. Deploy the full Node application using `render.yaml` (or the Dockerfile), with persistent storage. Run `npm install && npm run build` and `npm start`.
+2. Set `ADMIN_PASSWORD`, `GOOGLE_CLIENT_ID`, and `CORS_ORIGIN` to the site's exact public HTTPS origin. Set `NODE_ENV=production`. Keep `DATABASE_FILE` and `UPLOADS_DIR` on the persistent disk. For emailed publish keys, also set `SMTP_HOST`, `SMTP_PORT`, `SMTP_USER`, `SMTP_PASS`, `MAIL_FROM` and `PUBLIC_URL` (see `.env.example`).
 3. In Google Cloud, create an OAuth client of type **Web application** and add that exact origin under **Authorized JavaScript origins**. Add `http://localhost:5174` if testing locally. Configure the consent screen and test users or production publishing as appropriate.
-4. Open the deployed site and sign in with two separate Google accounts. Post an item from one account, approve the listing in admin after the configured publishing process, and exchange messages from the other account. Confirm the conversation survives reloads and sign-out prevents access.
+4. Open the deployed site and sign in with two separate Google accounts. Post an item from one account, approve it in admin, enter the emailed key under Your listings, and exchange messages from the other account. Confirm the unread badge appears, the conversation survives reloads, and sign-out prevents access.
 
 Google's setup guide: https://developers.google.com/identity/gsi/web/guides/get-google-api-clientid
 
@@ -27,4 +29,4 @@ The current Vercel project is a static demo. It cannot run the SQLite API. The s
 
 ## Verification
 
-`npm test` runs the existing VietQR tests and isolated account/messaging integration tests. The latter inject a test-only Google verifier into the router factory, never into the running application. They test rejection, session flags/expiry, CSRF-origin checks, listing ownership, private conversation access, two-way delivery, deduplication, pagination, and sample exclusion. Real Google consent still needs testing after the deployment client ID is configured.
+`npm test` runs the VietQR tests and isolated integration tests for accounts, messaging and approval. They inject a test-only Google verifier and mail transport, never into the running application. They test rejection, session flags/expiry, CSRF-origin checks, listing ownership, seller email, private conversation access, two-way delivery, unread counts, deduplication, pagination, sample exclusion, and the publish key: emailing, hashing, owner-only entry, attempt lock, resend, expiry, rejection, mail failure and manual delivery. Real Google consent and your SMTP provider still need testing after the deployment is configured.

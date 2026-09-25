@@ -42,6 +42,17 @@ export const api = {
 
   markPaid: (id) => request(`/api/listings/${id}/mark-paid`, { method: 'POST' }),
 
+  myListings: () => request('/api/listings/mine'),
+
+  publish: (id, key) =>
+    request(`/api/listings/${id}/publish`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ key }),
+    }),
+
+  resendKey: (id) => request(`/api/listings/${id}/resend-key`, { method: 'POST' }),
+
   buyRequest: (id) => request(`/api/listings/${id}/buy-request`, { method: 'POST' }),
 
   contact: (body) =>
@@ -66,6 +77,12 @@ export const api = {
 
     approve: (token, id) =>
       request(`/api/admin/listings/${id}/approve`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` },
+      }),
+
+    resendKey: (token, id) =>
+      request(`/api/admin/listings/${id}/resend-key`, {
         method: 'POST',
         headers: { authorization: `Bearer ${token}` },
       }),

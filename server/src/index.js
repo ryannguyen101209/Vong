@@ -11,7 +11,7 @@ import { usingDefaultPassword } from './auth.js';
 import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { rateLimit } from 'express-rate-limit';
-import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
+import { CATEGORIES, DISTRICTS, CONDITIONS } from './catalog.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 dotenv.config({ path: path.join(SERVER_ROOT, '.env') });

@@ -27,7 +27,11 @@ db.pragma('journal_mode = WAL');
 db.pragma('foreign_keys = ON');
 
 /*
- * A listing moves: pending_payment -> awaiting_approval -> published | rejected
+ * A listing moves:
+ *   pending_payment -> awaiting_approval -> approved -> published
+ *                                        \-> rejected (seller can mark paid again)
+ * "approved" means a human checked the transfer and a one-time publish key was
+ * emailed to the seller; the listing goes live when the seller enters it.
  * Nothing here ever touches buyer money. The only money Vong knows about is the
  * flat listing fee the seller transfers to us, and even that is confirmed by a
  * human looking at a bank app.
@@ -37,7 +41,7 @@ db.exec(`
     id              TEXT PRIMARY KEY,
     ref             TEXT NOT NULL UNIQUE,
     -- A seller writes in one language only, so either column may be empty; the
-    -- CHECKs guarantee at least one variant of each exists. Seed listings have both.
+    -- CHECKs guarantee at least one variant of each exists.
     title_en        TEXT,
     title_vi        TEXT,
     description_en  TEXT,
@@ -171,6 +175,22 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_session_expiry ON user_sessions(expires_at);
 `);
 if (!columns.includes('seller_id')) db.exec('ALTER TABLE listings ADD COLUMN seller_id TEXT REFERENCES users(id)');
+
+// The publish key is stored only as a hash. Attempts are counted so a key
+// cannot be guessed; a locked or expired key has to be re-sent.
+for (const [name, type] of [
+  ['publish_key_hash', 'TEXT'],
+  ['publish_key_expires_at', 'INTEGER'],
+  ['publish_key_attempts', 'INTEGER NOT NULL DEFAULT 0'],
+  ['publish_key_sent_at', 'TEXT'],
+]) {
+  if (!columns.includes(name)) db.exec(`ALTER TABLE listings ADD COLUMN ${name} ${type}`);
+}
+
+// Earlier versions shipped invented sample listings. Nothing fake is shown any
+// more, so remove them outright rather than hiding them.
+const removedSamples = db.prepare('DELETE FROM listings WHERE is_seed = 1').run().changes;
+if (removedSamples > 0) console.log(`Removed ${removedSamples} sample listing(s).`);
 db.exec(`
   CREATE TABLE IF NOT EXISTS conversations (
     id TEXT PRIMARY KEY,
@@ -192,6 +212,12 @@ db.exec(`
   );
   CREATE INDEX IF NOT EXISTS idx_chat_conversation ON chat_messages(conversation_id, id);
 `);
+
+// Highest message id each side has seen, for unread counts.
+const conversationColumns = db.prepare('PRAGMA table_info(conversations)').all().map((c) => c.name);
+for (const name of ['buyer_last_read', 'seller_last_read']) {
+  if (!conversationColumns.includes(name)) db.exec(`ALTER TABLE conversations ADD COLUMN ${name} INTEGER NOT NULL DEFAULT 0`);
+}
 
 export const DEFAULT_SETTINGS = {
   bank_bin: '970436',
