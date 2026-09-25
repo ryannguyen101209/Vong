@@ -128,8 +128,8 @@ export function Payment() {
   if (listing.status === 'awaiting_approval') {
     return (
       <div className="shell pay-status">
-        <p className="status status--wait">{t('payment.statusAwaitingTitle')}</p>
         <h1>{t('payment.checkingTitle')}</h1>
+        <p className="status status--wait">{t('payment.statusAwaitingTitle')}</p>
         <p className="pay-status__body">{t('payment.checkingBody', { email: listing.seller_email })}</p>
         <p className="pay-status__ref">{t('payment.refNote', { ref: listing.ref })}</p>
         <div className="row pay-status__actions">
@@ -143,8 +143,8 @@ export function Payment() {
   if (listing.status === 'approved') {
     return (
       <div className="shell pay-status">
-        <p className="status status--ok">{t('payment.approvedTitle')}</p>
         <h1>{title}</h1>
+        <p className="status status--ok">{t('payment.approvedTitle')}</p>
         <p className="pay-status__body">{t('payment.statusApprovedBody')}</p>
         <div className="pay-status__key">
           <PublishKeyForm listing={listing} keyInfo={data.key} onPublished={load} />
@@ -156,8 +156,8 @@ export function Payment() {
   if (listing.status === 'published') {
     return (
       <div className="shell pay-status">
-        <p className="status status--ok">{t('payment.statusPublishedTitle')}</p>
         <h1>{title}</h1>
+        <p className="status status--ok">{t('payment.statusPublishedTitle')}</p>
         <p className="pay-status__body">{t('payment.statusPublishedBody')}</p>
         <div className="row pay-status__actions">
           <Link to={`/listing/${listing.id}`} className="btn btn--primary">{t('payment.viewListing')}</Link>
@@ -173,10 +173,10 @@ export function Payment() {
     <div className="pay">
       <div className="pay__top">
         <div className="shell pay__col">
+          <h1>{t('payment.title')}</h1>
           <p className={`status ${rejected ? 'status--bad' : 'status--wait'}`}>
             {rejected ? t('payment.statusRejectedTitle') : t('payment.statusPendingTitle')}
           </p>
-          <h1>{t('payment.title')}</h1>
           <p className="pay__lead">{t('payment.lead')}</p>
           {rejected && (
             <div className="notice notice--bad pay__rejected">

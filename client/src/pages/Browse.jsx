@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { Link, useSearchParams } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { ListingPost } from '../components/ListingCard.jsx';
+import { Feed } from '../components/Feed.jsx';
 import { MarketRail } from '../components/MarketRail.jsx';
 import { ErrorState, LoadingFeed } from '../components/States.jsx';
 import { SearchIcon } from '../components/Icons.jsx';
@@ -137,9 +137,7 @@ export function Browse() {
             {status === 'ready' && listings.length > 0 && (
               <>
                 <p className="system-msg feed__count">{resultLabel}</p>
-                <ol className="feed">
-                  {listings.map((listing) => <ListingPost key={listing.id} listing={listing} />)}
-                </ol>
+                <Feed listings={listings} byDay={sort === 'newest'} />
               </>
             )}
           </section>

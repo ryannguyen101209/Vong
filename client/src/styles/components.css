@@ -200,7 +200,7 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
 }
 .save-btn:hover { color: var(--ink); }
 .save-btn svg { width: 18px; height: 18px; }
-.save-btn[data-saved='true'] { color: var(--unread); }
+.save-btn[data-saved='true'] { color: var(--blue-ink); }
 .save-btn--inline { min-height: 44px; padding: 0 var(--s-4); border: 1px solid var(--line-strong); border-radius: var(--r-pill); color: var(--ink); }
 .save-btn--inline:hover { background: var(--bubble); }
 
@@ -364,7 +364,7 @@ a.post__bubble:hover { color: var(--ink); background: #fbfdff; }
   border: 1px solid var(--line-strong); border-radius: var(--r-md); background: var(--page);
   font-size: 1.375rem; font-weight: 600; font-variant-numeric: tabular-nums; letter-spacing: 0.2em; text-align: center; text-transform: uppercase;
 }
-.key-input::placeholder { color: var(--line-strong); }
+.key-input::placeholder { color: var(--ink-faint); }
 .key-input:focus { outline: none; border-color: var(--blue); box-shadow: 0 0 0 3px var(--blue-soft); }
 .key-input[aria-invalid='true'] { border-color: var(--bad); }
 .key-input:disabled { opacity: 0.55; }

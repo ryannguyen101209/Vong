@@ -12,7 +12,6 @@ export function MarketRail({ categories = [], fee = null }) {
       <section className="rail__block">
         <h2>{t('rail.sellTitle')}</h2>
         <p>{t('rail.sellBody', { fee: feeLabel })}</p>
-        <Link className="btn btn--primary" to="/sell">{t('market.sell')}</Link>
       </section>
 
       {categories.length > 0 && (

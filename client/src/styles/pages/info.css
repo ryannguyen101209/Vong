@@ -30,11 +30,7 @@
 .prose p { color: var(--ink-soft); line-height: 1.7; }
 
 /* A pinned note in the thread: tint, bubble shape, no border, no shadow. */
-.pinned {
-  padding: var(--s-5) var(--s-6) var(--s-6);
-  border-radius: var(--r-tail) var(--r-bubble) var(--r-bubble) var(--r-bubble);
-  background: var(--thread);
-}
+.pinned { padding-block: var(--s-5); border-block: 1px solid var(--line-strong); }
 .pinned p { color: var(--ink); }
 
 /* ----------------------------------------------------------------- FAQ --- */

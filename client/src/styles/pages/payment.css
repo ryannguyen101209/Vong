@@ -25,11 +25,11 @@
 /* ------------------------------------------------------------- details --- */
 
 .pay__side { display: flex; flex-direction: column; gap: var(--s-4); min-width: 0; }
-.pay-details { padding: var(--s-4) var(--s-5) var(--s-5); border-radius: var(--r-bubble); background: var(--page); }
+.pay-details { padding: 0; }
 .pay-details h2 { margin-bottom: var(--s-2); font-size: var(--text-base); font-weight: 600; letter-spacing: -0.01em; }
 .pay-details dl { margin: 0; }
 
-.pay-detail { display: flex; flex-direction: column; gap: 2px; padding-block: var(--s-3); border-top: 1px solid var(--line); }
+.pay-detail { display: flex; flex-direction: column; gap: 2px; padding-block: var(--s-3); border-top: 1px solid var(--line-strong); }
 .pay-detail dt { color: var(--ink-faint); font-size: var(--text-xs); }
 .pay-detail dd { display: flex; align-items: center; justify-content: space-between; gap: var(--s-3); min-height: 30px; margin: 0; }
 .pay-detail__value { min-width: 0; font-weight: 600; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
@@ -62,7 +62,7 @@
   .pay__thread { padding-block: var(--s-5) var(--s-12); }
   .pay__grid { grid-template-columns: minmax(0, 1fr); gap: var(--s-5); }
   .pay-qr { width: min(100%, 252px); margin-inline: auto; }
-  .pay-details { padding: var(--s-3) var(--s-4) var(--s-4); }
+  .pay-details { padding: 0; }
   .pay__mark { align-self: stretch; min-width: 0; }
 
   .pay-status { min-height: 0; padding-block: var(--s-8) var(--s-12); }

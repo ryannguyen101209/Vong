@@ -3,7 +3,7 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice } from '../lib/format.js';
-import { ListingPost } from '../components/ListingCard.jsx';
+import { Feed, FeedComposer } from '../components/Feed.jsx';
 import { MarketRail } from '../components/MarketRail.jsx';
 import { ErrorState, LoadingFeed } from '../components/States.jsx';
 import { SearchIcon } from '../components/Icons.jsx';
@@ -76,19 +76,17 @@ export function Home() {
       <div className="market__thread">
         <div className="shell market__inner">
           <section className="market__feed" aria-label={t('home.recentTitle')}>
+            <FeedComposer />
             {status === 'loading' && <LoadingFeed />}
             {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
             {status === 'ready' && listings.length === 0 && (
               <div className="thread-empty">
                 <p className="system-msg">{district ? t('market.emptyDistrict', { district: t(`districts.${district}`) }) : t('market.emptyAll')}</p>
-                {!district && <Link className="btn btn--primary" to="/sell">{t('market.firstCta')}</Link>}
               </div>
             )}
             {status === 'ready' && listings.length > 0 && (
               <>
-                <ol className="feed">
-                  {listings.slice(0, FEED_SIZE).map((listing) => <ListingPost listing={listing} key={listing.id} />)}
-                </ol>
+                <Feed listings={listings.slice(0, FEED_SIZE)} />
                 {listings.length > FEED_SIZE && (
                   <Link className="btn feed__more" to={district ? `/browse?district=${district}` : '/browse'}>{t('market.seeAll')}</Link>
                 )}

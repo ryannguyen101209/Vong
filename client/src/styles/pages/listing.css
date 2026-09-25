@@ -34,6 +34,14 @@
 .listing__phone a { color: var(--ink); font-size: var(--text-lg); font-weight: 700; font-variant-numeric: tabular-nums; text-decoration: none; }
 .listing__phone svg { color: var(--blue); }
 
+/* Desktop: the actions sit under the price; the bottom bar is for phones. */
+.listing__actions { display: none; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); }
+@media (min-width: 1024px) {
+  .listing__actions { display: flex; }
+  .listing__actions .listing__message { flex: 0 1 auto; }
+  .listing__reply { display: none; }
+}
+
 @media (max-width: 640px) {
   .listing { padding-block: var(--s-4) var(--s-8); }
   .listing__text { padding-inline: var(--s-2); }

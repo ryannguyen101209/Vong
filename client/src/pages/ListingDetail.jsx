@@ -64,6 +64,41 @@ export function ListingDetail() {
       .finally(() => setRequesting(false));
   };
 
+  const actions = (
+    <>
+      {own ? (
+        <>
+          <p className="listing__own">{t('listing.ownBody')}</p>
+          <div className="row">
+            <Link to="/my-listings" className="btn btn--small">{t('mine.title')}</Link>
+            <Link to="/messages" className="btn btn--small">{t('nav.messages')}</Link>
+          </div>
+        </>
+      ) : contact?.seller_phone ? (
+        <p className="listing__phone">
+          <PhoneIcon /> <a href={`tel:${contact.seller_phone.replace(/\s/g, '')}`}>{contact.seller_phone}</a>
+          <span>{t('listing.contactBody')}</span>
+        </p>
+      ) : (
+        <>
+          <Link
+            to={`/messages?listing=${listing.id}`}
+            className={`btn btn--primary listing__message${published ? '' : ' is-disabled'}`}
+            aria-disabled={!published}
+            onClick={(event) => !published && event.preventDefault()}
+          >
+            <MessageIcon /> {t('listing.messageSellerNamed', { name: listing.seller_name })}
+          </Link>
+          <button type="button" className="btn" onClick={showPhone} disabled={requesting || !published}>
+            <PhoneIcon /> {requesting ? t('listing.requesting') : t('listing.requestPhone')}
+          </button>
+          <SaveButton listingId={listing.id} inline />
+          {contact?.error && <p className="field__error" role="alert">{t('common.error')}</p>}
+        </>
+      )}
+    </>
+  );
+
   return (
     <div className="listing-page">
       <div className="shell listing">
@@ -91,6 +126,7 @@ export function ListingDetail() {
             <div className="listing__text">
               <h1 id="listing-title">{title}</h1>
               <p className="listing__price">{formatPrice(listing.price_vnd, lang)}</p>
+              <div className="listing__actions">{actions}</div>
               <dl className="listing__facts">
                 <div><dt>{t('listing.condition')}</dt><dd>{t(`conditions.${listing.condition}`)}</dd></div>
                 <div><dt>{t('listing.category')}</dt><dd>{t(`categories.${listing.category}`)}</dd></div>
@@ -109,36 +145,7 @@ export function ListingDetail() {
 
       <div className="listing__reply" role="region" aria-label={t('listing.sellerTitle')}>
         <div className="shell listing__reply-inner">
-          {own ? (
-            <>
-              <p className="listing__own">{t('listing.ownBody')}</p>
-              <div className="row">
-                <Link to="/my-listings" className="btn btn--small">{t('mine.title')}</Link>
-                <Link to="/messages" className="btn btn--small">{t('nav.messages')}</Link>
-              </div>
-            </>
-          ) : contact?.seller_phone ? (
-            <p className="listing__phone">
-              <PhoneIcon /> <a href={`tel:${contact.seller_phone.replace(/\s/g, '')}`}>{contact.seller_phone}</a>
-              <span>{t('listing.contactBody')}</span>
-            </p>
-          ) : (
-            <>
-              <Link
-                to={`/messages?listing=${listing.id}`}
-                className={`btn btn--primary listing__message${published ? '' : ' is-disabled'}`}
-                aria-disabled={!published}
-                onClick={(event) => !published && event.preventDefault()}
-              >
-                <MessageIcon /> {t('listing.messageSellerNamed', { name: listing.seller_name })}
-              </Link>
-              <button type="button" className="btn" onClick={showPhone} disabled={requesting || !published}>
-                <PhoneIcon /> {requesting ? t('listing.requesting') : t('listing.requestPhone')}
-              </button>
-              <SaveButton listingId={listing.id} inline />
-              {contact?.error && <p className="field__error" role="alert">{t('common.error')}</p>}
-            </>
-          )}
+          {actions}
         </div>
       </div>
     </div>

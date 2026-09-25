@@ -105,14 +105,18 @@ export function Contact() {
           <aside className="contact__ways" aria-labelledby="contact-ways">
             <h2 id="contact-ways">{t('contact.otherWaysTitle')}</h2>
             <dl>
-              <div>
-                <dt>{t('contact.zaloLabel')}</dt>
-                <dd className="contact__zalo">{SITE.zalo}</dd>
-              </div>
-              <div>
-                <dt>{t('contact.emailUsLabel')}</dt>
-                <dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
-              </div>
+              {SITE.zalo && (
+                <div>
+                  <dt>{t('contact.zaloLabel')}</dt>
+                  <dd className="contact__zalo">{SITE.zalo}</dd>
+                </div>
+              )}
+              {SITE.email && (
+                <div>
+                  <dt>{t('contact.emailUsLabel')}</dt>
+                  <dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
+                </div>
+              )}
               <div>
                 <dt>{t('contact.hoursLabel')}</dt>
                 <dd>{t('contact.replyHours')}</dd>

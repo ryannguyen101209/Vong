@@ -465,4 +465,11 @@ export default {
     sellBody: 'Viết tin và trả {{fee}} một lần. Tụi mình kiểm tra thanh toán xong là tin lên sóng, và bạn giữ trọn tiền bán.',
     note: 'Vòng không giữ tiền của người mua. Hai bên tự thống nhất cách trả tiền và nhận hàng qua tin nhắn.',
   },
+
+  feed: {
+    today: 'Hôm nay',
+    yesterday: 'Hôm qua',
+    composer: 'Bạn muốn bán gì?',
+    post: 'Đăng',
+  },
 };

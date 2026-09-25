@@ -21,6 +21,20 @@
 .market__inner { display: grid; grid-template-columns: minmax(0, var(--feed)) minmax(240px, 280px); align-items: start; justify-content: space-between; gap: var(--s-12); }
 .market__feed { display: flex; flex-direction: column; gap: var(--s-5); min-width: 0; }
 .feed__more { align-self: flex-start; margin-left: 48px; }
+.feed__day { display: flex; justify-content: center; }
+
+.feed-composer {
+  display: grid; grid-template-columns: 36px minmax(0, 1fr) auto; align-items: center; gap: var(--s-3);
+  padding-bottom: var(--s-5); border-bottom: 1px solid var(--line-strong); color: var(--ink); text-decoration: none;
+}
+.feed-composer:hover { color: var(--ink); }
+.feed-composer__mark { background: var(--page); color: var(--blue); }
+.feed-composer__field {
+  display: flex; align-items: center; min-width: 0; height: 44px; padding: 0 var(--s-4);
+  border-radius: var(--r-pill); background: var(--page); color: var(--ink-faint); font-size: 0.9375rem;
+  overflow: hidden; white-space: nowrap; text-overflow: ellipsis; transition: color 0.15s var(--ease);
+}
+.feed-composer:hover .feed-composer__field { color: var(--ink); }
 .thread-empty { display: flex; flex-direction: column; align-items: center; gap: var(--s-4); padding-block: var(--s-12); }
 
 .rail { position: sticky; top: calc(var(--header-h) + var(--s-6)); display: flex; flex-direction: column; gap: var(--s-8); }

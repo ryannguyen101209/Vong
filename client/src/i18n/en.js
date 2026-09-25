@@ -465,4 +465,11 @@ export default {
     sellBody: 'Write a listing and pay {{fee}} once. It goes live after we’ve checked the payment, and you keep the whole price.',
     note: 'Vòng never holds the buyer’s money. You agree on payment and pickup in chat.',
   },
+
+  feed: {
+    today: 'Today',
+    yesterday: 'Yesterday',
+    composer: 'What do you want to sell?',
+    post: 'Post',
+  },
 };

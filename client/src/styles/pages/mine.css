@@ -59,12 +59,8 @@ a.mini-post:hover { background: #fbfdff; color: var(--ink); }
 .mine-step p { max-width: 52ch; color: var(--ink-soft); font-size: var(--text-sm); overflow-wrap: anywhere; }
 .mine-step__actions { display: flex; flex-wrap: wrap; gap: var(--s-2); }
 
-/* Approved: the key form is the one reply that asks for something. A white
-   bubble with a thin blue edge, so it reads first without raising its voice. */
-.mine-post .key-area {
-  width: min(100%, 520px); margin-top: var(--s-1);
-  border: 1px solid rgb(20 99 243 / 32%); background: var(--page);
-}
+/* Approved: the key form reads as the reply under the post, no box of its own. */
+.mine-post .key-area { width: min(100%, 520px); margin-top: var(--s-1); padding: var(--s-2) 0 0 var(--s-4); border-left: 1px solid var(--line-strong); border-radius: 0; background: transparent; }
 .mine-post .key-area__icon { background: var(--blue-soft); }
 
 @media (max-width: 720px) {
