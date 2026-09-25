@@ -43,8 +43,8 @@ export function About() {
       </div>
 
       <div className="row" style={{ marginTop: 32 }}>
-        <Link to="/sell" className="btn btn--accent">{t('home.heroCtaPrimary')}</Link>
-        <Link to="/contact" className="btn btn--ghost">{t('nav.contact')}</Link>
+        <Link to="/sell" className="btn btn--primary">{t('home.heroCtaPrimary')}</Link>
+        <Link to="/contact" className="btn">{t('nav.contact')}</Link>
       </div>
     </div>
   );

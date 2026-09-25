@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { CloseIcon } from './Icons.jsx';
+import { LogoMark } from './Logo.jsx';
 
 const GOOGLE_SCRIPT = 'https://accounts.google.com/gsi/client';
 
@@ -87,12 +88,12 @@ export function SignInDialog() {
   return (
     <div className="dialog-backdrop auth-backdrop" role="presentation" onMouseDown={closeSignIn}>
       <section ref={dialogRef} className="dialog auth-dialog" role="dialog" aria-modal="true" aria-labelledby="signin-title" onMouseDown={(event) => event.stopPropagation()}>
-        <button type="button" className="dialog-close" onClick={closeSignIn} aria-label={t('common.close')}>
+        <button type="button" className="icon-btn dialog-close" onClick={closeSignIn} aria-label={t('common.close')}>
           <CloseIcon />
         </button>
-        <div className="auth-mark" aria-hidden="true">V</div>
+        <span className="brand" aria-hidden="true"><LogoMark size={36} /></span>
         <h2 id="signin-title">{t('auth.title')}</h2>
-        <p className="muted">{t('auth.lead')}</p>
+        <p>{t('auth.lead')}</p>
 
         {googleConfigured ? (
           <>
@@ -101,8 +102,8 @@ export function SignInDialog() {
             {status === 'error' && <p className="field__error">{t('auth.loadError')}</p>}
           </>
         ) : (
-          <div className="auth-config-note">
-            <strong>{t('auth.previewTitle')}</strong>
+          <div className="notice auth-config-note">
+            <p className="notice__title">{t('auth.previewTitle')}</p>
             <p>{t('auth.previewBody')}</p>
           </div>
         )}

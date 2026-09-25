@@ -7,7 +7,7 @@ import { requireUser } from '../accounts.js';
 export const router = express.Router();
 router.use(requireUser);
 const writeLimit = rateLimit({ windowMs: 60_000, limit: 40, keyGenerator: (req) => req.user.id, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_messages' } });
-const query = `SELECT c.*, l.title_en, l.title_vi, l.image_path,
+const query = `SELECT c.*, l.title_en, l.title_vi, l.image_path, l.price_vnd,
   CASE WHEN c.buyer_id = @user THEN seller.name ELSE buyer.name END AS other_name,
   (SELECT body FROM chat_messages WHERE conversation_id = c.id ORDER BY id DESC LIMIT 1) AS last_message,
   (SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c.id AND m.sender_id <> @user

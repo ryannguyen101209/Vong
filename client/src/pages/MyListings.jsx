@@ -23,7 +23,7 @@ function NextStep({ listing, onChange }) {
       return (
         <div className="my-listing__next">
           <p>{t('mine.nextPay', { fee: formatPrice(listing.fee_vnd, lang) })}</p>
-          <Link className="btn btn--accent btn--small" to={`/payment/${listing.id}`}>{t('mine.payCta')}</Link>
+          <Link className="btn btn--primary btn--small" to={`/payment/${listing.id}`}>{t('mine.payCta')}</Link>
         </div>
       );
     case 'awaiting_approval':
@@ -35,8 +35,8 @@ function NextStep({ listing, onChange }) {
         <div className="my-listing__next">
           <p>{t('mine.nextLive')}</p>
           <div className="row">
-            <Link className="btn btn--ghost btn--small" to={`/listing/${listing.id}`}>{t('payment.viewListing')}</Link>
-            <Link className="btn btn--ghost btn--small" to="/messages">{t('nav.messages')}</Link>
+            <Link className="btn btn--small" to={`/listing/${listing.id}`}>{t('payment.viewListing')}</Link>
+            <Link className="btn btn--small" to="/messages">{t('nav.messages')}</Link>
           </div>
         </div>
       );
@@ -44,7 +44,7 @@ function NextStep({ listing, onChange }) {
       return (
         <div className="my-listing__next">
           <p>{t('payment.statusRejectedBody', { reason: listing.reject_reason || '—' })}</p>
-          <Link className="btn btn--ghost btn--small" to={`/payment/${listing.id}`}>{t('mine.rejectedCta')}</Link>
+          <Link className="btn btn--small" to={`/payment/${listing.id}`}>{t('mine.rejectedCta')}</Link>
         </div>
       );
     default:
@@ -73,7 +73,7 @@ export function MyListings() {
       <div className="shell section messages-gate">
         <h1>{t('mine.signInTitle')}</h1>
         <p className="lead">{t('mine.signInBody')}</p>
-        <button type="button" className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button>
+        <button type="button" className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button>
       </div>
     );
   }
@@ -85,14 +85,14 @@ export function MyListings() {
           <h1>{t('mine.title')}</h1>
           <p className="lead">{t('mine.lead')}</p>
         </div>
-        <Link className="btn btn--accent" to="/sell">{t('market.sell')}</Link>
+        <Link className="btn btn--primary" to="/sell">{t('market.sell')}</Link>
       </div>
 
       {status === 'loading' && <p role="status" className="muted">{t('common.loading')}</p>}
       {status === 'error' && <ErrorState onRetry={load} />}
       {status === 'ready' && listings.length === 0 && (
         <EmptyState title={t('mine.emptyTitle')} body={t('mine.emptyBody')}>
-          <Link className="btn btn--accent" to="/sell">{t('market.firstCta')}</Link>
+          <Link className="btn btn--primary" to="/sell">{t('market.firstCta')}</Link>
         </EmptyState>
       )}
       {status === 'ready' && listings.length > 0 && (

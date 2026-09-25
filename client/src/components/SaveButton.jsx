@@ -6,7 +6,7 @@ import { SaveReasonDialog } from './SaveReasonDialog.jsx';
 
 /**
  * Hearting is never one tap: saving opens the reason dialog, un-saving is
- * immediate. `inline` is the larger labelled version used on the detail page.
+ * immediate. `inline` is the outlined version used on the listing page.
  */
 export function SaveButton({ listingId, inline = false }) {
   const { t } = useI18n();
@@ -30,10 +30,9 @@ export function SaveButton({ listingId, inline = false }) {
         data-saved={saved}
         onClick={handleClick}
         aria-pressed={saved}
-        title={saved ? t('nav.saved') : t('common.save')}
       >
         <HeartIcon filled={saved} />
-        {inline && <span>{saved ? t('nav.saved') : t('common.save')}</span>}
+        <span>{saved ? t('nav.saved') : t('common.save')}</span>
       </button>
 
       {dialogOpen && (

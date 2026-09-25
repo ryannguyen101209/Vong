@@ -81,11 +81,12 @@ export const api = {
       fee_vnd: state.settings.fee_vnd,
     }),
 
-  listings: ({ search = '', category = '', sort = 'newest', ids } = {}) => {
+  listings: ({ search = '', category = '', district = '', sort = 'newest', ids } = {}) => {
     let listings = state.listings.filter((listing) => listing.status === 'published');
 
     if (ids?.length) listings = listings.filter((listing) => ids.includes(listing.id));
     if (category) listings = listings.filter((listing) => listing.category === category);
+    if (district) listings = listings.filter((listing) => listing.district === district);
 
     if (search) {
       const q = search.trim().toLowerCase();

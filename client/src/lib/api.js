@@ -24,10 +24,11 @@ async function request(path, options = {}) {
 export const api = {
   meta: () => request('/api/meta'),
 
-  listings: ({ search = '', category = '', sort = 'newest', ids } = {}) => {
+  listings: ({ search = '', category = '', district = '', sort = 'newest', ids } = {}) => {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (category) params.set('category', category);
+    if (district) params.set('district', district);
     if (sort) params.set('sort', sort);
     if (ids?.length) params.set('ids', ids.join(','));
     return request(`/api/listings?${params.toString()}`);

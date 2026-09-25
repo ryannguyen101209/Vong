@@ -27,7 +27,6 @@ export default {
     menu: 'Menu',
     switchLanguage: 'Switch to English',
     languageShort: 'EN',
-    themeToggle: 'Đổi giao diện',
   },
 
   market: {
@@ -35,8 +34,8 @@ export default {
     firstBody: 'Chưa có món đồ nào. Hãy tìm nhà mới cho món đồ bạn không còn dùng.',
     firstCta: 'Đăng bán món đồ đầu tiên',
     eyebrow: 'Chợ đồ cũ quanh bạn',
-    title: 'Đồ hay. Khởi đầu mới.',
-    lead: 'Mua món đồ bạn thích. Bán món đồ không còn dùng. Ngay tại Sài Gòn.',
+    title: 'Đồ cũ quanh Sài Gòn',
+    lead: 'Đăng bán với {{fee}}. Không lấy hoa hồng khi bạn bán được.',
     sell: 'Đăng bán',
     search: 'Tìm kiếm',
     categories: 'Mua theo danh mục',
@@ -44,6 +43,11 @@ export default {
     sellTitle: 'Có người sẽ thích món đồ của bạn.',
     sellBody: 'Thêm ảnh, đặt giá và kết nối với người mua gần bạn. Phí đăng tin nhỏ. Không thu hoa hồng.',
     skip: 'Đến nội dung chính',
+    districts: 'Khu vực',
+    allDistricts: 'Tất cả khu vực',
+    emptyAll: 'Chưa có món nào được đăng. Tin đầu tiên sẽ hiện ở đây.',
+    emptyDistrict: 'Chưa có món nào ở {{district}}.',
+    seeAll: 'Xem tất cả tin',
   },
 
   home: {
@@ -56,9 +60,9 @@ export default {
   },
 
   browse: {
-    title: 'Dạo xem',
+    title: 'Tất cả tin',
     lead: 'Tất cả tin đang được đăng trên Vòng.',
-    searchPlaceholder: 'Tìm theo tên, mô tả hoặc quận…',
+    searchPlaceholder: 'Tìm đồ cũ ở Sài Gòn',
     searchLabel: 'Tìm tin đăng',
     sortLabel: 'Sắp xếp',
     sortNewest: 'Mới nhất',
@@ -98,6 +102,7 @@ export default {
     statusNotice: 'Tin này chưa công khai — trạng thái: {{status}}.',
     ownTitle: 'Đây là tin của bạn',
     ownBody: 'Người mua nhắn cho bạn về món này sẽ hiện trong mục Tin nhắn.',
+    messageSellerNamed: 'Nhắn cho {{name}}',
   },
 
   sell: {
@@ -186,6 +191,7 @@ export default {
     placeholder: 'Viết tin nhắn',
     send: 'Gửi',
     unread: 'chưa đọc',
+    contextLabel: 'Về món này',
   },
 
   key: {
@@ -477,11 +483,18 @@ export default {
   },
 
   footer: {
-    blurb: 'Chợ đồ cũ cho Thành phố Hồ Chí Minh, do ba sinh viên làm ra.',
+    blurb: 'Chợ đồ cũ cho TP. Hồ Chí Minh. Một khoản phí đăng tin nhỏ, không hoa hồng.',
     exploreTitle: 'Khám phá',
     aboutTitle: 'Thông tin',
     legalBody:
       'Vòng chỉ thu phí đăng tin từ người bán. Tụi mình không lấy hoa hồng và không bao giờ giữ tiền giữa người mua và người bán.',
     madeIn: 'Làm tại Sài Gòn',
+    linksLabel: 'Liên kết',
+  },
+
+  rail: {
+    sellTitle: 'Bán món bạn không dùng nữa',
+    sellBody: 'Viết tin và trả {{fee}} một lần. Tin lên sau một lần kiểm tra, và bạn giữ trọn tiền bán.',
+    note: 'Vòng không giữ tiền của người mua. Hai bên tự thống nhất cách trả tiền và nhận hàng qua tin nhắn.',
   },
 };

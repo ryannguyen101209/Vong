@@ -42,7 +42,7 @@ export function Saved() {
           <p className="lead">{t('saved.lead')}</p>
         </div>
         <EmptyState title={t('saved.emptyTitle')} body={t('saved.emptyBody')}>
-          <Link to="/browse" className="btn btn--accent">{t('saved.emptyCta')}</Link>
+          <Link to="/browse" className="btn btn--primary">{t('saved.emptyCta')}</Link>
         </EmptyState>
       </div>
     );
@@ -92,7 +92,7 @@ export function Saved() {
                 </div>
 
                 <div className="saved-item__actions">
-                  <button type="button" className="btn btn--ghost btn--small" onClick={() => setEditing(entry)}>
+                  <button type="button" className="btn btn--small" onClick={() => setEditing(entry)}>
                     {t('saved.editReason')}
                   </button>
                   <button type="button" className="btn btn--danger btn--small" onClick={() => remove(entry.id)}>

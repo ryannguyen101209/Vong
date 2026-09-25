@@ -1,7 +1,7 @@
 /*
  * The Vòng mark: one continuous cursive stroke that loops over itself and falls
  * into a V. Drawn as a path so it stays crisp at any size and inherits colour
- * from CSS (currentColor), which is what makes it work in both themes.
+ * from CSS (currentColor).
  */
 
 const MARK_PATH =
@@ -30,7 +30,7 @@ export function LogoMark({ size = 32, className = '' }) {
   );
 }
 
-/** Mark inside the navy rounded square, as on the app icon. */
+/** Mark inside the blue rounded square, as on the app icon. */
 export function LogoTile({ size = 56, className = '' }) {
   return (
     <svg
@@ -41,12 +41,12 @@ export function LogoTile({ size = 56, className = '' }) {
       aria-hidden="true"
       focusable="false"
     >
-      <rect width="120" height="120" rx="28" fill="#0A2947" />
+      <rect width="120" height="120" rx="28" fill="#1463F3" />
       <g transform="translate(24.67 31.38) scale(0.3533)">
         <path
           d={MARK_PATH}
           fill="none"
-          stroke="#F3E4C9"
+          stroke="#FFFFFF"
           strokeWidth="13"
           strokeLinecap="round"
           strokeLinejoin="round"

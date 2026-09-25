@@ -2,81 +2,103 @@ import { useEffect, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { ListingCard } from '../components/ListingCard.jsx';
-import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
-import { ArrowUpRightIcon, SearchIcon } from '../components/Icons.jsx';
+import { formatPrice } from '../lib/format.js';
+import { ListingPost } from '../components/ListingCard.jsx';
+import { MarketRail } from '../components/MarketRail.jsx';
+import { ErrorState, LoadingFeed } from '../components/States.jsx';
+import { SearchIcon } from '../components/Icons.jsx';
+
+const FEED_SIZE = 20;
 
 export function Home() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const navigate = useNavigate();
-  const [search, setSearch] = useState('');
+  const [meta, setMeta] = useState({ categories: [], districts: [], fee_vnd: null });
+  const [district, setDistrict] = useState('');
   const [listings, setListings] = useState([]);
-  const [categories, setCategories] = useState([]);
   const [status, setStatus] = useState('loading');
   const [attempt, setAttempt] = useState(0);
+  const [search, setSearch] = useState('');
+
+  useEffect(() => {
+    api.meta().then(setMeta).catch(() => {});
+  }, []);
 
   useEffect(() => {
     let active = true;
     setStatus('loading');
-    Promise.all([api.listings({ sort: 'newest' }), api.meta()])
-      .then(([data, meta]) => {
+    api.listings({ sort: 'newest', district })
+      .then((data) => {
         if (!active) return;
-        setListings(data.listings.slice(0, 8));
-        setCategories(meta.categories);
+        setListings(data.listings);
         setStatus('ready');
       })
       .catch(() => active && setStatus('error'));
     return () => { active = false; };
-  }, [attempt]);
+  }, [district, attempt]);
 
-  function onSearch(event) {
+  const onSearch = (event) => {
     event.preventDefault();
-    const query = new URLSearchParams();
-    if (search.trim()) query.set('q', search.trim());
-    navigate('/browse' + (query.size ? '?' + query : ''));
-  }
+    const query = search.trim();
+    navigate(query ? `/browse?q=${encodeURIComponent(query)}` : '/browse');
+  };
+
+  const fee = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
 
   return (
-    <div className="shell marketplace">
-      <section className="market-hero" aria-labelledby="market-title">
-        <div className="market-hero__copy">
-          <p className="eyebrow">{t('home.heroLocation')} / {t('market.eyebrow')}</p>
-          <h1 id="market-title">{t('market.title')}</h1>
-          <p className="lead">{t('market.lead')}</p>
-          <div className="row">
-            <Link to="/browse" className="btn btn--accent">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
-            <Link to="/sell" className="btn btn--ghost">{t('market.sell')}</Link>
+    <div className="market">
+      <div className="market__top">
+        <div className="shell">
+          <div className="market__head">
+            <h1>{t('market.title')}</h1>
+            <p>{t('market.lead', { fee })}</p>
           </div>
+
+          <form className="market-search" role="search" onSubmit={onSearch}>
+            <SearchIcon />
+            <label className="sr-only" htmlFor="home-search">{t('browse.searchLabel')}</label>
+            <input id="home-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('browse.searchPlaceholder')} />
+          </form>
+
+          <ul className="threads" aria-label={t('market.districts')}>
+            <li>
+              <button type="button" className="thread-tab" aria-pressed={!district} onClick={() => setDistrict('')}>{t('market.allDistricts')}</button>
+            </li>
+            {meta.districts.map((value) => (
+              <li key={value}>
+                <button type="button" className="thread-tab" aria-pressed={district === value} onClick={() => setDistrict(value)}>{t(`districts.${value}`)}</button>
+              </li>
+            ))}
+          </ul>
         </div>
-      </section>
+      </div>
 
-      <section className="market-discover" aria-label={t('browse.searchLabel')}>
-        <form className="market-search" role="search" onSubmit={onSearch}>
-          <SearchIcon />
-          <label className="sr-only" htmlFor="market-search">{t('browse.searchLabel')}</label>
-          <input id="market-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('browse.searchPlaceholder')} />
-          <button type="submit" className="btn btn--accent">{t('market.search')}</button>
-        </form>
-        <nav className="market-categories" aria-label={t('market.categories')}>
-          <Link to="/browse" className="chip chip--active">{t('browse.allCategories')}</Link>
-          {categories.map((category) => <Link className="chip" key={category} to={'/browse?category=' + encodeURIComponent(category)}>{t('categories.' + category)}</Link>)}
-        </nav>
-      </section>
+      <div className="market__thread">
+        <div className="shell market__inner">
+          <section className="market__feed" aria-label={t('home.recentTitle')}>
+            {status === 'loading' && <LoadingFeed />}
+            {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
+            {status === 'ready' && listings.length === 0 && (
+              <div className="thread-empty">
+                <p className="system-msg">{district ? t('market.emptyDistrict', { district: t(`districts.${district}`) }) : t('market.emptyAll')}</p>
+                {!district && <Link className="btn btn--primary" to="/sell">{t('market.firstCta')}</Link>}
+              </div>
+            )}
+            {status === 'ready' && listings.length > 0 && (
+              <>
+                <ol className="feed">
+                  {listings.slice(0, FEED_SIZE).map((listing) => <ListingPost listing={listing} key={listing.id} />)}
+                </ol>
+                {listings.length > FEED_SIZE && (
+                  <Link className="btn feed__more" to={district ? `/browse?district=${district}` : '/browse'}>{t('market.seeAll')}</Link>
+                )}
+              </>
+            )}
+          </section>
 
-      <section aria-label={t('home.recentTitle')} className="market-listings">
-        {(status !== 'ready' || listings.length > 0) && <div className="market-section-head">
-          <div><h2 id="recent-title">{t('home.recentTitle')}</h2><p className="muted">{t('home.recentLead')}</p></div>
-          <Link to="/browse" className="market-text-link">{t('home.recentViewAll')} <ArrowUpRightIcon size={18} /></Link>
-        </div>}
-        {status === 'loading' && <LoadingGrid count={8} />}
-        {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
-        {status === 'ready' && (listings.length ? <div className="grid-listings">{listings.map((listing) => <ListingCard listing={listing} key={listing.id} />)}</div> : <EmptyState title={t('market.firstTitle')} body={t('market.firstBody')}><Link className="btn btn--accent" to="/sell">{t('market.firstCta')}</Link></EmptyState>)}
-      </section>
-
-      <section className="market-sell" aria-labelledby="sell-title">
-        <div><p className="eyebrow">{t('market.sellEyebrow')}</p><h2 id="sell-title">{t('market.sellTitle')}</h2><p>{t('market.sellBody')}</p></div>
-        <Link to="/sell" className="btn btn--accent">{t('market.sell')} <ArrowUpRightIcon size={18} /></Link>
-      </section>
+          <MarketRail categories={meta.categories} fee={meta.fee_vnd} />
+        </div>
+      </div>
     </div>
   );
 }

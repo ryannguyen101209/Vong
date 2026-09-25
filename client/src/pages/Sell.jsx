@@ -129,7 +129,7 @@ export function Sell() {
   const hasErrors = Object.keys(errors).length > 0;
 
   if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
-  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.sellTitle')}</h1><p className="lead">{t('auth.sellBody')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
+  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.sellTitle')}</h1><p className="lead">{t('auth.sellBody')}</p><button className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
 
   if (metaStatus !== 'ready') {
     return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <p role="status">{t('common.loading')}</p>}</div>;
@@ -149,13 +149,13 @@ export function Sell() {
         </div>
       </header>
 
-      <div className="notice notice--accent fee-notice">
+      <div className="notice notice--info fee-notice">
         <p className="notice__title">{t('sell.feeNoticeTitle', { fee: feeLabel })}</p>
         <p style={{ margin: 0 }}>{t('sell.feeNoticeBody')}</p>
       </div>
 
       {hasErrors && (
-        <div className="notice notice--danger" style={{ marginBottom: 24 }} role="alert">
+        <div className="notice notice--bad" style={{ marginBottom: 24 }} role="alert">
           <p className="notice__title">{t('sell.errorTitle')}</p>
           {errors.image === 'too_large' && <p style={{ margin: 0 }}>{t('sell.errorImage')}</p>}
           {errors.form && <p style={{ margin: 0 }}>{t('common.error')}</p>}
@@ -188,13 +188,13 @@ export function Sell() {
               <strong>{image ? image.name : t('sell.photoDropTitle')}</strong>
               <span className="field__hint">{t('sell.photoHint')}</span>
               <div className="row">
-                <button type="button" className="btn btn--ghost btn--small" onClick={() => fileInput.current?.click()}>
+                <button type="button" className="btn btn--small" onClick={() => fileInput.current?.click()}>
                   {image ? t('sell.photoChange') : t('sell.photoChoose')}
                 </button>
                 {image && (
                   <button
                     type="button"
-                    className="link-quiet"
+                    className="link-btn"
                     onClick={() => {
                       setImage(null);
                       if (fileInput.current) fileInput.current.value = '';
@@ -347,7 +347,7 @@ export function Sell() {
             <strong>{t('sell.submitSummary', { fee: feeLabel })}</strong>
             <span>{t('sell.submitSummaryBody')}</span>
           </div>
-          <button type="submit" className="btn btn--accent" disabled={submitting}>
+          <button type="submit" className="btn btn--primary" disabled={submitting}>
           {submitting ? t('sell.submitting') : t('sell.submit')}
           </button>
         </div>

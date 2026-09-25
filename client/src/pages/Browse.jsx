@@ -1,10 +1,10 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
-import { useSearchParams } from 'react-router-dom';
-import { Link } from 'react-router-dom';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useSearchParams } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { ListingCard } from '../components/ListingCard.jsx';
-import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
+import { ListingPost } from '../components/ListingCard.jsx';
+import { MarketRail } from '../components/MarketRail.jsx';
+import { ErrorState, LoadingFeed } from '../components/States.jsx';
 import { SearchIcon } from '../components/Icons.jsx';
 
 const SORTS = [
@@ -19,16 +19,17 @@ export function Browse() {
   const [params, setParams] = useSearchParams();
   const search = params.get('q') ?? '';
   const category = params.get('category') ?? '';
+  const district = params.get('district') ?? '';
   const sort = params.get('sort') ?? 'newest';
 
   const [searchInput, setSearchInput] = useState(search);
-  const [categories, setCategories] = useState([]);
+  const [meta, setMeta] = useState({ categories: [], districts: [], fee_vnd: null });
   const [listings, setListings] = useState([]);
   const [status, setStatus] = useState('loading');
   const requestId = useRef(0);
 
   useEffect(() => {
-    api.meta().then((meta) => setCategories(meta.categories)).catch(() => setCategories([]));
+    api.meta().then(setMeta).catch(() => {});
   }, []);
 
   // Keep the box in step when the URL changes from outside (back button, links).
@@ -50,7 +51,7 @@ export function Browse() {
     const currentRequest = ++requestId.current;
     setStatus('loading');
     api
-      .listings({ search, category, sort })
+      .listings({ search, category, district, sort })
       .then((data) => {
         if (currentRequest !== requestId.current) return;
         setListings(data.listings);
@@ -59,7 +60,7 @@ export function Browse() {
       .catch(() => {
         if (currentRequest === requestId.current) setStatus('error');
       });
-  }, [search, category, sort]);
+  }, [search, category, district, sort]);
 
   useEffect(() => {
     load();
@@ -73,96 +74,79 @@ export function Browse() {
     setParams(next);
   };
 
-  const hasFilters = Boolean(search || category || sort !== 'newest');
-
-  const resultLabel = useMemo(
-    () => (listings.length === 1 ? t('browse.resultsOne') : t('browse.resultsMany', { count: listings.length })),
-    [listings.length, t]
-  );
+  const hasFilters = Boolean(search || category || district || sort !== 'newest');
+  const resultLabel = listings.length === 1 ? t('browse.resultsOne') : t('browse.resultsMany', { count: listings.length });
 
   return (
-    <div className="shell section editorial-page browse-page">
-      <div className="section-head">
-        <h1>{t('browse.title')}</h1>
-        <p className="lead">{t('browse.lead')}</p>
-      </div>
+    <div className="market">
+      <div className="market__top">
+        <div className="shell">
+          <div className="market__head">
+            <h1>{t('browse.title')}</h1>
+          </div>
 
-      <div className="filters">
-        <div className="filters__row">
-          <label className="search-field">
-            <span className="sr-only">{t('browse.searchLabel')}</span>
+          <label className="market-search market-search--always">
             <SearchIcon />
-            <input
-              type="search"
-              value={searchInput}
-              placeholder={t('browse.searchPlaceholder')}
-              onChange={(event) => setSearchInput(event.target.value)}
-            />
+            <span className="sr-only">{t('browse.searchLabel')}</span>
+            <input type="search" value={searchInput} placeholder={t('browse.searchPlaceholder')} onChange={(event) => setSearchInput(event.target.value)} />
           </label>
 
-          <label>
-            <span className="sr-only">{t('browse.sortLabel')}</span>
-            <select className="select" value={sort} onChange={(event) => update('sort', event.target.value)}>
-              {SORTS.map((option) => (
-                <option key={option.value} value={option.value}>{t(option.key)}</option>
-              ))}
-            </select>
-          </label>
-        </div>
+          <ul className="threads" aria-label={t('market.districts')}>
+            <li>
+              <button type="button" className="thread-tab" aria-pressed={!district} onClick={() => update('district', '')}>{t('market.allDistricts')}</button>
+            </li>
+            {meta.districts.map((value) => (
+              <li key={value}>
+                <button type="button" className="thread-tab" aria-pressed={district === value} onClick={() => update('district', value)}>{t(`districts.${value}`)}</button>
+              </li>
+            ))}
+          </ul>
 
-        <div className="chip-row">
-          <button
-            type="button"
-            className="chip"
-            aria-pressed={!category}
-            onClick={() => update('category', '')}
-          >
-            {t('browse.allCategories')}
-          </button>
-          {categories.map((value) => (
-            <button
-              key={value}
-              type="button"
-              className="chip"
-              aria-pressed={category === value}
-              onClick={() => update('category', category === value ? '' : value)}
-            >
-              {t(`categories.${value}`)}
-            </button>
-          ))}
-        </div>
-
-        {status === 'ready' && (
-          <div className="spread">
-            <span className="small muted">{resultLabel}</span>
-            {hasFilters && (
-              <button type="button" className="link-quiet" onClick={() => setParams({})}>
-                {t('browse.clearFilters')}
-              </button>
-            )}
+          <div className="filter-row">
+            <label>
+              <span className="sr-only">{t('listing.category')}</span>
+              <select className="select" value={category} onChange={(event) => update('category', event.target.value)}>
+                <option value="">{t('browse.allCategories')}</option>
+                {meta.categories.map((value) => <option key={value} value={value}>{t(`categories.${value}`)}</option>)}
+              </select>
+            </label>
+            <label>
+              <span className="sr-only">{t('browse.sortLabel')}</span>
+              <select className="select" value={sort} onChange={(event) => update('sort', event.target.value)}>
+                {SORTS.map((option) => <option key={option.value} value={option.value}>{t(option.key)}</option>)}
+              </select>
+            </label>
+            {hasFilters && <button type="button" className="link-btn" onClick={() => setParams({})}>{t('browse.clearFilters')}</button>}
           </div>
-        )}
+        </div>
       </div>
 
-      {status === 'loading' && <LoadingGrid />}
-      {status === 'error' && <ErrorState onRetry={load} />}
-      {status === 'ready' &&
-        (listings.length === 0 ? (
-          <EmptyState title={t(hasFilters ? 'browse.emptyTitle' : 'market.firstTitle')} body={t(hasFilters ? 'browse.emptyBody' : 'market.firstBody')}>
-            {!hasFilters && <Link to="/sell" className="btn btn--accent">{t('market.firstCta')}</Link>}
-            {hasFilters && (
-              <button type="button" className="btn btn--ghost" onClick={() => setParams({})}>
-                {t('browse.clearFilters')}
-              </button>
+      <div className="market__thread">
+        <div className="shell market__inner">
+          <section className="market__feed" aria-label={t('browse.title')} aria-busy={status === 'loading'}>
+            {status === 'loading' && <LoadingFeed />}
+            {status === 'error' && <ErrorState onRetry={load} />}
+            {status === 'ready' && listings.length === 0 && (
+              <div className="thread-empty">
+                <p className="system-msg">{hasFilters ? t('browse.emptyBody') : t('market.emptyAll')}</p>
+                {hasFilters
+                  ? <button type="button" className="btn" onClick={() => setParams({})}>{t('browse.clearFilters')}</button>
+                  : <Link to="/sell" className="btn btn--primary">{t('market.firstCta')}</Link>}
+              </div>
             )}
-          </EmptyState>
-        ) : (
-          <div className="grid-listings">
-            {listings.map((listing) => (
-              <ListingCard key={listing.id} listing={listing} />
-            ))}
-          </div>
-        ))}
+            {status === 'ready' && listings.length > 0 && (
+              <>
+                <p className="system-msg feed__count">{resultLabel}</p>
+                <ol className="feed">
+                  {listings.map((listing) => <ListingPost key={listing.id} listing={listing} />)}
+                </ol>
+              </>
+            )}
+          </section>
+
+          <MarketRail fee={meta.fee_vnd} />
+        </div>
+      </div>
     </div>
   );
 }

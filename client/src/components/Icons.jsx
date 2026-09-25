@@ -111,3 +111,16 @@ export const ChevronDownIcon = ({ size = 16 }) => (
     <path d="m6 9 6 6 6-6" />
   </svg>
 );
+
+export const ReplyIcon = ({ size = 18 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M9 14 4 9l5-5" />
+    <path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11" />
+  </svg>
+);
+
+export const SendIcon = ({ size = 20 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M5 12h13M12 5l7 7-7 7" />
+  </svg>
+);

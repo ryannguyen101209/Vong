@@ -27,7 +27,6 @@ export default {
     menu: 'Menu',
     switchLanguage: 'Chuyển sang tiếng Việt',
     languageShort: 'VI',
-    themeToggle: 'Switch theme',
   },
 
   market: {
@@ -35,8 +34,8 @@ export default {
     firstBody: 'No items yet. Give something you no longer use a new home.',
     firstCta: 'Sell the first item',
     eyebrow: 'Your local secondhand market',
-    title: 'Good finds. A fresh start.',
-    lead: 'Buy pre-loved pieces. Sell what you no longer need. Right here in Saigon.',
+    title: 'Secondhand around Saigon',
+    lead: 'List something for {{fee}}. No commission when it sells.',
     sell: 'Sell an item',
     search: 'Search',
     categories: 'Shop by category',
@@ -44,6 +43,11 @@ export default {
     sellTitle: 'Someone else will love it.',
     sellBody: 'Add a photo, set your price, and connect with local buyers. A small publishing fee. No sales commission.',
     skip: 'Skip to content',
+    districts: 'Districts',
+    allDistricts: 'All districts',
+    emptyAll: 'Nothing for sale yet. The first listing will appear here.',
+    emptyDistrict: 'Nothing for sale in {{district}} yet.',
+    seeAll: 'See all listings',
   },
 
   home: {
@@ -56,9 +60,9 @@ export default {
   },
 
   browse: {
-    title: 'Browse',
+    title: 'All listings',
     lead: 'Everything currently live on Vòng.',
-    searchPlaceholder: 'Search by name, description or district…',
+    searchPlaceholder: 'Search secondhand in Saigon',
     searchLabel: 'Search listings',
     sortLabel: 'Sort',
     sortNewest: 'Newest first',
@@ -98,6 +102,7 @@ export default {
     statusNotice: 'This listing is not public yet — status: {{status}}.',
     ownTitle: 'This is your listing',
     ownBody: 'Buyers who message you about it show up in Messages.',
+    messageSellerNamed: 'Message {{name}}',
   },
 
   sell: {
@@ -186,6 +191,7 @@ export default {
     placeholder: 'Write a message',
     send: 'Send',
     unread: 'unread',
+    contextLabel: 'About this item',
   },
 
   key: {
@@ -477,11 +483,18 @@ export default {
   },
 
   footer: {
-    blurb: 'A secondhand marketplace for Ho Chi Minh City, built by three students.',
+    blurb: 'A secondhand marketplace for Ho Chi Minh City. One small listing fee, no commission.',
     exploreTitle: 'Explore',
     aboutTitle: 'About',
     legalBody:
       'Vòng charges sellers a listing fee only. We take no commission and never hold payment between buyer and seller.',
     madeIn: 'Made in Saigon',
+    linksLabel: 'Site links',
+  },
+
+  rail: {
+    sellTitle: 'Sell something you no longer use',
+    sellBody: 'Write a listing and pay {{fee}} once. It goes live after a quick check, and you keep the whole price.',
+    note: 'Vòng never holds the buyer’s money. You agree on payment and pickup in chat.',
   },
 };

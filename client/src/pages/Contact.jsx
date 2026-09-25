@@ -52,7 +52,7 @@ export function Contact() {
               <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('contact.sentTitle')}</p>
               <p>{t('contact.sentBody')}</p>
               <div>
-                <button type="button" className="btn btn--ghost" onClick={() => setSent(false)}>
+                <button type="button" className="btn" onClick={() => setSent(false)}>
                   {t('contact.sentAnother')}
                 </button>
               </div>
@@ -84,7 +84,7 @@ export function Contact() {
                 )}
               </Field>
 
-              <button type="submit" className="btn btn--accent" disabled={submitting}>
+              <button type="submit" className="btn btn--primary" disabled={submitting}>
                 {submitting ? t('contact.submitting') : t('contact.submit')}
               </button>
             </form>

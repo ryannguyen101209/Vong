@@ -1,0 +1,44 @@
+/* One post, opened: the item large on the thread, the reply bar below it. */
+
+.listing-page { display: flex; flex-direction: column; min-height: calc(100vh - var(--header-h)); background: var(--thread); }
+.listing { display: flex; flex-direction: column; gap: var(--s-4); max-width: 760px; padding-block: var(--s-6) var(--s-10); }
+.listing__back { display: inline-flex; align-self: flex-start; align-items: center; gap: 6px; min-height: 36px; color: var(--ink-soft); font-size: var(--text-sm); font-weight: 600; text-decoration: none; }
+.listing__back:hover { color: var(--ink); }
+
+.listing__post { display: flex; flex-direction: column; gap: var(--s-3); }
+.listing__author { align-items: center; gap: var(--s-3); }
+.listing__author > div { display: flex; flex-direction: column; }
+.listing__author span { color: var(--ink-faint); font-size: var(--text-xs); }
+
+.listing__bubble { padding: 8px; }
+.listing__photo { aspect-ratio: 4 / 3; max-height: 60vh; width: 100%; overflow: hidden; border-radius: calc(var(--r-bubble) - 8px) calc(var(--r-bubble) - 8px) var(--r-sm) var(--r-sm); background: var(--bubble); }
+.listing__photo img { width: 100%; height: 100%; object-fit: cover; }
+.listing__text { display: flex; flex-direction: column; gap: var(--s-4); padding: var(--s-5) var(--s-4) var(--s-4); }
+.listing__text h1 { font-size: var(--text-xl); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.listing__price { margin-top: calc(var(--s-2) * -1); font-size: var(--text-lg); font-weight: 700; font-variant-numeric: tabular-nums; }
+
+.listing__facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: var(--s-3); margin: 0; padding-block: var(--s-4); border-block: 1px solid var(--line); }
+.listing__facts div { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.listing__facts dt { color: var(--ink-faint); font-size: var(--text-xs); }
+.listing__facts dd { margin: 0; font-size: var(--text-sm); font-weight: 600; }
+
+.listing__desc { display: flex; flex-direction: column; gap: var(--s-3); max-width: 65ch; color: var(--ink-soft); line-height: 1.7; overflow-wrap: anywhere; }
+.listing__safety { margin-top: var(--s-2); }
+
+/* The reply bar: a composer at the foot of the thread. */
+.listing__reply { position: sticky; bottom: 0; z-index: 20; margin-top: auto; border-top: 1px solid var(--line); background: var(--page); }
+.listing__reply-inner { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-2) var(--s-3); max-width: 760px; padding-block: var(--s-3); }
+.listing__message { flex: 1 1 260px; }
+.listing__own { flex: 1 1 260px; color: var(--ink-soft); font-size: var(--text-sm); }
+.listing__phone { display: flex; flex-wrap: wrap; align-items: center; gap: var(--s-1) var(--s-3); color: var(--ink-soft); font-size: var(--text-sm); }
+.listing__phone a { color: var(--ink); font-size: var(--text-lg); font-weight: 700; font-variant-numeric: tabular-nums; text-decoration: none; }
+.listing__phone svg { color: var(--blue); }
+
+@media (max-width: 640px) {
+  .listing { padding-block: var(--s-4) var(--s-8); }
+  .listing__text { padding-inline: var(--s-2); }
+  .listing__text h1 { font-size: var(--text-lg); }
+  .listing__facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .listing__reply-inner .btn:not(.listing__message) { flex: 1 1 0; padding-inline: var(--s-3); }
+  .listing__message { flex-basis: 100%; }
+}

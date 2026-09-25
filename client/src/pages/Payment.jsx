@@ -93,14 +93,14 @@ export function Payment() {
   };
 
   if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
-  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.title')}</h1><p className="lead">{t('auth.lead')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
+  if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.title')}</h1><p className="lead">{t('auth.lead')}</p><button className="btn btn--primary" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
   if (status === 'loading') {
     return <div className="shell section editorial-page payment-page"><p className="muted">{t('common.loading')}</p></div>;
   }
   if (status === 'unconfigured') {
     return (
       <div className="shell section editorial-page payment-page">
-        <div className="notice notice--warning">{t('payment.notConfigured')}</div>
+        <div className="notice notice--wait">{t('payment.notConfigured')}</div>
       </div>
     );
   }
@@ -122,8 +122,8 @@ export function Payment() {
             {t('payment.markedRef', { ref: listing.ref })}
           </p>
           <div className="row" style={{ marginTop: 24 }}>
-            <Link to="/my-listings" className="btn btn--accent">{t('mine.title')}</Link>
-            <Link to="/browse" className="btn btn--ghost">{t('nav.browse')}</Link>
+            <Link to="/my-listings" className="btn btn--primary">{t('mine.title')}</Link>
+            <Link to="/browse" className="btn">{t('nav.browse')}</Link>
           </div>
         </div>
       </div>
@@ -151,8 +151,8 @@ export function Payment() {
           <h1>{title}</h1>
           <p className="lead">{t('payment.statusPublishedBody')}</p>
           <div className="row" style={{ marginTop: 24 }}>
-            <Link to={`/listing/${listing.id}`} className="btn btn--accent">{t('payment.viewListing')}</Link>
-            <Link to="/my-listings" className="btn btn--ghost">{t('mine.title')}</Link>
+            <Link to={`/listing/${listing.id}`} className="btn btn--primary">{t('payment.viewListing')}</Link>
+            <Link to="/my-listings" className="btn">{t('mine.title')}</Link>
           </div>
         </div>
       </div>
@@ -170,7 +170,7 @@ export function Payment() {
       </div>
 
       {listing.status === 'rejected' && (
-        <div className="notice notice--danger" style={{ marginBottom: 28 }}>
+        <div className="notice notice--bad" style={{ marginBottom: 28 }}>
           <p className="notice__title">{t('payment.statusRejectedTitle')}</p>
           <p>{t('payment.statusRejectedBody', { reason: data.listing.reject_reason || '—' })}</p>
           <p className="small" style={{ margin: 0 }}>{t('payment.statusRejectedRetry')}</p>
@@ -208,7 +208,7 @@ export function Payment() {
           </div>
 
           <div>
-            <button type="button" className="btn btn--accent btn--block" onClick={markPaid} disabled={marking}>
+            <button type="button" className="btn btn--primary btn--block" onClick={markPaid} disabled={marking}>
               {marking ? t('payment.marking') : t('payment.markPaid')}
             </button>
             <p className="small muted" style={{ marginTop: 12, textAlign: 'center' }}>

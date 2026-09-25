@@ -51,7 +51,7 @@ export function Faq() {
       </div>
 
       <div className="row" style={{ marginTop: 36 }}>
-        <Link to="/contact" className="btn btn--ghost">{t('nav.contact')}</Link>
+        <Link to="/contact" className="btn">{t('nav.contact')}</Link>
       </div>
     </div>
   );

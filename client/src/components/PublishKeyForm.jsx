@@ -91,7 +91,7 @@ export function PublishKeyForm({ listing, keyInfo, onPublished, compact = false 
           aria-invalid={error ? 'true' : undefined}
           aria-describedby={error ? `${inputId}-error` : undefined}
         />
-        <button type="submit" className="btn btn--accent" disabled={busy || needsNewKey || value.replace('-', '').length !== 8}>
+        <button type="submit" className="btn btn--primary" disabled={busy || needsNewKey || value.replace('-', '').length !== 8}>
           {busy ? t('key.publishing') : t('key.submit')}
         </button>
       </form>
@@ -103,7 +103,7 @@ export function PublishKeyForm({ listing, keyInfo, onPublished, compact = false 
         {keyInfo?.can_resend ? (
           <>
             <span>{t('key.help')}</span>
-            <button type="button" className="link-quiet" onClick={sendNewKey} disabled={resend === 'sending'}>
+            <button type="button" className="link-btn" onClick={sendNewKey} disabled={resend === 'sending'}>
               {resend === 'sending' ? t('key.resending') : t('key.resend')}
             </button>
             {resend === 'too_soon' && <span className="key-area__status" role="status">{t('key.resendTooSoon')}</span>}

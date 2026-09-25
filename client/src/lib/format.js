@@ -32,3 +32,17 @@ export function formatDateTime(iso, lang = 'en') {
 export function digitsOnly(value) {
   return String(value ?? '').replace(/[^\d]/g, '');
 }
+
+/** "2 hours ago" / "2 giờ trước", for post times in the feed. */
+export function formatRelative(iso, lang = 'en') {
+  if (!iso) return '';
+  const date = new Date(iso);
+  if (Number.isNaN(date.getTime())) return '';
+  const seconds = Math.round((date.getTime() - Date.now()) / 1000);
+  const units = [['year', 31536000], ['month', 2592000], ['week', 604800], ['day', 86400], ['hour', 3600], ['minute', 60]];
+  const rtf = new Intl.RelativeTimeFormat(lang === 'vi' ? 'vi-VN' : 'en-GB', { numeric: 'auto' });
+  for (const [unit, size] of units) {
+    if (Math.abs(seconds) >= size) return rtf.format(Math.round(seconds / size), unit);
+  }
+  return rtf.format(0, 'minute');
+}

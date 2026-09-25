@@ -61,7 +61,7 @@ function LoginForm({ onSuccess }) {
               />
             )}
           </Field>
-          <button type="submit" className="btn btn--accent btn--block" disabled={busy || !password}>
+          <button type="submit" className="btn btn--primary btn--block" disabled={busy || !password}>
             {busy ? t('admin.loggingIn') : t('admin.login')}
           </button>
         </form>
@@ -104,7 +104,7 @@ function RejectDialog({ onClose, onSubmit }) {
         />
 
         <div className="row" style={{ justifyContent: 'flex-end', marginTop: 20 }}>
-          <button type="button" className="btn btn--ghost" onClick={onClose}>{t('common.cancel')}</button>
+          <button type="button" className="btn" onClick={onClose}>{t('common.cancel')}</button>
           <button
             type="button"
             className="btn btn--danger"
@@ -145,14 +145,14 @@ function KeyResult({ listing, result }) {
   const title = localized(listing, 'title');
   if (result.delivery === 'sent') {
     return (
-      <div className="notice notice--positive" role="status">
+      <div className="notice notice--ok" role="status">
         <p className="notice__title">{t('admin.actionedApproved', { title })}</p>
         <p className="small" style={{ margin: 0 }}>{t('admin.keyEmailed', { email: result.sent_to })}</p>
       </div>
     );
   }
   return (
-    <div className="notice notice--warning" role="status">
+    <div className="notice notice--wait" role="status">
       <p className="notice__title">{t('admin.actionedApproved', { title })}</p>
       <p className="small" style={{ margin: '0 0 12px' }}>
         {t(result.delivery === 'failed' ? 'admin.keyMailFailed' : 'admin.keyNotEmailed', { email: result.sent_to })}
@@ -241,7 +241,7 @@ function Queue({ token, onAuthError }) {
         ))}
       </div>
 
-      {actionError && <div className="notice notice--danger" role="alert" style={{ marginBottom: 20 }}>{t('common.error')}</div>}
+      {actionError && <div className="notice notice--bad" role="alert" style={{ marginBottom: 20 }}>{t('common.error')}</div>}
 
       {lastAction?.action === 'approve' && (
         <div style={{ marginBottom: 20 }}>
@@ -250,7 +250,7 @@ function Queue({ token, onAuthError }) {
       )}
 
       {lastAction?.action === 'reject' && (
-        <div className="notice notice--danger" role="status" style={{ marginBottom: 20 }}>
+        <div className="notice notice--bad" role="status" style={{ marginBottom: 20 }}>
           <p className="notice__title">
             {t('admin.actionedRejected', { title: localized(lastAction.listing, 'title') })}
           </p>
@@ -301,7 +301,7 @@ function Queue({ token, onAuthError }) {
                   )}
                 </p>
 
-                <div className="notice notice--warning small">
+                <div className="notice notice--wait small">
                   <div>
                     {t('admin.expectedAmount', {
                       amount: formatPrice(listing.fee_vnd, lang),
@@ -390,7 +390,7 @@ function AllListings({ token, onAuthError }) {
       {resent && (
         <div style={{ marginBottom: 20 }}>
           {resent.error
-            ? <div className="notice notice--danger" role="alert">{t('common.error')}</div>
+            ? <div className="notice notice--bad" role="alert">{t('common.error')}</div>
             : <KeyResult listing={resent.listing} result={resent.result} />}
         </div>
       )}
@@ -425,7 +425,7 @@ function AllListings({ token, onAuthError }) {
                 {status === 'approved' && (
                   <td>
                     <div className="small muted">{t('admin.keySentAt', { when: formatDateTime(listing.publish_key_sent_at, lang) })}</div>
-                    <button type="button" className="link-quiet" disabled={busyId === listing.id} onClick={() => resendKey(listing)}>
+                    <button type="button" className="link-btn" disabled={busyId === listing.id} onClick={() => resendKey(listing)}>
                       {busyId === listing.id ? t('key.resending') : t('admin.resendKey')}
                     </button>
                   </td>
@@ -540,7 +540,7 @@ function Settings({ token, onAuthError }) {
           </div>
         )}
 
-        <button type="submit" className="btn btn--accent" disabled={saving}>
+        <button type="submit" className="btn btn--primary" disabled={saving}>
           {saving ? t('admin.savingSettings') : t('admin.saveSettings')}
         </button>
       </form>
@@ -603,13 +603,13 @@ export function Admin() {
     <div className="shell section editorial-page admin-page">
       <div className="spread" style={{ marginBottom: 28 }}>
         <h1 style={{ margin: 0 }}>{t('admin.loginTitle')}</h1>
-        <button type="button" className="btn btn--ghost btn--small" onClick={signOut}>
+        <button type="button" className="btn btn--small" onClick={signOut}>
           {t('admin.logout')}
         </button>
       </div>
 
       {defaultPassword && (
-        <div className="notice notice--warning" style={{ marginBottom: 24 }}>
+        <div className="notice notice--wait" style={{ marginBottom: 24 }}>
           {t('admin.defaultPasswordWarning')}
         </div>
       )}

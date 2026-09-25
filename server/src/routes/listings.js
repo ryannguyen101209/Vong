@@ -49,7 +49,7 @@ const SORTS = {
 
 /** GET /api/listings — published listings, with search / category / sort. */
 router.get('/', (req, res) => {
-  const { search = '', category = '', sort = 'newest', ids = '' } = req.query;
+  const { search = '', category = '', district = '', sort = 'newest', ids = '' } = req.query;
 
   const where = [];
   const params = {};
@@ -68,6 +68,11 @@ router.get('/', (req, res) => {
   if (category && CATEGORIES.includes(String(category))) {
     where.push('category = @category');
     params.category = category;
+  }
+
+  if (district && DISTRICTS.includes(String(district))) {
+    where.push('district = @district');
+    params.district = district;
   }
 
   if (search) {

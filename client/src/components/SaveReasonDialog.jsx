@@ -74,10 +74,10 @@ export function SaveReasonDialog({ existing, onSubmit, onClose }) {
           </div>
 
           <div className="row" style={{ justifyContent: 'flex-end' }}>
-            <button type="button" className="btn btn--ghost" onClick={onClose}>
+            <button type="button" className="btn" onClick={onClose}>
               {t('common.cancel')}
             </button>
-            <button type="submit" className="btn btn--accent" disabled={!reasonKey && !note.trim()}>
+            <button type="submit" className="btn btn--primary" disabled={!reasonKey && !note.trim()}>
               {existing ? t('saveDialog.update') : t('saveDialog.submit')}
             </button>
           </div>

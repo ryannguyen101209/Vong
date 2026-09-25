@@ -1,21 +1,21 @@
 import { useI18n } from '../i18n/index.jsx';
-import { BoxIcon } from './Icons.jsx';
 
 export function EmptyState({ title, body, children }) {
   return (
-    <div className="empty-state">
-      <BoxIcon />
-      <h3>{title}</h3>
-      {body && <p className="lead" style={{ marginInline: 'auto' }}>{body}</p>}
-      {children && <div className="row" style={{ justifyContent: 'center', marginTop: 20 }}>{children}</div>}
+    <div className="empty">
+      <h2>{title}</h2>
+      {body && <p>{body}</p>}
+      {children && <div className="row">{children}</div>}
     </div>
   );
 }
 
-export function LoadingGrid({ count = 8 }) {
+/** Placeholder posts while the feed loads. */
+export function LoadingFeed({ count = 3 }) {
+  const { t } = useI18n();
   return (
-    <div className="skeleton-grid" aria-busy="true">
-      {Array.from({ length: count }, (_, i) => <div className="skeleton" key={i} />)}
+    <div className="skeleton-feed" aria-busy="true" aria-label={t('common.loading')}>
+      {Array.from({ length: count }, (_, i) => <div className="skeleton-post" key={i}><span /></div>)}
     </div>
   );
 }
@@ -23,12 +23,12 @@ export function LoadingGrid({ count = 8 }) {
 export function ErrorState({ onRetry }) {
   const { t } = useI18n();
   return (
-    <div className="empty-state">
-      <h3>{t('common.error')}</h3>
+    <div className="empty" role="alert">
+      <h2>{t('common.error')}</h2>
       {onRetry && (
-        <button type="button" className="btn btn--ghost" onClick={onRetry} style={{ marginTop: 16 }}>
-          {t('common.retry')}
-        </button>
+        <div className="row">
+          <button type="button" className="btn" onClick={onRetry}>{t('common.retry')}</button>
+        </div>
       )}
     </div>
   );
