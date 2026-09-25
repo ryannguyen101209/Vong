@@ -80,6 +80,7 @@
 .contact__ways dl > div { display: flex; flex-direction: column; gap: 2px; padding-block: var(--s-3); border-top: 1px solid var(--line); }
 .contact__ways dt { color: var(--ink-faint); font-size: var(--text-xs); }
 .contact__ways dd { margin: 0; overflow-wrap: anywhere; }
+.contact__ways > p { color: var(--ink-soft); }
 /* One tap selects the whole number, ready to paste into Zalo. */
 .contact__zalo { font-size: var(--text-md); font-weight: 600; font-variant-numeric: tabular-nums; user-select: all; }
 
@@ -106,7 +107,7 @@
   .info__head--group { align-items: flex-start; gap: var(--s-3); }
   .info__mark { width: 48px; height: 48px; }
   .prose { gap: var(--s-8); padding-top: var(--s-6); }
-  .pinned { padding: var(--s-4) var(--s-4) var(--s-5); }
+  .pinned { padding-block: var(--s-4) var(--s-5); }
   .contact { padding-top: var(--s-6); }
   .contact__submit { align-self: stretch; }
 }

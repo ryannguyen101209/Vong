@@ -59,4 +59,7 @@
   .market-search { display: block; }
   .market__thread { padding-block: var(--s-6) var(--s-12); }
   .feed__more { margin-left: 0; }
+  /* The search pill sits just above on phones, so the composer drops its field
+     look and reads as a post row: avatar, prompt, Post. */
+  .feed-composer__field { height: auto; padding: 0; background: none; color: var(--ink-soft); font-weight: 500; }
 }

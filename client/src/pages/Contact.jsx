@@ -102,27 +102,35 @@ export function Contact() {
             )}
           </div>
 
-          <aside className="contact__ways" aria-labelledby="contact-ways">
-            <h2 id="contact-ways">{t('contact.otherWaysTitle')}</h2>
-            <dl>
-              {SITE.zalo && (
+          {/* Only promise other ways to reach us once there is one to show. */}
+          {SITE.zalo || SITE.email ? (
+            <aside className="contact__ways" aria-labelledby="contact-ways">
+              <h2 id="contact-ways">{t('contact.otherWaysTitle')}</h2>
+              <dl>
+                {SITE.zalo && (
+                  <div>
+                    <dt>{t('contact.zaloLabel')}</dt>
+                    <dd className="contact__zalo">{SITE.zalo}</dd>
+                  </div>
+                )}
+                {SITE.email && (
+                  <div>
+                    <dt>{t('contact.emailUsLabel')}</dt>
+                    <dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
+                  </div>
+                )}
                 <div>
-                  <dt>{t('contact.zaloLabel')}</dt>
-                  <dd className="contact__zalo">{SITE.zalo}</dd>
+                  <dt>{t('contact.hoursLabel')}</dt>
+                  <dd>{t('contact.replyHours')}</dd>
                 </div>
-              )}
-              {SITE.email && (
-                <div>
-                  <dt>{t('contact.emailUsLabel')}</dt>
-                  <dd><a href={`mailto:${SITE.email}`}>{SITE.email}</a></dd>
-                </div>
-              )}
-              <div>
-                <dt>{t('contact.hoursLabel')}</dt>
-                <dd>{t('contact.replyHours')}</dd>
-              </div>
-            </dl>
-          </aside>
+              </dl>
+            </aside>
+          ) : (
+            <aside className="contact__ways" aria-labelledby="contact-ways">
+              <h2 id="contact-ways">{t('contact.hoursLabel')}</h2>
+              <p>{t('contact.replyHours')}</p>
+            </aside>
+          )}
         </div>
       </div>
     </div>
