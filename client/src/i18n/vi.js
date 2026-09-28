@@ -221,6 +221,7 @@ export default {
     signOut: 'Đăng xuất',
     account: 'Tài khoản',
     loadError: 'Không tải được đăng nhập Google. Bạn thử lại nhé.',
+    signInError: 'Chưa đăng nhập được. Bạn thử lại nhé.',
     previewTitle: 'Đăng nhập chưa sẵn sàng.',
     previewBody: 'Tụi mình đang hoàn tất thiết lập tài khoản. Bạn quay lại sau nhé.',
     terms: 'Khi tiếp tục, bạn đồng ý giao dịch lịch sự và an toàn.',

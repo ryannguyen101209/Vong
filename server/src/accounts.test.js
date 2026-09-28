@@ -34,6 +34,20 @@ try {
   assert.equal((await request('/api/auth/google', { body: { credential: 'forged-token' } })).status, 401);
   assert.equal((await request('/api/auth/google', { body: { credential: 'seller' }, headers: { Origin: 'https://attacker.example' } })).status, 403);
   assert.equal((await request('/api/auth/google', { body: { credential: 'seller' }, headers: { 'X-Vong-Request': '' } })).status, 403);
+  // Without CORS_ORIGIN, `npm start` serves the site from the API's own port.
+  const configuredOrigin = process.env.CORS_ORIGIN;
+  delete process.env.CORS_ORIGIN;
+  process.env.PORT = '4321';
+  assert.equal((await request('/api/auth/google', { body: { credential: 'forged-token' }, headers: { Origin: 'http://localhost:4321' } })).status, 401);
+  assert.equal((await request('/api/auth/google', { body: { credential: 'forged-token' }, headers: { Origin: 'http://localhost:9999' } })).status, 403);
+  process.env.CORS_ORIGIN = 'https://vong.example/, https://www.vong.example';
+  assert.equal((await request('/api/auth/google', { body: { credential: 'forged-token' }, headers: { Origin: 'https://vong.example' } })).status, 401);
+  assert.equal((await request('/api/auth/google', { body: { credential: 'forged-token' }, headers: { Origin: 'https://www.vong.example' } })).status, 401);
+  process.env.CORS_ORIGIN = configuredOrigin;
+  delete process.env.PORT;
+  // Whitespace pasted into a dashboard must not break the audience check (the verifier asserts 'test-client').
+  process.env.GOOGLE_CLIENT_ID = ' test-client\n';
+  assert.equal((await request('/api/auth/config')).body.googleClientId, 'test-client');
   const seller = await request('/api/auth/google', { body: { credential: 'seller' } });
   const buyer = await request('/api/auth/google', { body: { credential: 'buyer' } });
   const stranger = await request('/api/auth/google', { body: { credential: 'stranger' } });

@@ -51,7 +51,7 @@ This repo has a `render.yaml`, so most of it is filled in for you.
    starts blank.
 6. Leave the marketplace empty. Do not run the seed command. Visitors see
    “Sell the first item” until a real seller publishes a listing. Configure
-   Google sign-in and messaging using [ACCOUNTS.md](ACCOUNTS.md).
+   Google sign-in using [GOOGLE_SIGN_IN.md](GOOGLE_SIGN_IN.md), section 4.
 
 7. Go to `/admin`, sign in with the password from step 3, and put your **real
    bank details** in Settings. Then scan a listing's QR with your own banking
@@ -96,7 +96,8 @@ so it restarts if the machine reboots.
 - [ ] Real bank details saved in /admin → Settings
 - [ ] A test QR scanned with your own banking app
 - [ ] Your Zalo number and email updated in `client/src/lib/site.js`
-- [ ] `CORS_ORIGIN` in `.env` set to your domain
+- [ ] `CORS_ORIGIN` set to your site's exact address (sign-in and every form fail without it)
+- [ ] `GOOGLE_CLIENT_ID` set, that address added to the Google client's origins, and the app published ([GOOGLE_SIGN_IN.md](GOOGLE_SIGN_IN.md))
 - [ ] A backup plan for the database file — it is your entire business
 
 ---

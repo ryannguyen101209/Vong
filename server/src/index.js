@@ -8,7 +8,7 @@ import { db, getSettings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
 import { router as listingsRouter } from './routes/listings.js';
 import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
-import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
+import { allowedOrigins, createAuthRouter, googleClientId, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
@@ -21,8 +21,7 @@ const app = express();
 app.set('trust proxy', Number(process.env.TRUST_PROXY_HOPS) || false);
 const PORT = Number(process.env.PORT) || 4000;
 
-const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174').split(',').map((origin) => origin.trim());
-app.use(cors({ origin: allowedOrigins, credentials: true }));
+app.use(cors({ origin: allowedOrigins(), credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_requests' } }));
 app.use('/api', protectWrites, sessionUser);
@@ -107,7 +106,13 @@ app.listen(PORT, () => {
   if (usingDefaultPassword()) {
     console.log('⚠  ADMIN_PASSWORD is not set — the admin page accepts "vong-admin". Set it in .env before deploying.');
   }
-  if (!process.env.GOOGLE_CLIENT_ID) {
-    console.log('⚠  GOOGLE_CLIENT_ID is not set — Google sign-in is disabled. See ACCOUNTS.md, "Create the Google client ID".');
+  const clientId = googleClientId();
+  if (!clientId) {
+    console.log('⚠  GOOGLE_CLIENT_ID is not set — Google sign-in is disabled. See GOOGLE_SIGN_IN.md.');
+  } else if (!clientId.endsWith('.apps.googleusercontent.com')) {
+    console.log('⚠  GOOGLE_CLIENT_ID does not end in .apps.googleusercontent.com — copy the Client ID, not the secret or project ID. See GOOGLE_SIGN_IN.md.');
+  }
+  if (process.env.NODE_ENV === 'production' && !process.env.CORS_ORIGIN?.trim()) {
+    console.log('⚠  CORS_ORIGIN is not set — sign-in and every form will be rejected. Set it to the site\'s public origin, e.g. https://vong.vn.');
   }
 });

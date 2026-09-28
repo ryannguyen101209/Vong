@@ -28,7 +28,7 @@ npm install
 cp .env.example .env
 #    open .env and change ADMIN_PASSWORD to something only you know
 
-# 3. Configure GOOGLE_CLIENT_ID in .env for sign-in.
+# 3. Configure GOOGLE_CLIENT_ID in .env for sign-in (see GOOGLE_SIGN_IN.md).
 #    Start with an empty marketplace; do not seed example products.
 
 # 4. Start both the API and the website
@@ -50,7 +50,7 @@ The admin page is at **http://localhost:5173/admin** — sign in with the
 | `npm run reset` | Deletes the sample listings and reloads them. Your own listings are left alone. |
 | `npm run build` | Builds the website into `client/dist/` for deployment. |
 | `npm start` | Runs the API and serves the built website from one port (4000). |
-| `npm test` | Checks the VietQR generator against known values. |
+| `npm test` | Checks the VietQR generator against known values, and runs the sign-in and messaging tests. |
 
 ---
 
@@ -84,6 +84,10 @@ If the phone cannot load the page, it is almost always your computer's firewall:
 Cafe and university Wi-Fi often use "client isolation", which stops devices on
 the network from seeing each other no matter how you configure your laptop. Use
 a home network or your phone's hotspot instead.
+
+This is for checking layout. **Google sign-in does not work from the
+`Network:` address**, because Google refuses IP addresses, and forms sent
+from it are rejected. Test sign-in on your phone against the live HTTPS site.
 
 ---
 
@@ -209,7 +213,8 @@ address on a public listing page is a spam magnet. Only the admin views see them
 print to the server log; you read them in the admin Settings tab.
 
 **Google accounts and private messaging are implemented.** Deploy the full Node
-backend and configure `GOOGLE_CLIENT_ID` to activate them. Saved items still live
+backend and configure `GOOGLE_CLIENT_ID` to activate them; see
+[GOOGLE_SIGN_IN.md](GOOGLE_SIGN_IN.md). Saved items still live
 in one browser, and sellers cannot edit/delete their listings yet. New listings
 are owned by the signed-in account; old listings are not automatically claimed.
 

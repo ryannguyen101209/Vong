@@ -106,7 +106,7 @@ export function SignInDialog() {
             <p>{t('auth.previewBody')}</p>
           </div>
         )}
-        {authError && <p role="alert" className="field__error">{t('auth.loadError')}</p>}
+        {authError && <p role="alert" className="field__error">{t('auth.signInError')}</p>}
         <p className="auth-terms">{t('auth.terms')}</p>
       </section>
     </div>

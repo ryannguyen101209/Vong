@@ -221,6 +221,7 @@ export default {
     signOut: 'Sign out',
     account: 'Account',
     loadError: 'Google sign-in could not load. Please try again.',
+    signInError: 'Sign-in didn’t go through. Please try again.',
     previewTitle: 'Sign-in is not available yet.',
     previewBody: 'We’re finishing account setup. Please check back soon.',
     terms: 'By continuing, you agree to keep transactions respectful and safe.',
