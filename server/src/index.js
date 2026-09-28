@@ -107,4 +107,7 @@ app.listen(PORT, () => {
   if (usingDefaultPassword()) {
     console.log('⚠  ADMIN_PASSWORD is not set — the admin page accepts "vong-admin". Set it in .env before deploying.');
   }
+  if (!process.env.GOOGLE_CLIENT_ID) {
+    console.log('⚠  GOOGLE_CLIENT_ID is not set — Google sign-in is disabled. See ACCOUNTS.md, "Create the Google client ID".');
+  }
 });
