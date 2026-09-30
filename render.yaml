@@ -3,7 +3,9 @@
 # same values into a web form.
 services:
   - type: web
-    name: vong
+    # The name sets the address, https://vong-hcmc-marketplace.onrender.com.
+    # client/vercel.json forwards /api and /uploads there; keep the two in step.
+    name: vong-hcmc-marketplace
     runtime: node
     plan: starter          # a plan with a persistent disk; free plans have none
     # --include=dev: NODE_ENV=production would otherwise skip Vite, and the build fails.
@@ -13,8 +15,10 @@ services:
     envVars:
       - key: NODE_ENV
         value: production
+      # Two hops: Vercel's proxy, then Render's load balancer. With one, every
+      # visitor shares Vercel's IP and hits the same rate limit.
       - key: TRUST_PROXY_HOPS
-        value: "1"
+        value: "2"
       - key: NODE_VERSION
         value: "22"
       - key: ADMIN_PASSWORD
@@ -22,7 +26,7 @@ services:
       - key: GOOGLE_CLIENT_ID
         sync: false
       - key: CORS_ORIGIN
-        sync: false        # exact public HTTPS origin; comma-separated if needed
+        sync: false        # the Vercel site's exact HTTPS origin; comma-separated if several
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE

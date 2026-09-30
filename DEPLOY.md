@@ -19,8 +19,9 @@ Two smaller things would still bite you even if the API did run there: Vercel's
 filesystem is wiped on every deploy, so your SQLite database and every uploaded
 photo would vanish each time you push.
 
-**Delete the Vercel project** so you are not testing against a broken URL, and
-use one of the options below instead.
+The fix is to run the server on a host that can (Render, below) and keep Vercel
+as the address people visit, forwarding `/api` and `/uploads` to that server.
+See [Keeping Vercel as the front door](#keeping-vercel-as-the-front-door).
 
 ---
 
@@ -64,6 +65,25 @@ This repo has a `render.yaml`, so most of it is filled in for you.
 uploads folder at it. Without that, every redeploy resets your site to zero
 listings and deletes everyone's photos. This is the single most important part
 of the config, and the easiest to leave out by accident.
+
+---
+
+## Keeping Vercel as the front door
+
+Visitors keep using the Vercel address. `client/vercel.json` builds the real
+frontend (`npm run build`, not the demo) and forwards `/api/*` and `/uploads/*`
+to the Render service, so the browser only ever talks to the Vercel domain and
+the sign-in cookie stays first-party.
+
+- The Vercel project's **Root Directory** must be `client`.
+- The Render address in `client/vercel.json` must match the service name in
+  `render.yaml` (`https://vong-hcmc-marketplace.onrender.com`). If Render gives
+  the service a different address, change both rewrites to it.
+- On Render, set `CORS_ORIGIN` to the Vercel address, e.g.
+  `https://vong.vercel.app`, and add that same address to the Google client's
+  **Authorized JavaScript origins**.
+- `TRUST_PROXY_HOPS` is `2` (Vercel, then Render) so rate limits see each
+  visitor's IP rather than Vercel's.
 
 ---
 
