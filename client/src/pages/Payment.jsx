@@ -75,7 +75,7 @@ export function Payment() {
       errorCorrectionLevel: 'M',
       margin: 1,
       width: 512,
-      color: { dark: '#0A2947', light: '#FFFFFF' },
+      color: { dark: '#25332B', light: '#FFFFFF' },
     })
       .then(setQrImage)
       .catch(() => setQrImage(null));
@@ -172,7 +172,7 @@ export function Payment() {
             <p className="muted small">{t('common.loading')}</p>
           )}
           <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
-            <span style={{ color: '#0A2947' }}><LogoMark size={22} /></span>
+            <span style={{ color: '#38604A' }}><LogoMark size={22} /></span>
             <span className="qr-frame__brand">VietQR · {payment.bank_name}</span>
           </div>
         </div>

@@ -30,7 +30,7 @@ export function LogoMark({ size = 32, className = '' }) {
   );
 }
 
-/** Mark inside the navy rounded square, as on the app icon. */
+/** Mark inside the green rounded square, as on the app icon (follows light/dark theme). */
 export function LogoTile({ size = 56, className = '' }) {
   return (
     <svg
@@ -41,12 +41,12 @@ export function LogoTile({ size = 56, className = '' }) {
       aria-hidden="true"
       focusable="false"
     >
-      <rect width="120" height="120" rx="28" fill="#0A2947" />
+      <rect width="120" height="120" rx="28" style={{ fill: 'var(--accent)' }} />
       <g transform="translate(24.67 31.38) scale(0.3533)">
         <path
           d={MARK_PATH}
           fill="none"
-          stroke="#F3E4C9"
+          style={{ stroke: 'var(--page)' }}
           strokeWidth="13"
           strokeLinecap="round"
           strokeLinejoin="round"
