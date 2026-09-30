@@ -46,7 +46,7 @@ This repo has a `render.yaml`, so most of it is filled in for you.
 3. It will ask for the one value not in the file: **ADMIN_PASSWORD**. Set a real
    one. Secrets never go in the repo.
 4. Create the service and wait for the first build. It runs
-   `npm install && npm run build`, then `npm start`.
+   `npm install --include=dev && npm run build`, then `npm start`.
 5. Open the URL it gives you. The site is live, but **empty** — your database
    starts blank.
 6. Leave the marketplace empty. Do not run the seed command. Visitors see

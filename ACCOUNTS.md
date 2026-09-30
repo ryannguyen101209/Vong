@@ -14,7 +14,7 @@ Sample listings are excluded from public API results and detail pages. The stati
 
 ## Activate on a real host
 
-1. Deploy the full Node application using `render.yaml` (or the Dockerfile), with persistent storage. Run `npm install && npm run build` and `npm start`. Do not run `npm run seed`.
+1. Deploy the full Node application using `render.yaml` (or the Dockerfile), with persistent storage. Run `npm install --include=dev && npm run build` and `npm start`. Do not run `npm run seed`.
 2. Set `ADMIN_PASSWORD`, `GOOGLE_CLIENT_ID`, and `CORS_ORIGIN` to the site's exact public HTTPS origin. Set `NODE_ENV=production`. Keep `DATABASE_FILE` and `UPLOADS_DIR` on the persistent disk.
 3. In Google Cloud, create an OAuth client of type **Web application** and add that exact origin under **Authorized JavaScript origins**. Add `http://localhost:5174` if testing locally. Configure the consent screen and test users or production publishing as appropriate.
 4. Open the deployed site and sign in with two separate Google accounts. Post an item from one account, approve the listing in admin after the configured publishing process, and exchange messages from the other account. Confirm the conversation survives reloads and sign-out prevents access.
