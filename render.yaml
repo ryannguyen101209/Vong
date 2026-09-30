@@ -6,7 +6,7 @@ services:
     name: vong
     runtime: node
     plan: starter          # a plan with a persistent disk; free plans have none
-    buildCommand: npm install && npm run build
+    buildCommand: npm install --include=dev && npm run build   # Render sets NODE_ENV=production, which would skip Vite
     startCommand: npm start
     healthCheckPath: /api/health
     envVars:
