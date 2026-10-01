@@ -5,7 +5,14 @@
  */
 
 export const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'hobby'];
-export const DISTRICTS = ['district_1', 'district_3', 'district_7', 'binh_thanh', 'thao_dien'];
+// Every district as people in Saigon still name them (the pre-2021 / pre-2025 map).
+// 'thao_dien' is no longer offered but stays labelled in the UI for older listings.
+export const DISTRICTS = [
+  'district_1', 'district_2', 'district_3', 'district_4', 'district_5', 'district_6',
+  'district_7', 'district_8', 'district_9', 'district_10', 'district_11', 'district_12',
+  'binh_tan', 'binh_thanh', 'go_vap', 'phu_nhuan', 'tan_binh', 'tan_phu', 'thu_duc',
+  'binh_chanh', 'can_gio', 'cu_chi', 'hoc_mon', 'nha_be',
+];
 export const CONDITIONS = ['like_new', 'good', 'fair', 'well_used'];
 
 export const SEED_LISTINGS = [

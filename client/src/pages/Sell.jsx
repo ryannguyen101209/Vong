@@ -4,9 +4,14 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
-import { UploadIcon } from '../components/Icons.jsx';
+import { UploadIcon, CloseIcon, PlusIcon } from '../components/Icons.jsx';
 import { ErrorState } from '../components/States.jsx';
 import { useAuth } from '../lib/auth.jsx';
+
+const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
+const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
+const DEFAULT_MAX_PHOTOS = 8;
+let photoKey = 0;
 
 const EMPTY = {
   title: '',
@@ -28,8 +33,9 @@ export function Sell() {
 
   const [meta, setMeta] = useState({ categories: [], districts: [], conditions: [], fee_vnd: null });
   const [values, setValues] = useState(EMPTY);
-  const [image, setImage] = useState(null);
-  const [preview, setPreview] = useState(null);
+  // Each photo keeps its File, a stable key for React, and an object URL for the preview.
+  const [photos, setPhotos] = useState([]);
+  const photosRef = useRef(photos);
   const [errors, setErrors] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [dragging, setDragging] = useState(false);
@@ -51,16 +57,11 @@ export function Sell() {
     return () => { active = false; };
   }, [metaAttempt]);
 
-  // Object URLs have to be released or the tab leaks memory on every re-pick.
-  useEffect(() => {
-    if (!image) {
-      setPreview(null);
-      return undefined;
-    }
-    const url = URL.createObjectURL(image);
-    setPreview(url);
-    return () => URL.revokeObjectURL(url);
-  }, [image]);
+  // Object URLs have to be released or the tab leaks memory; revoke whatever is left on unmount.
+  useEffect(() => { photosRef.current = photos; }, [photos]);
+  useEffect(() => () => photosRef.current.forEach((photo) => URL.revokeObjectURL(photo.url)), []);
+
+  const maxPhotos = meta.max_photos || DEFAULT_MAX_PHOTOS;
 
   const set = (key) => (event) => {
     const value = key === 'price_vnd' ? digitsOnly(event.target.value) : event.target.value;
@@ -84,7 +85,7 @@ export function Sell() {
     const body = new FormData();
     Object.entries(values).forEach(([key, value]) => body.append(key, value));
     body.append('lang', lang);
-    if (image) body.append('image', image);
+    photos.forEach((photo) => body.append('images', photo.file));
 
     try {
       const created = await api.createListing(body);
@@ -93,37 +94,64 @@ export function Sell() {
     } catch (error) {
       if (error.payload?.fields) setErrors(error.payload.fields);
       else if (error.payload?.error === 'image_too_large') setErrors({ image: 'too_large' });
+      else if (error.payload?.error === 'too_many_images') setErrors({ image: 'too_many' });
       else setErrors({ form: 'error' });
       setSubmitting(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   };
 
-  const chooseImage = (file) => {
+  const addPhotos = (fileList) => {
+    const files = Array.from(fileList ?? []);
+    if (files.length === 0) return;
+    let problem = null;
+    const accepted = [];
+    for (const file of files) {
+      if (!PHOTO_TYPES.includes(file.type)) { problem = problem ?? 'type'; continue; }
+      if (file.size > MAX_PHOTO_BYTES) { problem = problem ?? 'too_large'; continue; }
+      accepted.push(file);
+    }
+    const room = maxPhotos - photos.length;
+    if (accepted.length > room) problem = 'too_many';
+    const added = accepted.slice(0, Math.max(room, 0)).map((file) => ({ file, key: ++photoKey, url: URL.createObjectURL(file) }));
+    setPhotos((current) => [...current, ...added]);
+    setErrors((current) => {
+      const { image: ignored, ...rest } = current;
+      return problem ? { ...rest, image: problem } : rest;
+    });
+    if (fileInput.current) fileInput.current.value = '';
+  };
+
+  const removePhoto = (key) => {
+    setPhotos((current) => {
+      const gone = current.find((photo) => photo.key === key);
+      if (gone) URL.revokeObjectURL(gone.url);
+      return current.filter((photo) => photo.key !== key);
+    });
     setErrors((current) => {
       const { image: ignored, ...rest } = current;
       return rest;
     });
-    if (!file) {
-      setImage(null);
-      return;
-    }
-    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-      setErrors((current) => ({ ...current, image: 'type' }));
-      return;
-    }
-    if (file.size > 5 * 1024 * 1024) {
-      setErrors((current) => ({ ...current, image: 'too_large' }));
-      return;
-    }
-    setImage(file);
+  };
+
+  const makeCover = (key) => {
+    setPhotos((current) => {
+      const chosen = current.find((photo) => photo.key === key);
+      return chosen ? [chosen, ...current.filter((photo) => photo.key !== key)] : current;
+    });
   };
 
   const onDrop = (event) => {
     event.preventDefault();
     setDragging(false);
-    chooseImage(event.dataTransfer.files?.[0]);
+    addPhotos(event.dataTransfer.files);
   };
+
+  const imageError = errors.image === 'too_large'
+    ? t('sell.errorImage')
+    : errors.image === 'too_many'
+      ? t('sell.errorTooMany', { max: maxPhotos })
+      : errors.image ? t('sell.errorImageType') : null;
 
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
@@ -157,7 +185,7 @@ export function Sell() {
       {hasErrors && (
         <div className="notice notice--danger" style={{ marginBottom: 24 }} role="alert">
           <p className="notice__title">{t('sell.errorTitle')}</p>
-          {errors.image === 'too_large' && <p style={{ margin: 0 }}>{t('sell.errorImage')}</p>}
+          {imageError && <p style={{ margin: 0 }}>{imageError}</p>}
           {errors.form && <p style={{ margin: 0 }}>{t('common.error')}</p>}
         </div>
       )}
@@ -166,47 +194,71 @@ export function Sell() {
         <div className="field">
           <span className="field__label">{t('sell.photoLabel')}</span>
           <div
-            className={`uploader${dragging ? ' is-dragging' : ''}${preview ? ' has-preview' : ''}`}
+            className={`uploader${dragging ? ' is-dragging' : ''}${photos.length ? ' has-photos' : ''}`}
             onDragEnter={(event) => { event.preventDefault(); setDragging(true); }}
             onDragOver={(event) => event.preventDefault()}
             onDragLeave={(event) => { if (!event.currentTarget.contains(event.relatedTarget)) setDragging(false); }}
             onDrop={onDrop}
           >
-            {preview ? (
-              <div className="uploader__preview"><img src={preview} alt={t('sell.photoPreviewAlt')} /></div>
-            ) : (
-              <div className="uploader__drop-icon"><UploadIcon size={28} /></div>
-            )}
-            <div className="uploader__copy">
-              <input
-                ref={fileInput}
-                type="file"
-                accept="image/jpeg,image/png,image/webp"
-                className="sr-only"
-                onChange={(event) => chooseImage(event.target.files?.[0])}
-              />
-              <strong>{image ? image.name : t('sell.photoDropTitle')}</strong>
-              <span className="field__hint">{t('sell.photoHint')}</span>
-              <div className="row">
-                <button type="button" className="btn btn--ghost btn--small" onClick={() => fileInput.current?.click()}>
-                  {image ? t('sell.photoChange') : t('sell.photoChoose')}
-                </button>
-                {image && (
-                  <button
-                    type="button"
-                    className="link-quiet"
-                    onClick={() => {
-                      setImage(null);
-                      if (fileInput.current) fileInput.current.value = '';
-                    }}
-                  >
-                    {t('sell.photoRemove')}
+            <input
+              ref={fileInput}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              multiple
+              className="sr-only"
+              onChange={(event) => addPhotos(event.target.files)}
+            />
+            {photos.length === 0 ? (
+              <>
+                <div className="uploader__drop-icon"><UploadIcon size={28} /></div>
+                <div className="uploader__copy">
+                  <strong>{t('sell.photoDropTitle')}</strong>
+                  <span className="field__hint">{t('sell.photoHint', { max: maxPhotos })}</span>
+                  <button type="button" className="btn btn--ghost btn--small" onClick={() => fileInput.current?.click()}>
+                    {t('sell.photoChoose')}
                   </button>
-                )}
+                </div>
+              </>
+            ) : (
+              <div className="uploader__gallery">
+                <ul className="photo-grid">
+                  {photos.map((photo, index) => (
+                    <li key={photo.key} className={`photo-tile${index === 0 ? ' is-cover' : ''}`}>
+                      <img src={photo.url} alt={t('sell.photoPreviewAlt')} />
+                      {index === 0 ? (
+                        <span className="photo-tile__badge">{t('sell.photoCover')}</span>
+                      ) : (
+                        <button type="button" className="photo-tile__cover" onClick={() => makeCover(photo.key)}>
+                          {t('sell.photoMakeCover')}
+                        </button>
+                      )}
+                      <button
+                        type="button"
+                        className="photo-tile__remove"
+                        aria-label={t('sell.photoRemove')}
+                        title={t('sell.photoRemove')}
+                        onClick={() => removePhoto(photo.key)}
+                      >
+                        <CloseIcon size={16} />
+                      </button>
+                    </li>
+                  ))}
+                  {photos.length < maxPhotos && (
+                    <li>
+                      <button type="button" className="photo-tile photo-tile--add" onClick={() => fileInput.current?.click()}>
+                        <PlusIcon size={22} />
+                        <span>{t('sell.photoChange')}</span>
+                      </button>
+                    </li>
+                  )}
+                </ul>
+                <span className="field__hint">
+                  {t('sell.photoCount', { count: photos.length, max: maxPhotos })} · {t('sell.photoHint', { max: maxPhotos })}
+                </span>
               </div>
-            </div>
+            )}
           </div>
-          {errors.image && <span className="field__error">{errors.image === 'too_large' ? t('sell.errorImage') : t('sell.errorImageType')}</span>}
+          {imageError && <span className="field__error">{imageError}</span>}
         </div>
 
         <Field label={t('sell.titleLabel')} error={errorFor('title')} required>

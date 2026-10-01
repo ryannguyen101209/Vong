@@ -5,7 +5,7 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 
 import { db, getSettings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
-import { router as listingsRouter } from './routes/listings.js';
+import { router as listingsRouter, MAX_PHOTOS } from './routes/listings.js';
 import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
 import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
@@ -48,6 +48,7 @@ app.get('/api/meta', (req, res) => {
     districts: DISTRICTS,
     conditions: CONDITIONS,
     fee_vnd: settings.fee_vnd,
+    max_photos: MAX_PHOTOS,
   });
 });
 
@@ -97,6 +98,9 @@ app.use((req, res) => res.status(404).json({ error: 'not_found' }));
 app.use((err, req, res, next) => {
   if (err?.code === 'LIMIT_FILE_SIZE') {
     return res.status(413).json({ error: 'image_too_large' });
+  }
+  if (err?.code === 'LIMIT_FILE_COUNT' || err?.code === 'LIMIT_UNEXPECTED_FILE') {
+    return res.status(400).json({ error: 'too_many_images' });
   }
   console.error(err);
   res.status(500).json({ error: 'server_error' });
