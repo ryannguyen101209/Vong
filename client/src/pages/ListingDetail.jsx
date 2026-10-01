@@ -74,9 +74,7 @@ export function ListingDetail() {
 
       <div className="detail">
         <div>
-          <div className="detail__media">
-            <ListingImage listing={listing} alt={title} />
-          </div>
+          <Gallery listing={listing} title={title} />
 
           <div className="card panel" style={{ marginTop: 28 }}>
             <h2 style={{ fontSize: '1.3rem' }}>{t('listing.descriptionTitle')}</h2>
@@ -176,6 +174,59 @@ export function ListingDetail() {
           </div>
         </aside>
       </div>
+    </div>
+  );
+}
+
+/** Main photo plus a thumbnail strip when the seller added more than one. */
+function Gallery({ listing, title }) {
+  const { t } = useI18n();
+  const images = listing.images?.length ? listing.images : listing.image_path ? [listing.image_path] : [];
+  const [active, setActive] = useState(0);
+  const count = images.length;
+  const current = Math.min(active, Math.max(count - 1, 0));
+
+  if (count <= 1) {
+    return (
+      <div className="detail__media">
+        <ListingImage listing={listing} alt={title} />
+      </div>
+    );
+  }
+
+  const go = (step) => setActive((current + step + count) % count);
+
+  return (
+    <div className="gallery">
+      <div
+        className="detail__media gallery__main"
+        tabIndex={0}
+        aria-roledescription="carousel"
+        onKeyDown={(event) => {
+          if (event.key === 'ArrowRight') go(1);
+          if (event.key === 'ArrowLeft') go(-1);
+        }}
+      >
+        <img src={images[current]} alt={t('listing.photoAlt', { title, n: current + 1, count })} />
+        <button type="button" className="gallery__nav gallery__nav--prev" aria-label={t('listing.prevPhoto')} onClick={() => go(-1)}>‹</button>
+        <button type="button" className="gallery__nav gallery__nav--next" aria-label={t('listing.nextPhoto')} onClick={() => go(1)}>›</button>
+        <span className="gallery__count">{current + 1} / {count}</span>
+      </div>
+      <ul className="gallery__thumbs">
+        {images.map((src, index) => (
+          <li key={src}>
+            <button
+              type="button"
+              className={`gallery__thumb${index === current ? ' is-active' : ''}`}
+              aria-label={t('listing.showPhoto', { n: index + 1 })}
+              aria-current={index === current ? 'true' : undefined}
+              onClick={() => setActive(index)}
+            >
+              <img src={src} alt="" loading="lazy" />
+            </button>
+          </li>
+        ))}
+      </ul>
     </div>
   );
 }
