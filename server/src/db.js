@@ -133,6 +133,14 @@ if (!columns.includes('seller_email')) {
   db.exec('ALTER TABLE listings ADD COLUMN seller_email TEXT');
 }
 
+/* Migration: listings can carry several photos. `images` is a JSON array of
+ * upload paths; `image_path` stays as the cover (the first photo) so cards,
+ * conversations and older code keep working unchanged. */
+if (!columns.includes('images')) {
+  console.log('Adding images to listings…');
+  db.exec('ALTER TABLE listings ADD COLUMN images TEXT');
+}
+
 /* Repair databases whose buy_requests foreign key was rewritten by the migration
  * above before it used legacy_alter_table. Interest rows are preserved. */
 const buyRequestsDdl = db
