@@ -10,6 +10,7 @@ import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
 import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
+import { router as analyticsRouter } from './routes/analytics.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
 
@@ -56,6 +57,9 @@ app.get('/api/health', (req, res) => {
   const { n } = db.prepare("SELECT COUNT(*) AS n FROM listings WHERE status = 'published' AND is_seed = 0").get();
   res.json({ ok: true, published_listings: n, admin_password_is_default: usingDefaultPassword() });
 });
+
+// Owner-only totals for the private dashboard (disabled unless ANALYTICS_KEY is set).
+app.use('/api/analytics', analyticsRouter);
 
 /**
  * POST /api/contact — stores the message and prints it to the server log.
