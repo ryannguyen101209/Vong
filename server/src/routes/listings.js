@@ -11,6 +11,7 @@ import { requireUser } from '../accounts.js';
 export const router = express.Router();
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024;
+export const MAX_PHOTOS = 8;
 const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/webp', 'image/gif'];
 
 const upload = multer({
@@ -25,7 +26,7 @@ const upload = multer({
       cb(null, `${newId()}${ext}`);
     },
   }),
-  limits: { fileSize: MAX_IMAGE_BYTES, files: 1 },
+  limits: { fileSize: MAX_IMAGE_BYTES, files: MAX_PHOTOS },
   fileFilter(req, file, cb) {
     cb(null, ALLOWED_IMAGE_TYPES.includes(file.mimetype));
   },
@@ -34,9 +35,23 @@ const upload = multer({
 /** Columns safe to send to anybody. Seller phone is deliberately not here. */
 const PUBLIC_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category,
-  price_vnd, district, condition, seller_name, image_path, status,
+  price_vnd, district, condition, seller_name, image_path, images, status,
   reject_reason, fee_vnd, views, created_at, published_at, seller_id
 `;
+
+/** Turns the stored JSON column into an array, falling back to the single cover photo. */
+function withImages(row) {
+  if (!row) return row;
+  let images = [];
+  try { images = JSON.parse(row.images || '[]'); } catch { images = []; }
+  if (!Array.isArray(images) || images.length === 0) images = row.image_path ? [row.image_path] : [];
+  return { ...row, images };
+}
+
+/** Uploaded files from either the new `images` field or the older single `image` field. */
+function uploadedFiles(req) {
+  return [...(req.files?.images ?? []), ...(req.files?.image ?? [])];
+}
 
 const SORTS = {
   newest: 'COALESCE(published_at, created_at) DESC',
@@ -82,7 +97,7 @@ router.get('/', (req, res) => {
     .prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE ${where.join(' AND ')} ORDER BY ${order}`)
     .all(params);
 
-  res.json({ listings: rows });
+  res.json({ listings: rows.map(withImages) });
 });
 
 /** GET /api/listings/:id — one listing. Views only count published views. */
@@ -95,7 +110,7 @@ router.get('/:id', (req, res) => {
     db.prepare('UPDATE listings SET views = views + 1 WHERE id = ?').run(row.id);
     row.views += 1;
   }
-  res.json({ listing: row });
+  res.json({ listing: withImages(row) });
 });
 
 function validateListing(body) {
@@ -123,17 +138,19 @@ function validateListing(body) {
 }
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
-router.post('/', requireUser, upload.single('image'), (req, res) => {
+router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHOTOS }, { name: 'image', maxCount: 1 }]), (req, res) => {
+  const files = uploadedFiles(req);
   const { errors, values } = validateListing({ ...req.body, seller_email: req.user.email });
+  if (files.length > MAX_PHOTOS) errors.images = 'too_many';
   if (Object.keys(errors).length > 0) {
-    if (req.file) fs.unlink(req.file.path, () => {});
+    files.forEach((file) => fs.unlink(file.path, () => {}));
     return res.status(400).json({ error: 'validation_failed', fields: errors });
   }
 
   const { fee_vnd: fee } = getSettings();
   const id = newId();
   const ref = newRef();
-  const imagePath = req.file ? `/uploads/listings/${req.file.filename}` : null;
+  const imagePaths = files.map((file) => `/uploads/listings/${file.filename}`);
   // Sellers write in one language; the other variant stays empty and the UI
   // falls back to what they wrote rather than inventing a translation.
   const lang = req.body.lang === 'vi' ? 'vi' : 'en';
@@ -142,11 +159,11 @@ router.post('/', requireUser, upload.single('image'), (req, res) => {
     INSERT INTO listings (
       id, ref, title_en, title_vi, description_en, description_vi, category,
       price_vnd, district, condition, seller_name, seller_phone, seller_email,
-      image_path, status, fee_vnd, created_at, seller_id
+      image_path, images, status, fee_vnd, created_at, seller_id
     ) VALUES (
       @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
       @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email,
-      @image_path, 'pending_payment', @fee_vnd, @created_at, @seller_id
+      @image_path, @images, 'pending_payment', @fee_vnd, @created_at, @seller_id
     )
   `).run({
     id,
@@ -162,7 +179,8 @@ router.post('/', requireUser, upload.single('image'), (req, res) => {
     seller_name: values.sellerName,
     seller_phone: values.sellerPhone,
     seller_email: values.sellerEmail,
-    image_path: imagePath,
+    image_path: imagePaths[0] ?? null,
+    images: JSON.stringify(imagePaths),
     fee_vnd: fee,
     created_at: new Date().toISOString(),
     seller_id: req.user.id,
