@@ -12,6 +12,7 @@ import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { mountSharePages } from './share-pages.js';
+import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
 
@@ -53,6 +54,13 @@ app.get('/api/meta', (req, res) => {
     first_listing_free: isFirstListing(req.user?.id),
     max_photos: MAX_PHOTOS,
   });
+});
+
+/** Anonymous heartbeat for the live visitor count. Stores nothing on disk. */
+app.post('/api/presence', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  if (!touchVisitor(req.body?.id)) return res.status(400).json({ error: 'bad_id' });
+  res.json({ ok: true });
 });
 
 app.get('/api/health', (req, res) => {
