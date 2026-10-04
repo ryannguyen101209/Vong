@@ -146,6 +146,9 @@ export default {
     messageSeller: 'Nhắn người bán',
     requestPhone: 'Xem số điện thoại',
     requesting: 'Đang lấy thông tin…',
+    share: 'Chia sẻ',
+    linkCopied: 'Đã sao chép link',
+    shareText: '{{title}} giá {{price}} trên Vòng',
     contactTitle: 'Liên hệ {{name}} theo số này',
     contactBody:
       'Bạn nhắn hoặc gọi số này, số này dùng Zalo được luôn. Vòng không chuyển tin nhắn giùm, nên từ đây là chuyện giữa hai bạn với nhau.',
