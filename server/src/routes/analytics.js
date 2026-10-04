@@ -1,6 +1,7 @@
 import crypto from 'node:crypto';
 import express from 'express';
 import { db } from '../db.js';
+import { liveVisitors } from '../presence.js';
 
 /**
  * GET /api/analytics?key=...
@@ -78,8 +79,20 @@ function buildReport() {
     LIMIT 10
   `).all();
 
+  // Fees by month (Saigon time) for listings that were approved: published or later sold.
+  const monthly = db.prepare(`
+    SELECT strftime('%Y-%m', COALESCE(published_at, created_at), '${TZ_SHIFT}') AS month,
+           COALESCE(SUM(fee_vnd), 0) AS fees_vnd, COUNT(*) AS listings,
+           SUM(CASE WHEN fee_vnd = 0 THEN 1 ELSE 0 END) AS free_listings
+    FROM listings
+    WHERE ${real} AND status IN ('published', 'sold')
+    GROUP BY month ORDER BY month DESC LIMIT 12
+  `).all();
+
   return {
     generated_at: new Date().toISOString(),
+    live_visitors: liveVisitors(),
+    monthly,
     listings: {
       by_status: byStatus,
       total: Object.values(byStatus).reduce((s, n) => s + n, 0),
