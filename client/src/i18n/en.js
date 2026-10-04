@@ -146,6 +146,9 @@ export default {
     messageSeller: 'Message seller',
     requestPhone: 'Show phone number',
     requesting: 'Getting contact…',
+    share: 'Share',
+    linkCopied: 'Link copied',
+    shareText: '{{title}} for {{price}} on Vòng',
     contactTitle: 'Here is how to reach {{name}}',
     contactBody:
       'Message or call this number — it works on Zalo too. Vòng does not pass messages along, so this conversation is between the two of you from here.',
