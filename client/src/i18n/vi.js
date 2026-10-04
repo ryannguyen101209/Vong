@@ -26,6 +26,7 @@ export default {
     sell: 'Đăng bán',
     saved: 'Đã lưu',
     messages: 'Tin nhắn',
+    myListings: 'Tin của tôi',
     about: 'Về Vòng',
     faq: 'Hỏi đáp',
     contact: 'Liên hệ',
@@ -160,6 +161,7 @@ export default {
     notFoundTitle: 'Tin này không còn xem được',
     notFoundBody: 'Có thể tin đã bị gỡ, hoặc vẫn đang chờ được duyệt.',
     statusNotice: 'Tin này chưa công khai — trạng thái: {{status}}.',
+    soldNotice: 'Món này đã bán rồi.',
     photoAlt: '{{title}}, hình {{n}}/{{count}}',
     showPhoto: 'Xem hình {{n}}',
     prevPhoto: 'Hình trước',
@@ -356,7 +358,7 @@ export default {
       'Ba sinh viên ở Sài Gòn, làm dự án này giữa những buổi học. Tụi mình tự đọc và trả lời form liên hệ, cũng chính là mấy đứa mở app ngân hàng ra kiểm tra để duyệt tin cho bạn.',
     honestTitle: 'Những gì còn thiếu',
     honestBody:
-      'Hiện chưa có tài khoản người dùng, nên danh sách đã lưu chỉ nằm trong trình duyệt của bạn và tin đăng rồi thì chưa sửa được. Việc duyệt thanh toán vẫn làm tay. Tụi mình thà làm một thứ nhỏ mà thật, còn hơn tỏ ra to hơn thực tế.',
+      'Danh sách đã lưu nằm trong trình duyệt của bạn, không gắn với tài khoản. Ảnh của tin đã đăng chưa đổi được. Việc duyệt thanh toán vẫn làm tay. Tụi mình thà làm một thứ nhỏ mà thật, còn hơn tỏ ra to hơn thực tế.',
   },
 
   faq: {
@@ -389,7 +391,7 @@ export default {
       },
       {
         q: 'Mình sửa hoặc xoá tin đăng được không?',
-        a: 'Hiện thì chưa — chưa có tài khoản người dùng nên không có cách chứng minh tin đó là của bạn. Bạn nhắn qua trang liên hệ kèm mã tin (dạng VONG-A1B2C3), tụi mình làm giúp bạn.',
+        a: 'Được. Đăng nhập rồi vào Tin của tôi: bạn sửa được thông tin, đánh dấu đã bán, hoặc xoá tin. Chưa đổi được ảnh, nên muốn đổi ảnh thì xoá tin rồi đăng lại.',
       },
       {
         q: 'Mình chuyển khoản rồi mà tin vẫn chưa lên.',
@@ -491,6 +493,40 @@ export default {
     awaiting_approval: 'Chờ duyệt',
     published: 'Đã đăng',
     rejected: 'Bị từ chối',
+    sold: 'Đã bán',
+    removed: 'Đã xoá',
+  },
+
+  myListings: {
+    title: 'Tin của tôi',
+    lead: 'Tất cả tin bạn đã đăng. Đánh dấu đã bán, sửa thông tin, hoặc gỡ tin xuống.',
+    signInTitle: 'Đăng nhập để quản lý tin của bạn',
+    signInBody: 'Tài khoản Google là thứ gắn tin đăng với bạn.',
+    emptyTitle: 'Bạn chưa đăng tin nào',
+    emptyBody: 'Tin đầu tiên của bạn miễn phí.',
+    views: '{{count}} lượt xem',
+    hint: {
+      pending_payment: 'Chưa công khai. Trả phí xong là tin được chuyển đi duyệt.',
+      awaiting_approval: 'Tụi mình đang kiểm tra, thường trong vài tiếng. Duyệt xong là tin lên sóng.',
+      published: 'Đang hiển thị. Người mua tìm thấy được.',
+      sold: 'Đã đánh dấu bán. Tin không còn hiện ở trang Dạo xem.',
+      rejected: 'Chưa được đăng. Lý do: {{reason}}',
+    },
+    pay: 'Trả phí đăng tin',
+    resubmit: 'Sửa và gửi lại',
+    view: 'Xem tin',
+    markSold: 'Đánh dấu đã bán',
+    relist: 'Bán lại',
+    edit: 'Sửa',
+    delete: 'Xoá',
+    confirmDelete: 'Đúng, xoá tin',
+    cancel: 'Huỷ',
+    editTitle: 'Sửa tin đăng',
+    editLead: 'Thay đổi hiện ngay lập tức.',
+    editMissing: 'Không tìm thấy tin này.',
+    photosNote: 'Chưa đổi được ảnh. Muốn dùng ảnh khác thì xoá tin này rồi đăng lại.',
+    save: 'Lưu thay đổi',
+    saving: 'Đang lưu…',
   },
 
   categories: {
