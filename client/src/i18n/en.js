@@ -47,6 +47,7 @@ export default {
     title: 'Good finds. A fresh start.',
     lead: 'Buy pre-loved pieces. Sell what you no longer need. Right here in Saigon.',
     sell: 'Sell an item',
+    freeNote: 'Your first listing is free.',
     search: 'Search',
     categories: 'Shop by category',
     imageAlt: 'A pre-loved chair in a sunlit room',
@@ -93,7 +94,7 @@ export default {
       'Photo, price, district, and an honest description of the scratches. It takes about two minutes and costs nothing.',
     step2Title: 'Pay the listing fee',
     step2Body:
-      'Scan the VietQR code with your banking app. The transfer note is filled in for you, so we can match your payment. Your first listing is free and skips this step.',
+      'Scan the VietQR code with your banking app. Enter the amount and paste your reference as the transfer note, so we can match your payment. Your first listing is free and skips this step.',
     step3Title: 'We publish it',
     step3Body:
       'A real person checks the transfer arrived, usually within a few hours. Then your listing is live and buyers contact you directly.',
@@ -218,6 +219,7 @@ export default {
     sellerEmailPlaceholder: 'you@example.com',
     sellerEmailHint: 'Never shown to buyers. We use it to tell you when your listing is approved.',
     submit: 'Continue to payment',
+    freeSubmit: 'Submit for review',
     submitting: 'Creating your listing…',
     errorTitle: 'Please check these fields',
     errorLength: 'This is too short or too long.',
@@ -236,7 +238,7 @@ export default {
     title: 'Sign in to Vòng',
     lead: 'Sign in with Google to sell items and message buyers and sellers.',
     sellTitle: 'Sign in to sell your first item.',
-    sellBody: 'Your Google account connects your listings and buyer conversations.',
+    sellBody: 'Your first listing is free, no payment needed. Your Google account connects your listings and buyer conversations.',
     signIn: 'Sign in',
     signOut: 'Sign out',
     account: 'Account',
@@ -272,7 +274,7 @@ export default {
 
   payment: {
     title: 'Pay the listing fee',
-    lead: 'Scan this with any Vietnamese banking app. Everything is already filled in.',
+    lead: 'Scan this with any Vietnamese banking app, then enter the amount and the transfer note shown here.',
     amount: 'Amount',
     bank: 'Bank',
     accountNumber: 'Account number',
@@ -281,7 +283,7 @@ export default {
     referenceHint:
       'Keep this note exactly as it is — it is how we match your transfer to your listing.',
     qrAlt: 'VietQR code for the listing fee',
-    qrHint: 'Open your banking app → scan QR → check the amount → confirm.',
+    qrHint: 'Open your banking app → scan QR → enter the amount above → paste the reference as the note → confirm.',
     manualTitle: 'Or transfer manually',
     manualBody: 'If scanning fails, transfer with these details and the note above.',
     markPaid: 'I’ve sent the payment',
