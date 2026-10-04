@@ -47,6 +47,7 @@ export default {
     title: 'Đồ hay. Khởi đầu mới.',
     lead: 'Mua món đồ bạn thích. Bán món đồ không còn dùng. Ngay tại Sài Gòn.',
     sell: 'Đăng bán',
+    freeNote: 'Món đầu tiên bạn đăng là miễn phí.',
     search: 'Tìm kiếm',
     categories: 'Mua theo danh mục',
     imageAlt: 'Chiếc ghế đã qua sử dụng trong căn phòng đầy nắng',
@@ -93,7 +94,7 @@ export default {
       'Một tấm hình, giá, quận, và mô tả thật lòng cả những vết xước. Mất chừng hai phút và không tốn đồng nào.',
     step2Title: 'Trả phí đăng tin',
     step2Body:
-      'Quét mã VietQR bằng app ngân hàng. Nội dung chuyển khoản đã điền sẵn để tụi mình đối chiếu đúng tin của bạn. Tin đầu tiên của bạn miễn phí và bỏ qua bước này.',
+      'Quét mã VietQR bằng app ngân hàng. Bạn nhập số tiền và dán mã tham chiếu vào nội dung chuyển khoản để tụi mình đối chiếu đúng tin của bạn. Tin đầu tiên của bạn miễn phí và bỏ qua bước này.',
     step3Title: 'Tụi mình duyệt và đăng',
     step3Body:
       'Một người thật kiểm tra tiền đã về chưa, thường trong vài tiếng. Sau đó tin lên sóng và người mua liên hệ thẳng với bạn.',
@@ -218,6 +219,7 @@ export default {
     sellerEmailPlaceholder: 'ban@example.com',
     sellerEmailHint: 'Không bao giờ hiện cho người mua. Tụi mình dùng để báo khi tin của bạn được duyệt.',
     submit: 'Tiếp tục để thanh toán',
+    freeSubmit: 'Gửi để duyệt',
     submitting: 'Đang tạo tin đăng…',
     errorTitle: 'Bạn xem lại giúp mấy ô này',
     errorLength: 'Nội dung này quá ngắn hoặc quá dài.',
@@ -236,7 +238,7 @@ export default {
     title: 'Đăng nhập Vòng',
     lead: 'Đăng nhập bằng Google để đăng bán và nhắn người mua, người bán.',
     sellTitle: 'Đăng nhập để bán món đồ đầu tiên.',
-    sellBody: 'Tài khoản Google kết nối tin đăng và cuộc trò chuyện với người mua.',
+    sellBody: 'Món đầu tiên bạn đăng là miễn phí, không cần thanh toán. Tài khoản Google kết nối tin đăng và cuộc trò chuyện với người mua.',
     signIn: 'Đăng nhập',
     signOut: 'Đăng xuất',
     account: 'Tài khoản',
@@ -272,7 +274,7 @@ export default {
 
   payment: {
     title: 'Thanh toán phí đăng tin',
-    lead: 'Quét mã bằng app ngân hàng bất kỳ. Mọi thông tin đã được điền sẵn.',
+    lead: 'Quét mã bằng app ngân hàng bất kỳ, rồi nhập số tiền và nội dung chuyển khoản như bên cạnh.',
     amount: 'Số tiền',
     bank: 'Ngân hàng',
     accountNumber: 'Số tài khoản',
@@ -281,7 +283,7 @@ export default {
     referenceHint:
       'Bạn giữ nguyên nội dung này nhé — tụi mình dựa vào đó để biết tiền của tin nào.',
     qrAlt: 'Mã VietQR cho phí đăng tin',
-    qrHint: 'Mở app ngân hàng → quét mã QR → kiểm tra số tiền → xác nhận.',
+    qrHint: 'Mở app ngân hàng → quét mã QR → nhập số tiền ở trên → dán mã tham chiếu vào nội dung → xác nhận.',
     manualTitle: 'Hoặc chuyển khoản thủ công',
     manualBody: 'Nếu quét không được, bạn chuyển theo thông tin dưới đây kèm nội dung ở trên.',
     markPaid: 'Mình đã chuyển khoản',
