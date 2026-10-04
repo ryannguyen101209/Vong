@@ -409,7 +409,7 @@ export function Sell() {
             <span>{meta.first_listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
           </div>
           <button type="submit" className="btn btn--accent" disabled={submitting}>
-          {submitting ? t('sell.submitting') : t('sell.submit')}
+          {submitting ? t('sell.submitting') : t(meta.first_listing_free ? 'sell.freeSubmit' : 'sell.submit')}
           </button>
         </div>
       </form>

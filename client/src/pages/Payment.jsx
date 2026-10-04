@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import QRCode from 'qrcode';
+import { PAYMENT_QR } from '../lib/paymentQr.js';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice } from '../lib/format.js';
@@ -47,7 +47,6 @@ export function Payment() {
   const { t, lang, localized } = useI18n();
   const { profile, loading: authLoading, openSignIn } = useAuth();
   const [data, setData] = useState(null);
-  const [qrImage, setQrImage] = useState(null);
   const [status, setStatus] = useState('loading');
   const [marking, setMarking] = useState(false);
 
@@ -67,19 +66,6 @@ export function Payment() {
   }, [id, profile]);
 
   useEffect(load, [load]);
-
-  // Render the EMVCo string the server built into an actual scannable code.
-  useEffect(() => {
-    if (!data?.payment?.qr_payload) return;
-    QRCode.toDataURL(data.payment.qr_payload, {
-      errorCorrectionLevel: 'M',
-      margin: 1,
-      width: 512,
-      color: { dark: '#25332B', light: '#FFFFFF' },
-    })
-      .then(setQrImage)
-      .catch(() => setQrImage(null));
-  }, [data]);
 
   const markPaid = async () => {
     setMarking(true);
@@ -182,14 +168,10 @@ export function Payment() {
 
       <div className="payment-grid">
         <div className="qr-frame">
-          {qrImage ? (
-            <img src={qrImage} alt={t('payment.qrAlt')} />
-          ) : (
-            <p className="muted small">{t('common.loading')}</p>
-          )}
+          <img src={PAYMENT_QR} alt={t('payment.qrAlt')} />
           <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
             <span style={{ color: '#38604A' }}><LogoMark size={22} /></span>
-            <span className="qr-frame__brand">VietQR · {payment.bank_name}</span>
+            <span className="qr-frame__brand">VietQR</span>
           </div>
         </div>
 
@@ -198,16 +180,8 @@ export function Payment() {
             <div className="detail-rows">
               <Row label={t('payment.amount')} value={formatPrice(payment.amount_vnd, lang)} />
               <Row label={t('payment.reference')} value={payment.reference} mono copyable />
-              <Row label={t('payment.bank')} value={payment.bank_name} />
-              <Row label={t('payment.accountNumber')} value={payment.account_number} mono copyable />
-              <Row label={t('payment.accountHolder')} value={payment.account_holder} />
             </div>
             <p className="small muted" style={{ marginTop: 16 }}>{t('payment.referenceHint')}</p>
-          </div>
-
-          <div className="notice">
-            <p className="notice__title">{t('payment.manualTitle')}</p>
-            <p className="small" style={{ margin: 0 }}>{t('payment.manualBody')}</p>
           </div>
 
           <div>
