@@ -171,7 +171,7 @@ export function Payment() {
           <img src={PAYMENT_QR} alt={t('payment.qrAlt')} />
           <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
             <span style={{ color: '#38604A' }}><LogoMark size={22} /></span>
-            <span className="qr-frame__brand">VietQR</span>
+            <span className="qr-frame__brand">VietQR · {payment.bank_name}</span>
           </div>
         </div>
 
@@ -180,8 +180,16 @@ export function Payment() {
             <div className="detail-rows">
               <Row label={t('payment.amount')} value={formatPrice(payment.amount_vnd, lang)} />
               <Row label={t('payment.reference')} value={payment.reference} mono copyable />
+              <Row label={t('payment.bank')} value={payment.bank_name} />
+              <Row label={t('payment.accountNumber')} value={payment.account_number} mono copyable />
+              <Row label={t('payment.accountHolder')} value={payment.account_holder} />
             </div>
             <p className="small muted" style={{ marginTop: 16 }}>{t('payment.referenceHint')}</p>
+          </div>
+
+          <div className="notice">
+            <p className="notice__title">{t('payment.manualTitle')}</p>
+            <p className="small" style={{ margin: 0 }}>{t('payment.manualBody')}</p>
           </div>
 
           <div>

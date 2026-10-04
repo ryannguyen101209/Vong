@@ -142,6 +142,7 @@ function Queue({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [listings, setListings] = useState([]);
   const [counts, setCounts] = useState({});
+  const [freeGiven, setFreeGiven] = useState(0);
   const [loading, setLoading] = useState(true);
   const [busyId, setBusyId] = useState(null);
   const [rejecting, setRejecting] = useState(null);
@@ -151,10 +152,11 @@ function Queue({ token, onAuthError }) {
   const load = useCallback(() => {
     setLoading(true);
     api.admin
-      .listings(token, 'awaiting_approval')
+      .listings(token, 'queue')
       .then((data) => {
         setListings(data.listings);
         setCounts(data.counts);
+        setFreeGiven(data.free_given ?? 0);
       })
       .catch((error) => error.status === 401 && onAuthError())
       .finally(() => setLoading(false));
@@ -190,6 +192,7 @@ function Queue({ token, onAuthError }) {
             {t(`status.${key}`)}: {counts[key] ?? 0}
           </span>
         ))}
+        <span className="badge">{t('admin.freeGiven', { n: freeGiven })}</span>
       </div>
 
       {lastAction && (
@@ -236,6 +239,11 @@ function Queue({ token, onAuthError }) {
 
               <div>
                 <h3 style={{ marginBottom: 6, fontSize: '1.1rem' }}>{localized(listing, 'title')}</h3>
+                <div className="row" style={{ gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
+                  {listing.is_first_listing && <span className="badge badge--positive">{t('admin.firstListing')}</span>}
+                  {listing.status === 'pending_payment' && <span className="badge">{t('status.pending_payment')}</span>}
+                  <span className="badge">{t('admin.sellerTotal', { n: listing.seller_total })}</span>
+                </div>
                 <p className="small muted" style={{ marginBottom: 10 }}>
                   {listing.seller_name} · {listing.seller_phone} · {t(`districts.${listing.district}`)} ·{' '}
                   {formatPrice(listing.price_vnd, lang)}
@@ -250,6 +258,13 @@ function Queue({ token, onAuthError }) {
                 <div className="notice notice--warning small">
                   {listing.fee_vnd === 0 ? (
                     <div>{t('admin.freeFirstListing')}</div>
+                  ) : listing.status === 'pending_payment' ? (
+                    <>
+                      <div>
+                        {t('admin.expectedAmount', { amount: formatPrice(listing.fee_vnd, lang), ref: listing.ref })}
+                      </div>
+                      <div className="muted">{t('admin.notMarkedPaid')}</div>
+                    </>
                   ) : (
                     <>
                       <div>
