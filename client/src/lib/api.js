@@ -43,6 +43,9 @@ export const api = {
   markPaid: (id) => request(`/api/listings/${id}/mark-paid`, { method: 'POST' }),
 
   // Seller tools: the signed-in seller's own listings.
+  /** Anonymous heartbeat for the owner's live visitor count. */
+  ping: (id) => request('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }),
+
   myListings: () => request('/api/listings/mine'),
 
   updateListing: (id, body) =>

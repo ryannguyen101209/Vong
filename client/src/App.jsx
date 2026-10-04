@@ -17,6 +17,7 @@ import { Messages } from './pages/Messages.jsx';
 import { MyListings } from './pages/MyListings.jsx';
 import { EditListing } from './pages/EditListing.jsx';
 import { SignInDialog } from './components/SignInDialog.jsx';
+import { api } from './lib/api.js';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -28,10 +29,29 @@ function ScrollToTop() {
   return null;
 }
 
+/** Tells the server this tab is open, so the owner can see how many people are here now. */
+function VisitorPing() {
+  useEffect(() => {
+    let id = '';
+    try {
+      id = sessionStorage.getItem('vong_visit') || '';
+      if (!id) { id = crypto.randomUUID(); sessionStorage.setItem('vong_visit', id); }
+    } catch { id = id || (crypto.randomUUID?.() ?? ''); }
+    if (!id) return undefined;
+    const ping = () => { if (document.visibilityState === 'visible') api.ping(id).catch(() => {}); };
+    ping();
+    const timer = setInterval(ping, 30_000);
+    document.addEventListener('visibilitychange', ping);
+    return () => { clearInterval(timer); document.removeEventListener('visibilitychange', ping); };
+  }, []);
+  return null;
+}
+
 export function App() {
   return (
     <>
       <ScrollToTop />
+      <VisitorPing />
       <Header />
       <main id="main-content" tabIndex={-1}>
         <Routes>
