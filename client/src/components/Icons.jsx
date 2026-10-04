@@ -16,6 +16,14 @@ export const HeartIcon = ({ filled = false, size = 20 }) => (
   </svg>
 );
 
+export const ShareIcon = ({ size = 20 }) => (
+  <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
+    <path d="M12 15V4" />
+    <path d="m7.5 8.5 4.5-4.5 4.5 4.5" />
+    <path d="M5 13v5.5A1.5 1.5 0 0 0 6.5 20h11a1.5 1.5 0 0 0 1.5-1.5V13" />
+  </svg>
+);
+
 export const SearchIcon = ({ size = 18 }) => (
   <svg viewBox="0 0 24 24" width={size} height={size} {...base}>
     <circle cx="11" cy="11" r="6.5" />
