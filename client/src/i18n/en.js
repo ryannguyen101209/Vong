@@ -26,6 +26,7 @@ export default {
     sell: 'Sell',
     saved: 'Saved',
     messages: 'Messages',
+    myListings: 'My listings',
     about: 'About',
     faq: 'FAQ',
     contact: 'Contact',
@@ -160,6 +161,7 @@ export default {
     notFoundTitle: 'This listing is not available',
     notFoundBody: 'It may have been taken down, or it is still waiting to be published.',
     statusNotice: 'This listing is not public yet — status: {{status}}.',
+    soldNotice: 'This item has been sold.',
     photoAlt: '{{title}}, photo {{n}} of {{count}}',
     showPhoto: 'Show photo {{n}}',
     prevPhoto: 'Previous photo',
@@ -356,7 +358,7 @@ export default {
       'Three university students in Saigon building this between classes. We answer the contact form ourselves, and we are the same people checking the bank app to approve your listing.',
     honestTitle: 'What we are still missing',
     honestBody:
-      'There are no accounts yet, so saved items live in your browser and a listing cannot be edited after posting. Payment approval is manual. We would rather ship something honest and small than pretend to be bigger than we are.',
+      'Saved items live in your browser, not your account. Photos on a listing cannot be changed after posting. Payment approval is manual. We would rather ship something honest and small than pretend to be bigger than we are.',
   },
 
   faq: {
@@ -389,7 +391,7 @@ export default {
       },
       {
         q: 'Can I edit or delete my listing?',
-        a: 'Not yet — there are no user accounts, so there is no way to prove a listing is yours. Message us through the contact page with your reference code (it looks like VONG-A1B2C3) and we will do it for you.',
+        a: 'Yes. Sign in and open My listings: you can edit the details, mark an item as sold, or delete the listing. Photos cannot be changed yet, so to swap photos delete the listing and post it again.',
       },
       {
         q: 'I paid but my listing is still not up.',
@@ -491,6 +493,40 @@ export default {
     awaiting_approval: 'Awaiting approval',
     published: 'Published',
     rejected: 'Rejected',
+    sold: 'Sold',
+    removed: 'Removed',
+  },
+
+  myListings: {
+    title: 'My listings',
+    lead: 'Everything you have posted. Mark things as sold, fix details, or take a listing down.',
+    signInTitle: 'Sign in to manage your listings',
+    signInBody: 'Your Google account is what ties listings to you.',
+    emptyTitle: 'You have not listed anything yet',
+    emptyBody: 'Your first listing is free.',
+    views: '{{count}} views',
+    hint: {
+      pending_payment: 'Not public yet. Pay the fee and it goes to review.',
+      awaiting_approval: 'We are checking it, usually within a few hours. It goes live once approved.',
+      published: 'Live now. Buyers can find it.',
+      sold: 'Marked as sold. It no longer shows in Browse.',
+      rejected: 'Not published. Reason: {{reason}}',
+    },
+    pay: 'Pay the fee',
+    resubmit: 'Fix and resubmit',
+    view: 'View',
+    markSold: 'Mark as sold',
+    relist: 'Back on sale',
+    edit: 'Edit',
+    delete: 'Delete',
+    confirmDelete: 'Yes, delete it',
+    cancel: 'Cancel',
+    editTitle: 'Edit listing',
+    editLead: 'Changes show straight away.',
+    editMissing: 'We could not find that listing.',
+    photosNote: 'Photos cannot be changed yet. To use different photos, delete this listing and post a new one.',
+    save: 'Save changes',
+    saving: 'Saving…',
   },
 
   categories: {

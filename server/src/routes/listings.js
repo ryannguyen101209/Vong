@@ -100,11 +100,27 @@ router.get('/', (req, res) => {
   res.json({ listings: rows.map(withImages) });
 });
 
+/** GET /api/listings/mine — everything the signed-in seller has listed, any status. */
+router.get('/mine', requireUser, (req, res) => {
+  const rows = db
+    .prepare(`
+      SELECT ${PUBLIC_COLUMNS}, seller_phone, paid_marked_at, sold_at FROM listings
+      WHERE seller_id = ? AND is_seed = 0 AND status != 'removed'
+      ORDER BY created_at DESC
+    `)
+    .all(req.user.id);
+  res.set('Cache-Control', 'no-store');
+  res.json({ listings: rows.map(withImages) });
+});
+
 /** GET /api/listings/:id — one listing. Views only count published views. */
 router.get('/:id', (req, res) => {
   const row = db.prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE id = ? AND is_seed = 0`).get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
-  if (row.status !== 'published' && row.seller_id !== req.user?.id) return res.status(404).json({ error: 'not_found' });
+  if (row.status === 'removed') return res.status(404).json({ error: 'not_found' });
+  // Sold listings stay viewable (marked as sold) so old links do not break.
+  const isPublic = row.status === 'published' || row.status === 'sold';
+  if (!isPublic && row.seller_id !== req.user?.id) return res.status(404).json({ error: 'not_found' });
 
   if (row.status === 'published' && req.query.count !== '0') {
     db.prepare('UPDATE listings SET views = views + 1 WHERE id = ?').run(row.id);
@@ -260,6 +276,90 @@ router.post('/:id/mark-paid', requireUser, (req, res) => {
   ).run(new Date().toISOString(), row.id);
 
   res.json({ id: row.id, status: 'awaiting_approval' });
+});
+
+/** The seller's own, not-removed listing, or undefined. */
+function ownListing(req) {
+  return db
+    .prepare("SELECT * FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0 AND status != 'removed'")
+    .get(req.params.id, req.user.id);
+}
+
+/**
+ * PATCH /api/listings/:id — the seller edits text fields. Photos and the fee are
+ * not touched. A live listing stays live: edits do not go back through review.
+ */
+router.patch('/:id', requireUser, (req, res) => {
+  const row = ownListing(req);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+
+  const body = req.body ?? {};
+  const lang = row.title_en != null ? 'en' : 'vi';
+  const merged = {
+    title: body.title ?? row.title_en ?? row.title_vi,
+    description: body.description ?? row.description_en ?? row.description_vi,
+    category: body.category ?? row.category,
+    price_vnd: body.price_vnd ?? row.price_vnd,
+    district: body.district ?? row.district,
+    condition: body.condition ?? row.condition,
+    seller_name: body.seller_name ?? row.seller_name,
+    seller_phone: body.seller_phone ?? row.seller_phone,
+    seller_email: req.user.email,
+  };
+  const { errors, values } = validateListing(merged);
+  if (Object.keys(errors).length > 0) return res.status(400).json({ error: 'validation_failed', fields: errors });
+
+  db.prepare(`
+    UPDATE listings SET
+      title_en = @title_en, title_vi = @title_vi,
+      description_en = @description_en, description_vi = @description_vi,
+      category = @category, price_vnd = @price_vnd, district = @district, condition = @condition,
+      seller_name = @seller_name, seller_phone = @seller_phone
+    WHERE id = @id
+  `).run({
+    id: row.id,
+    title_en: lang === 'en' ? values.title : row.title_en,
+    title_vi: lang === 'vi' ? values.title : row.title_vi,
+    description_en: lang === 'en' ? values.description : row.description_en,
+    description_vi: lang === 'vi' ? values.description : row.description_vi,
+    category: merged.category,
+    price_vnd: values.price,
+    district: merged.district,
+    condition: merged.condition,
+    seller_name: values.sellerName,
+    seller_phone: values.sellerPhone,
+  });
+  res.json({ id: row.id });
+});
+
+/** POST /api/listings/:id/sold — a live listing is marked sold and leaves Browse. */
+router.post('/:id/sold', requireUser, (req, res) => {
+  const row = ownListing(req);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (row.status !== 'published') return res.status(409).json({ error: 'wrong_status', status: row.status });
+  db.prepare("UPDATE listings SET status = 'sold', sold_at = ? WHERE id = ?").run(new Date().toISOString(), row.id);
+  res.json({ id: row.id, status: 'sold' });
+});
+
+/** POST /api/listings/:id/relist — undo "sold" (the buyer fell through). */
+router.post('/:id/relist', requireUser, (req, res) => {
+  const row = ownListing(req);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (row.status !== 'sold') return res.status(409).json({ error: 'wrong_status', status: row.status });
+  db.prepare("UPDATE listings SET status = 'published', sold_at = NULL WHERE id = ?").run(row.id);
+  res.json({ id: row.id, status: 'published' });
+});
+
+/**
+ * DELETE /api/listings/:id — the seller removes their listing. It is hidden
+ * everywhere but the row is kept, so chats and buy requests stay intact and a
+ * deleted first listing does not hand out a second free one.
+ */
+router.delete('/:id', requireUser, (req, res) => {
+  const row = ownListing(req);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  db.prepare("UPDATE listings SET status = 'removed' WHERE id = ?").run(row.id);
+  res.json({ id: row.id, status: 'removed' });
 });
 
 /**

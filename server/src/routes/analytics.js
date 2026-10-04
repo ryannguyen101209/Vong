@@ -88,7 +88,7 @@ function buildReport() {
       total_views: count(`SELECT COALESCE(SUM(views), 0) AS n FROM listings WHERE ${real}`),
     },
     fees_vnd: {
-      collected: count(`SELECT COALESCE(SUM(fee_vnd), 0) AS n FROM listings WHERE ${real} AND status = 'published'`),
+      collected: count(`SELECT COALESCE(SUM(fee_vnd), 0) AS n FROM listings WHERE ${real} AND status IN ('published', 'sold')`),
       awaiting_approval: count(`SELECT COALESCE(SUM(fee_vnd), 0) AS n FROM listings WHERE ${real} AND status = 'awaiting_approval'`),
     },
     users: {

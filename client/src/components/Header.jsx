@@ -11,6 +11,7 @@ const LINKS = [
   { to: '/browse', key: 'nav.browse' },
   { to: '/saved', key: 'nav.saved', showCount: true },
   { to: '/messages', key: 'nav.messages' },
+  { to: '/my-listings', key: 'nav.myListings' },
 ];
 
 export function Header() {

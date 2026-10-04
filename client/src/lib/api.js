@@ -42,6 +42,22 @@ export const api = {
 
   markPaid: (id) => request(`/api/listings/${id}/mark-paid`, { method: 'POST' }),
 
+  // Seller tools: the signed-in seller's own listings.
+  myListings: () => request('/api/listings/mine'),
+
+  updateListing: (id, body) =>
+    request(`/api/listings/${id}`, {
+      method: 'PATCH',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+
+  markSold: (id) => request(`/api/listings/${id}/sold`, { method: 'POST' }),
+
+  relist: (id) => request(`/api/listings/${id}/relist`, { method: 'POST' }),
+
+  deleteListing: (id) => request(`/api/listings/${id}`, { method: 'DELETE' }),
+
   buyRequest: (id) => request(`/api/listings/${id}/buy-request`, { method: 'POST' }),
 
   contact: (body) =>

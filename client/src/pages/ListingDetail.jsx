@@ -67,7 +67,12 @@ export function ListingDetail() {
         <ArrowLeftIcon /> {t('listing.backToBrowse')}
       </Link>
 
-      {listing.status !== 'published' && (
+      {listing.status === 'sold' && (
+        <div className="notice notice--warning" style={{ marginBottom: 24 }}>
+          {t('listing.soldNotice')}
+        </div>
+      )}
+      {listing.status !== 'published' && listing.status !== 'sold' && (
         <div className="notice notice--warning" style={{ marginBottom: 24 }}>
           {t('listing.statusNotice', { status: t(`status.${listing.status}`) })}
         </div>

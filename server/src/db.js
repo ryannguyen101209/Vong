@@ -179,6 +179,7 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_session_expiry ON user_sessions(expires_at);
 `);
 if (!columns.includes('seller_id')) db.exec('ALTER TABLE listings ADD COLUMN seller_id TEXT REFERENCES users(id)');
+if (!columns.includes('sold_at')) db.exec('ALTER TABLE listings ADD COLUMN sold_at TEXT');
 db.exec(`
   CREATE TABLE IF NOT EXISTS conversations (
     id TEXT PRIMARY KEY,
