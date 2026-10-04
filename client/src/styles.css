@@ -620,7 +620,7 @@ main { flex: 1; }
   box-shadow: var(--shadow-md);
   display: grid; place-items: center; gap: 14px;
 }
-.qr-frame img { width: 100%; max-width: 300px; image-rendering: pixelated; }
+.qr-frame img { width: 100%; max-width: 300px; }
 .qr-frame__brand { font-family: var(--serif); font-weight: 700; color: var(--navy); font-size: 0.95rem; letter-spacing: 0.02em; }
 
 .detail-rows { display: flex; flex-direction: column; gap: 2px; }
@@ -917,6 +917,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
 .market-hero .eyebrow { font-size: .65rem; letter-spacing: .1em; margin-bottom: 18px; }
 .market-hero h1 { max-width: 24ch; font-size: clamp(2.4rem, 4.2vw, 3.6rem); line-height: 1.03; font-weight: 600; }
 .market-hero .lead { max-width: 37ch; font-size: 1rem; margin: 18px 0 24px; }
+.market-hero__free { margin-top: 14px; font-size: .92rem; font-weight: 600; color: var(--accent-ink); }
 .market-hero__image { position: relative; min-height: 320px; }
 .market-hero__image img { width: 100%; height: 100%; position: absolute; object-fit: cover; object-position: center 55%; }
 .market-hero__image span { position: absolute; bottom: 16px; left: 16px; padding: 7px 12px; background: #fafbf8ed; color: #25332b; font-size: .74rem; border-radius: 4px; }
