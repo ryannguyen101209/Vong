@@ -52,7 +52,7 @@ export default {
     imageCaption: 'Nhà mới. Câu chuyện mới.',
     sellEyebrow: 'Dọn chỗ cho điều mới',
     sellTitle: 'Có người sẽ thích món đồ của bạn.',
-    sellBody: 'Thêm ảnh, đặt giá và kết nối với người mua gần bạn. Phí đăng tin nhỏ. Không thu hoa hồng.',
+    sellBody: 'Thêm ảnh, đặt giá và kết nối với người mua gần bạn. Tin đầu tiên miễn phí, sau đó phí đăng tin nhỏ. Không thu hoa hồng.',
     skip: 'Đến nội dung chính',
   },
 
@@ -77,7 +77,7 @@ export default {
     heroEyebrow: 'Thành phố Hồ Chí Minh',
     heroTitle: 'Cho đồ của bạn thêm một vòng nữa.',
     heroLead:
-      'Vòng là nơi mua bán lại bàn ghế, quần áo và đồ đạc đang nằm không trong các căn hộ ở Sài Gòn. Đăng tin miễn phí. Bạn chỉ trả một khoản phí nhỏ khi tin được lên sóng — còn chuyện mua bán thì Vòng không xen vào.',
+      'Vòng là nơi mua bán lại bàn ghế, quần áo và đồ đạc đang nằm không trong các căn hộ ở Sài Gòn. Tin đăng đầu tiên miễn phí. Từ tin thứ hai, bạn chỉ trả một khoản phí nhỏ khi tin được lên sóng — còn chuyện mua bán thì Vòng không xen vào.',
     heroCtaPrimary: 'Đăng tin ngay',
     heroCtaSecondary: 'Xem tin đang bán',
     heroVisualLabel: 'Sản phẩm mới đăng',
@@ -92,7 +92,7 @@ export default {
       'Một tấm hình, giá, quận, và mô tả thật lòng cả những vết xước. Mất chừng hai phút và không tốn đồng nào.',
     step2Title: 'Trả phí đăng tin',
     step2Body:
-      'Quét mã VietQR bằng app ngân hàng. Nội dung chuyển khoản đã điền sẵn để tụi mình đối chiếu đúng tin của bạn.',
+      'Quét mã VietQR bằng app ngân hàng. Nội dung chuyển khoản đã điền sẵn để tụi mình đối chiếu đúng tin của bạn. Tin đầu tiên của bạn miễn phí và bỏ qua bước này.',
     step3Title: 'Tụi mình duyệt và đăng',
     step3Body:
       'Một người thật kiểm tra tiền đã về chưa, thường trong vài tiếng. Sau đó tin lên sóng và người mua liên hệ thẳng với bạn.',
@@ -171,6 +171,13 @@ export default {
     title: 'Đăng tin bán',
     lead:
       'Cứ viết như đang kể cho bạn bè nghe. Nói luôn cả khuyết điểm — tin thật thà thường bán nhanh hơn tin bóng bẩy.',
+    freeNoticeTitle: 'Tin đầu tiên của bạn miễn phí',
+    freeNoticeBody:
+      'Không mất phí và không có bước thanh toán. Tụi mình vẫn xem từng tin bằng tay, nên tin lên sóng sau khi được duyệt, thường trong vài tiếng. Từ tin thứ hai, mỗi tin {{fee}}.',
+    freeLockup: 'Miễn phí',
+    freeLockupNote: 'tin đầu tiên của bạn',
+    freeSubmitSummary: 'Miễn phí, đây là tin đầu tiên của bạn',
+    freeSubmitSummaryBody: 'Không cần trả gì. Tụi mình duyệt rồi đăng.',
     feeNoticeTitle: 'Viết tin miễn phí, {{fee}} để đăng',
     feeNoticeBody:
       'Trang kế tiếp sẽ hiện mã QR. Tin của bạn lên sóng ngay sau khi tụi mình kiểm tra thấy tiền về.',
@@ -280,6 +287,9 @@ export default {
     markedTitle: 'Cảm ơn bạn — tụi mình đang kiểm tra',
     markedBody:
       'Một người thật sẽ đối chiếu với app ngân hàng, thường trong vài tiếng. Thấy tiền về là tin lên sóng ngay. Ở đây không có gì tự động cả, nên nếu bạn chuyển lúc 2 giờ sáng thì sáng hôm sau mới duyệt được.',
+    freeMarkedBody:
+      'Đây là tin đầu tiên của bạn nên không cần trả gì. Một người thật sẽ xem qua, thường trong vài tiếng, và tin lên sóng ngay khi được duyệt.',
+    freeResubmit: 'Gửi lại để duyệt',
     markedRef: 'Mã tin của bạn là {{ref}} — giữ lại phòng khi cần hỏi tụi mình.',
     statusPendingTitle: 'Đang chờ bạn chuyển khoản',
     statusAwaitingTitle: 'Đang chờ tụi mình kiểm tra',
@@ -338,7 +348,7 @@ export default {
       '“Vòng” là vòng tròn, là một lượt nữa. Đồ đạc đi thêm một vòng thay vì ra bãi rác. Ý tưởng chỉ có vậy thôi.',
     modelTitle: 'Tụi mình sống bằng gì',
     modelBody1:
-      'Viết tin thì miễn phí. Tin được đăng sau khi người bán chuyển một khoản phí nhỏ — mặc định là {{fee}}. Đó là khoản tiền duy nhất Vòng thu, đủ để trả tiền máy chủ và công tụi mình ngồi duyệt tin.',
+      'Tin đăng đầu tiên của mỗi người bán là miễn phí. Từ tin thứ hai, tin được đăng sau khi người bán chuyển một khoản phí nhỏ — mặc định là {{fee}}. Đó là khoản tiền duy nhất Vòng thu, đủ để trả tiền máy chủ và công tụi mình ngồi duyệt tin.',
     modelBody2:
       'Tụi mình không lấy hoa hồng trên giao dịch của bạn, và không bao giờ giữ tiền của người mua. Ở Việt Nam, muốn giữ tiền của người khác thì phải có giấy phép trung gian thanh toán do Ngân hàng Nhà nước cấp, tụi mình không có và cũng không giả vờ là có. Người mua với người bán tự lo chuyện thanh toán và nhận hàng.',
     teamTitle: 'Tụi mình là ai',
@@ -355,7 +365,7 @@ export default {
     items: [
       {
         q: 'Bán một món tốn bao nhiêu tiền?',
-        a: 'Viết tin thì miễn phí. Đăng tin tốn {{fee}}, chuyển khoản một lần. Tụi mình không lấy phần trăm giao dịch — bạn bán cây đàn 1.400.000₫ thì bạn giữ trọn số đó.',
+        a: 'Tin đầu tiên của bạn miễn phí, không cần trả gì. Từ tin thứ hai, viết tin vẫn miễn phí và đăng tin tốn {{fee}}, chuyển khoản một lần. Tụi mình không lấy phần trăm giao dịch — bạn bán cây đàn 1.400.000₫ thì bạn giữ trọn số đó.',
       },
       {
         q: 'Vì sao phải trả tiền trước khi tin hiện lên?',
@@ -436,6 +446,7 @@ export default {
     queueEmptyBody: 'Hiện không có tin nào đang chờ duyệt.',
     sellerClaims: 'Người bán báo đã chuyển lúc {{when}}',
     expectedAmount: 'Cần thấy {{amount}} với nội dung {{ref}}',
+    freeFirstListing: 'Tin đầu tiên, miễn phí. Không có khoản nào để kiểm tra, chỉ cần duyệt tin.',
     approve: 'Duyệt & đăng tin',
     approving: 'Đang đăng…',
     reject: 'Từ chối',
