@@ -221,6 +221,16 @@ export function getSettings() {
   return { ...out, fee_vnd: Number(out.fee_vnd) || 0 };
 }
 
+/**
+ * Every account's first real listing is free of the publishing fee. "First"
+ * means the account has never created a listing (in any status), so deleting or
+ * abandoning one does not hand out a second free listing.
+ */
+export function isFirstListing(userId) {
+  if (!userId) return false;
+  return !db.prepare('SELECT 1 FROM listings WHERE seller_id = ? AND is_seed = 0 LIMIT 1').get(userId);
+}
+
 export function saveSettings(patch) {
   const stmt = db.prepare(
     'INSERT INTO settings (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value'
