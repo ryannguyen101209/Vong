@@ -47,6 +47,7 @@ export function Home() {
             <Link to="/browse" className="btn btn--accent">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
             <Link to="/sell" className="btn btn--ghost">{t('market.sell')}</Link>
           </div>
+          <p className="market-hero__free">{t('market.freeNote')}</p>
         </div>
       </section>
 
