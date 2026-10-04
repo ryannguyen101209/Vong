@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
-import { db, getSettings, UPLOADS_DIR } from '../db.js';
+import { db, getSettings, isFirstListing, UPLOADS_DIR } from '../db.js';
 import { newId, newRef } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
@@ -147,7 +147,11 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     return res.status(400).json({ error: 'validation_failed', fields: errors });
   }
 
-  const { fee_vnd: fee } = getSettings();
+  // First listing per account is free: no fee, no payment step, straight to the
+  // admin queue (it is still reviewed by hand before it goes live).
+  const free = isFirstListing(req.user.id);
+  const fee = free ? 0 : getSettings().fee_vnd;
+  const now = new Date().toISOString();
   const id = newId();
   const ref = newRef();
   const imagePaths = files.map((file) => `/uploads/listings/${file.filename}`);
@@ -159,11 +163,11 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     INSERT INTO listings (
       id, ref, title_en, title_vi, description_en, description_vi, category,
       price_vnd, district, condition, seller_name, seller_phone, seller_email,
-      image_path, images, status, fee_vnd, created_at, seller_id
+      image_path, images, status, fee_vnd, created_at, paid_marked_at, seller_id
     ) VALUES (
       @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
       @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email,
-      @image_path, @images, 'pending_payment', @fee_vnd, @created_at, @seller_id
+      @image_path, @images, @status, @fee_vnd, @created_at, @paid_marked_at, @seller_id
     )
   `).run({
     id,
@@ -181,12 +185,14 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     seller_email: values.sellerEmail,
     image_path: imagePaths[0] ?? null,
     images: JSON.stringify(imagePaths),
+    status: free ? 'awaiting_approval' : 'pending_payment',
     fee_vnd: fee,
-    created_at: new Date().toISOString(),
+    created_at: now,
+    paid_marked_at: free ? now : null,
     seller_id: req.user.id,
   });
 
-  res.status(201).json({ id, ref, status: 'pending_payment', fee_vnd: fee });
+  res.status(201).json({ id, ref, status: free ? 'awaiting_approval' : 'pending_payment', fee_vnd: fee, free });
 });
 
 /** GET /api/listings/:id/payment — the VietQR payload for this listing's fee. */
@@ -195,6 +201,18 @@ router.get('/:id/payment', requireUser, (req, res) => {
     .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0')
     .get(req.params.id, req.user.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
+
+  const listing = {
+    id: row.id,
+    ref: row.ref,
+    status: row.status,
+    free: row.fee_vnd === 0,
+    title_en: row.title_en,
+    title_vi: row.title_vi,
+    reject_reason: row.reject_reason,
+  };
+  // A free first listing has nothing to pay: no QR, no bank details.
+  if (listing.free) return res.json({ listing, payment: null });
 
   const settings = getSettings();
   const bank = findBank(settings.bank_bin);
@@ -213,14 +231,7 @@ router.get('/:id/payment', requireUser, (req, res) => {
   }
 
   res.json({
-    listing: {
-      id: row.id,
-      ref: row.ref,
-      status: row.status,
-      title_en: row.title_en,
-      title_vi: row.title_vi,
-      reject_reason: row.reject_reason,
-    },
+    listing,
     payment: {
       qr_payload: payload,
       amount_vnd: row.fee_vnd,

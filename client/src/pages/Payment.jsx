@@ -116,7 +116,7 @@ export function Payment() {
         <div className="card panel">
           <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusAwaitingTitle')}</p>
           <h1>{t('payment.markedTitle')}</h1>
-          <p className="lead">{t('payment.markedBody')}</p>
+          <p className="lead">{listing.free ? t('payment.freeMarkedBody') : t('payment.markedBody')}</p>
           <p className="small muted" style={{ marginTop: 16 }}>
             {t('payment.markedRef', { ref: listing.ref })}
           </p>
@@ -141,6 +141,22 @@ export function Payment() {
             <Link to={`/listing/${listing.id}`} className="btn btn--accent">{t('payment.viewListing')}</Link>
             <Link to="/" className="btn btn--ghost">{t('payment.backHome')}</Link>
           </div>
+        </div>
+      </div>
+    );
+  }
+
+  // A rejected free listing has no transfer to make: show why, and let them resubmit.
+  if (listing.free) {
+    return (
+      <div className="shell section editorial-page payment-page payment-page--status">
+        <div className="card panel">
+          <p className="eyebrow">{t('payment.statusRejectedTitle')}</p>
+          <p>{t('payment.statusRejectedBody', { reason: listing.reject_reason || '—' })}</p>
+          <p className="small muted">{t('payment.statusRejectedRetry')}</p>
+          <button type="button" className="btn btn--accent" onClick={markPaid} disabled={marking} style={{ marginTop: 16 }}>
+            {marking ? t('payment.marking') : t('payment.freeResubmit')}
+          </button>
         </div>
       </div>
     );

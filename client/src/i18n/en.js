@@ -52,7 +52,7 @@ export default {
     imageCaption: 'Another home. Another chapter.',
     sellEyebrow: 'Make a little room',
     sellTitle: 'Someone else will love it.',
-    sellBody: 'Add a photo, set your price, and connect with local buyers. A small publishing fee. No sales commission.',
+    sellBody: 'Add a photo, set your price, and connect with local buyers. Your first listing is free, then a small publishing fee. No sales commission.',
     skip: 'Skip to content',
   },
 
@@ -77,7 +77,7 @@ export default {
     heroEyebrow: 'Ho Chi Minh City',
     heroTitle: 'Give your things a second round.',
     heroLead:
-      'Vòng is a marketplace for the furniture, clothes and gear already sitting in Saigon apartments. Listing is free. You pay a small fee only when your listing goes live — and we never touch the sale itself.',
+      'Vòng is a marketplace for the furniture, clothes and gear already sitting in Saigon apartments. Your first listing is free. After that, you pay a small fee only when a listing goes live — and we never touch the sale itself.',
     heroCtaPrimary: 'Post something',
     heroCtaSecondary: 'Browse listings',
     heroVisualLabel: 'Recently listed products',
@@ -92,7 +92,7 @@ export default {
       'Photo, price, district, and an honest description of the scratches. It takes about two minutes and costs nothing.',
     step2Title: 'Pay the listing fee',
     step2Body:
-      'Scan the VietQR code with your banking app. The transfer note is filled in for you, so we can match your payment.',
+      'Scan the VietQR code with your banking app. The transfer note is filled in for you, so we can match your payment. Your first listing is free and skips this step.',
     step3Title: 'We publish it',
     step3Body:
       'A real person checks the transfer arrived, usually within a few hours. Then your listing is live and buyers contact you directly.',
@@ -171,6 +171,13 @@ export default {
     title: 'Post a listing',
     lead:
       'Write it the way you would tell a friend. Mention the flaws — honest listings sell faster than polished ones.',
+    freeNoticeTitle: 'Your first listing is free',
+    freeNoticeBody:
+      'No fee and no payment step. We still look over every listing by hand, so it goes live once we have approved it, usually within a few hours. Listings after this one are {{fee}} each.',
+    freeLockup: 'Free',
+    freeLockupNote: 'your first listing',
+    freeSubmitSummary: 'Free, this is your first listing',
+    freeSubmitSummaryBody: 'Nothing to pay. We review it and publish it.',
     feeNoticeTitle: 'Free to write, {{fee}} to publish',
     feeNoticeBody:
       'You will see a QR code on the next page. Your listing goes live once we have checked the transfer.',
@@ -280,6 +287,9 @@ export default {
     markedTitle: 'Thanks — we’re checking for it',
     markedBody:
       'A real person compares this against our bank app, usually within a few hours. Your listing goes live as soon as we see the transfer. Nothing is automatic here, so if you sent it at 2am, expect the morning.',
+    freeMarkedBody:
+      'This was your first listing, so there is nothing to pay. A real person looks it over, usually within a few hours, and it goes live once approved.',
+    freeResubmit: 'Send it back for review',
     markedRef: 'Your reference is {{ref}} — keep it in case you need to ask us about it.',
     statusPendingTitle: 'Waiting for your transfer',
     statusAwaitingTitle: 'Waiting for us to check',
@@ -338,7 +348,7 @@ export default {
       '“Vòng” means a circle, a round, a loop. Things going around again instead of going to the dump. That is the whole idea.',
     modelTitle: 'How we pay for it',
     modelBody1:
-      'Listing is free to write. A listing goes live after the seller transfers a small fee — {{fee}} by default. That is the only money Vòng ever collects, and it covers the server and our time reviewing listings.',
+      'Every seller’s first listing is free. After that, a listing goes live once the seller transfers a small fee — {{fee}} by default. That is the only money Vòng ever collects, and it covers the server and our time reviewing listings.',
     modelBody2:
       'We take no commission on your sale, and we never hold the buyer’s money. Holding other people’s money in Vietnam requires a payment intermediary licence from the State Bank, which we do not have and are not pretending to have. Buyer and seller sort out payment and pickup between themselves.',
     teamTitle: 'Who we are',
@@ -355,7 +365,7 @@ export default {
     items: [
       {
         q: 'How much does it cost to sell something?',
-        a: 'Writing a listing is free. Publishing it costs {{fee}}, paid once by bank transfer. We take no percentage of your sale — if you sell a guitar for 1,400,000₫, you keep all of it.',
+        a: 'Your first listing is free, nothing to pay. After that, writing a listing is free and publishing it costs {{fee}}, paid once by bank transfer. We take no percentage of your sale — if you sell a guitar for 1,400,000₫, you keep all of it.',
       },
       {
         q: 'Why do I have to pay before my listing appears?',
@@ -436,6 +446,7 @@ export default {
     queueEmptyBody: 'Nothing is waiting for approval right now.',
     sellerClaims: 'Seller marked as paid {{when}}',
     expectedAmount: 'Expect {{amount}} with note {{ref}}',
+    freeFirstListing: 'First listing, free. No payment to check, just review it.',
     approve: 'Approve & publish',
     approving: 'Publishing…',
     reject: 'Reject',

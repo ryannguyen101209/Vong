@@ -31,7 +31,7 @@ export function Sell() {
   const navigate = useNavigate();
   const fileInput = useRef(null);
 
-  const [meta, setMeta] = useState({ categories: [], districts: [], conditions: [], fee_vnd: null });
+  const [meta, setMeta] = useState({ categories: [], districts: [], conditions: [], fee_vnd: null, first_listing_free: false });
   const [values, setValues] = useState(EMPTY);
   // Each photo keeps its File, a stable key for React, and an object URL for the preview.
   const [photos, setPhotos] = useState([]);
@@ -89,7 +89,7 @@ export function Sell() {
 
     try {
       const created = await api.createListing(body);
-      // Straight to payment: the listing is not public until the fee is paid.
+      // To the payment page (a free first listing just shows its review status there).
       navigate(`/payment/${created.id}`, { replace: true });
     } catch (error) {
       if (error.payload?.fields) setErrors(error.payload.fields);
@@ -172,14 +172,23 @@ export function Sell() {
           <p className="lead">{t('sell.lead')}</p>
         </div>
         <div className="sell-fee-lockup">
-          <span>{feeLabel}</span>
-          <small>{t('common.perListing')}</small>
+          <span>{meta.first_listing_free ? t('sell.freeLockup') : feeLabel}</span>
+          <small>{meta.first_listing_free ? t('sell.freeLockupNote') : t('common.perListing')}</small>
         </div>
       </header>
 
       <div className="notice notice--accent fee-notice">
-        <p className="notice__title">{t('sell.feeNoticeTitle', { fee: feeLabel })}</p>
-        <p style={{ margin: 0 }}>{t('sell.feeNoticeBody')}</p>
+        {meta.first_listing_free ? (
+          <>
+            <p className="notice__title">{t('sell.freeNoticeTitle')}</p>
+            <p style={{ margin: 0 }}>{t('sell.freeNoticeBody', { fee: feeLabel })}</p>
+          </>
+        ) : (
+          <>
+            <p className="notice__title">{t('sell.feeNoticeTitle', { fee: feeLabel })}</p>
+            <p style={{ margin: 0 }}>{t('sell.feeNoticeBody')}</p>
+          </>
+        )}
       </div>
 
       {hasErrors && (
@@ -396,8 +405,8 @@ export function Sell() {
 
         <div className="sell-submit">
           <div>
-            <strong>{t('sell.submitSummary', { fee: feeLabel })}</strong>
-            <span>{t('sell.submitSummaryBody')}</span>
+            <strong>{meta.first_listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
+            <span>{meta.first_listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
           </div>
           <button type="submit" className="btn btn--accent" disabled={submitting}>
           {submitting ? t('sell.submitting') : t('sell.submit')}

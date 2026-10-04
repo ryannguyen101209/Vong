@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import { db, getSettings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
+import { db, getSettings, isFirstListing, SERVER_ROOT, UPLOADS_DIR } from './db.js';
 import { router as listingsRouter, MAX_PHOTOS } from './routes/listings.js';
 import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
@@ -50,6 +50,7 @@ app.get('/api/meta', (req, res) => {
     districts: DISTRICTS,
     conditions: CONDITIONS,
     fee_vnd: settings.fee_vnd,
+    first_listing_free: isFirstListing(req.user?.id),
     max_photos: MAX_PHOTOS,
   });
 });

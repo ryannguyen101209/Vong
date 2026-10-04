@@ -248,15 +248,21 @@ function Queue({ token, onAuthError }) {
                 </p>
 
                 <div className="notice notice--warning small">
-                  <div>
-                    {t('admin.expectedAmount', {
-                      amount: formatPrice(listing.fee_vnd, lang),
-                      ref: listing.ref,
-                    })}
-                  </div>
-                  <div className="muted">
-                    {t('admin.sellerClaims', { when: formatDateTime(listing.paid_marked_at, lang) })}
-                  </div>
+                  {listing.fee_vnd === 0 ? (
+                    <div>{t('admin.freeFirstListing')}</div>
+                  ) : (
+                    <>
+                      <div>
+                        {t('admin.expectedAmount', {
+                          amount: formatPrice(listing.fee_vnd, lang),
+                          ref: listing.ref,
+                        })}
+                      </div>
+                      <div className="muted">
+                        {t('admin.sellerClaims', { when: formatDateTime(listing.paid_marked_at, lang) })}
+                      </div>
+                    </>
+                  )}
                 </div>
 
                 <div className="queue-item__actions">
