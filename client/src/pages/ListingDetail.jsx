@@ -5,6 +5,7 @@ import { api } from '../lib/api.js';
 import { formatPrice, formatDate } from '../lib/format.js';
 import { ListingImage } from '../components/ListingCard.jsx';
 import { SaveButton } from '../components/SaveButton.jsx';
+import { ShareButton } from '../components/ShareButton.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
@@ -159,6 +160,13 @@ export function ListingDetail() {
                     <PhoneIcon /> {requesting ? t('listing.requesting') : t('listing.requestPhone')}
                   </button>
                   <SaveButton listingId={listing.id} inline />
+                  {listing.status === 'published' && (
+                    <ShareButton
+                      url={`${window.location.origin}/listing/${listing.id}`}
+                      title={title}
+                      text={t('listing.shareText', { title, price: formatPrice(listing.price_vnd, lang) })}
+                    />
+                  )}
                 </div>
               </>
             )}

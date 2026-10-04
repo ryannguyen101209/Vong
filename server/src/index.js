@@ -11,6 +11,7 @@ import { usingDefaultPassword } from './auth.js';
 import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
+import { mountSharePages } from './share-pages.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
 
@@ -92,6 +93,7 @@ app.use('/api/admin', adminRouter);
 // you the whole app on one port. In dev, Vite serves the client instead.
 const clientDist = path.join(SERVER_ROOT, '..', 'client', 'dist');
 if (fs.existsSync(clientDist)) {
+  mountSharePages(app, clientDist); // listing link previews, sitemap.xml, robots.txt
   app.use(express.static(clientDist));
   app.get(/^(?!\/api|\/uploads).*/, (req, res) => res.sendFile(path.join(clientDist, 'index.html')));
 }
