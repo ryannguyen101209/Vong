@@ -7,6 +7,7 @@ import { newId, newRef } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
+import { notifyOwner } from '../notify.js';
 
 export const router = express.Router();
 
@@ -208,6 +209,12 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     seller_id: req.user.id,
   });
 
+  notifyOwner({
+    title: free ? 'New listing to review (free first listing)' : 'New listing, awaiting payment',
+    message: `${values.title} · ${values.price} VND` + (free ? '' : ` · fee ${fee} VND`),
+    tags: ['bell'],
+  });
+
   res.status(201).json({ id, ref, status: free ? 'awaiting_approval' : 'pending_payment', fee_vnd: fee, free });
 });
 
@@ -274,6 +281,8 @@ router.post('/:id/mark-paid', requireUser, (req, res) => {
   db.prepare(
     "UPDATE listings SET status = 'awaiting_approval', paid_marked_at = ?, reject_reason = NULL WHERE id = ?"
   ).run(new Date().toISOString(), row.id);
+
+  notifyOwner({ title: 'Seller says they paid', message: `Listing ${row.id}: check your bank app, then approve.`, tags: ['moneybag'] });
 
   res.json({ id: row.id, status: 'awaiting_approval' });
 });
