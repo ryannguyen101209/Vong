@@ -22,7 +22,12 @@ router.use(requireAdmin);
 const ADMIN_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd,
   district, condition, seller_name, seller_phone, seller_email, image_path, status, reject_reason,
-  fee_vnd, views, created_at, paid_marked_at, reviewed_at, published_at
+  fee_vnd, views, created_at, paid_marked_at, reviewed_at, published_at,
+  (SELECT COUNT(*) FROM listings o
+     WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
+       AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))
+  ) = 0 AND listings.seller_id IS NOT NULL AS is_first_listing,
+  (SELECT COUNT(*) FROM listings o WHERE o.seller_id = listings.seller_id AND o.is_seed = 0) AS seller_total
 `;
 
 /** GET /api/admin/listings?status=... — the review queue. */
@@ -30,7 +35,11 @@ router.get('/listings', (req, res) => {
   const status = String(req.query.status ?? 'awaiting_approval');
   const statuses = ['pending_payment', 'awaiting_approval', 'published', 'rejected'];
 
-  const rows = statuses.includes(status)
+  // "queue" = everything that needs you: paid-and-claimed first, then waiting-for-payment.
+  const rows = status === 'queue'
+    ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status IN ('awaiting_approval','pending_payment')
+        ORDER BY (status = 'awaiting_approval') DESC, COALESCE(paid_marked_at, created_at) ASC`).all()
+    : statuses.includes(status)
     ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status = ? ORDER BY COALESCE(paid_marked_at, created_at) ASC`).all(status)
     : db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings ORDER BY created_at DESC`).all();
 
@@ -39,14 +48,16 @@ router.get('/listings', (req, res) => {
     counts[row.status] = row.n;
   }
 
-  res.json({ listings: rows, counts });
+  const free_given = db.prepare('SELECT COUNT(*) AS n FROM listings WHERE is_seed = 0 AND fee_vnd = 0').get().n;
+
+  res.json({ listings: rows.map((r) => ({ ...r, is_first_listing: !!r.is_first_listing })), counts, free_given });
 });
 
 /** POST /api/admin/listings/:id/approve — you saw the money arrive. */
 router.post('/listings/:id/approve', (req, res) => {
   const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
-  if (row.status !== 'awaiting_approval') {
+  if (row.status !== 'awaiting_approval' && row.status !== 'pending_payment') {
     return res.status(409).json({ error: 'wrong_status', status: row.status });
   }
 
@@ -67,7 +78,7 @@ router.post('/listings/:id/reject', (req, res) => {
 
   const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
-  if (row.status !== 'awaiting_approval') {
+  if (row.status !== 'awaiting_approval' && row.status !== 'pending_payment') {
     return res.status(409).json({ error: 'wrong_status', status: row.status });
   }
 
