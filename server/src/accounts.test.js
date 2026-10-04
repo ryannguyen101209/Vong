@@ -58,6 +58,19 @@ try {
   assert.equal(isFirstListing(seller.body.profile.id), false);
   assert.equal(isFirstListing(buyer.body.profile.id), true);
   assert.equal(isFirstListing(null), false);
+  // Seller tools: list, edit, mark sold / relist, remove. Only the owner may use them.
+  const mine = await request('/api/listings/mine', { cookie: seller.cookie });
+  assert.equal(mine.body.listings.length, 2);
+  assert.equal((await request('/api/listings/mine', { cookie: buyer.cookie })).body.listings.length, 0);
+  assert.equal((await request('/api/listings/mine')).status, 401);
+  assert.equal((await request(`/api/listings/${listingId}`, { cookie: buyer.cookie, method: 'PATCH', body: { price_vnd: 5000 } })).status, 404);
+  assert.equal((await request(`/api/listings/${listingId}`, { cookie: seller.cookie, method: 'PATCH', body: { price_vnd: 5 } })).status, 400);
+  assert.equal((await request(`/api/listings/${listingId}`, { cookie: seller.cookie, method: 'PATCH', body: { price_vnd: 99000, title: 'Edited test chair' } })).status, 200);
+  const edited = db.prepare('SELECT title_en, price_vnd FROM listings WHERE id = ?').get(listingId);
+  assert.equal(edited.title_en, 'Edited test chair');
+  assert.equal(edited.price_vnd, 99000);
+  assert.equal((await request(`/api/listings/${listingId}/sold`, { cookie: seller.cookie, body: {} })).status, 409); // not live yet
+  assert.equal((await request(`/api/listings/${listingId}/sold`, { cookie: buyer.cookie, body: {} })).status, 404);
   const row = db.prepare('SELECT * FROM listings WHERE id = ?').get(listingId);
   assert.equal(row.seller_id, seller.body.profile.id);
   assert.equal(row.seller_email, 'seller@example.test');
@@ -66,6 +79,14 @@ try {
   assert.equal((await request(`/api/listings/${listingId}/mark-paid`, { cookie: buyer.cookie, body: {} })).status, 404);
   assert.equal((await request(`/api/listings/${listingId}/payment`, { cookie: seller.cookie })).status, 200);
   db.prepare("UPDATE listings SET status = 'published' WHERE id = ?").run(listingId);
+  assert.equal((await request(`/api/listings/${listingId}/sold`, { cookie: seller.cookie, body: {} })).body.status, 'sold');
+  assert.equal((await request(`/api/listings/${listingId}`, { cookie: buyer.cookie })).body.listing.status, 'sold'); // old links still work
+  assert.equal((await request('/api/listings')).body.listings.some((l) => l.id === listingId), false); // but it leaves Browse
+  assert.equal((await request(`/api/listings/${listingId}/relist`, { cookie: seller.cookie, body: {} })).body.status, 'published');
+  assert.equal((await request(`/api/listings/${second.body.id}`, { cookie: buyer.cookie, method: 'DELETE' })).status, 404);
+  assert.equal((await request(`/api/listings/${second.body.id}`, { cookie: seller.cookie, method: 'DELETE' })).body.status, 'removed');
+  assert.equal((await request(`/api/listings/${second.body.id}`, { cookie: seller.cookie })).status, 404);
+  assert.equal((await request('/api/listings/mine', { cookie: seller.cookie })).body.listings.length, 1);
   assert.equal((await request('/api/conversations', { cookie: seller.cookie, body: { listingId } })).status, 409);
   const started = await request('/api/conversations', { cookie: buyer.cookie, body: { listingId } });
   assert.equal(started.status, 200);
