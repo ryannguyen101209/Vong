@@ -96,6 +96,12 @@ export const api = {
         body: JSON.stringify({ reason }),
       }),
 
+    remove: (token, id) =>
+      request(`/api/admin/listings/${id}`, {
+        method: 'DELETE',
+        headers: { authorization: `Bearer ${token}` },
+      }),
+
     settings: (token) =>
       request('/api/admin/settings', { headers: { authorization: `Bearer ${token}` } }),
 
