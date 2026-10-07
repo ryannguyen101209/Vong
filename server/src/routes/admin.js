@@ -29,7 +29,7 @@ router.use(requireAdmin);
 const ADMIN_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd,
   district, condition, seller_name, seller_phone, seller_email, image_path, status, reject_reason,
-  fee_vnd, views, created_at, paid_marked_at, reviewed_at, published_at,
+  fee_vnd, views, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at,
   (SELECT COUNT(*) FROM listings o
      WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
        AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))

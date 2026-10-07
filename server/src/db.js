@@ -180,6 +180,13 @@ db.exec(`
 `);
 if (!columns.includes('seller_id')) db.exec('ALTER TABLE listings ADD COLUMN seller_id TEXT REFERENCES users(id)');
 if (!columns.includes('sold_at')) db.exec('ALTER TABLE listings ADD COLUMN sold_at TEXT');
+if (!columns.includes('payment_verified_at')) db.exec('ALTER TABLE listings ADD COLUMN payment_verified_at TEXT');
+db.exec(`
+  CREATE TABLE IF NOT EXISTS bank_transactions (
+    provider TEXT NOT NULL, txn_id TEXT NOT NULL, listing_id TEXT, amount_vnd INTEGER NOT NULL,
+    content TEXT, received_at TEXT, outcome TEXT NOT NULL, created_at TEXT NOT NULL,
+    PRIMARY KEY (provider, txn_id))
+`);
 db.exec(`
   CREATE TABLE IF NOT EXISTS conversations (
     id TEXT PRIMARY KEY,
