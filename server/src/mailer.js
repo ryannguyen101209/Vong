@@ -74,6 +74,21 @@ export function buildEmail(kind, data) {
       }),
     };
   }
+  if (kind === 'payment_received') {
+    const titleVi = clip(data.titleVi || data.titleEn, 80);
+    const titleEn = clip(data.titleEn || data.titleVi, 80);
+    const url = `${base}/payment/${encodeURIComponent(data.listingId)}`;
+    return {
+      subject: `Đã nhận tiền cho tin "${titleVi}" · Payment received`,
+      text: `Vòng đã nhận được khoản chuyển cho tin "${titleVi}". Tin đang chờ duyệt và sẽ lên sàn sớm.\n${url}\n\n---\nWe received your payment for "${titleEn}". It is now in review and will go live soon.\n${url}`,
+      html: layout({
+        heading: { vi: 'Đã nhận tiền, tin đang chờ duyệt', en: 'Payment received, your listing is in review' },
+        bodyVi: `Vòng đã nhận được khoản chuyển cho tin <b>${esc(titleVi)}</b>. Bạn không cần làm gì thêm, tin sẽ lên sàn ngay khi được duyệt.`,
+        bodyEn: `We received your payment for <b>${esc(titleEn)}</b>. Nothing more to do: it goes live as soon as it is reviewed.`,
+        button: { vi: 'Xem trạng thái', en: 'View status' }, url,
+      }),
+    };
+  }
   if (kind === 'new_message') {
     const from = clip(data.fromName, 40) || 'Someone';
     const titleVi = clip(data.titleVi || data.titleEn, 80);

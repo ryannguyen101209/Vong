@@ -67,6 +67,20 @@ export function Payment() {
 
   useEffect(load, [load]);
 
+  // The bank transfer is matched automatically on the server, so while we wait
+  // for money, quietly re-check every few seconds and switch screens by itself.
+  const waiting = status === 'ready' && data?.listing && !data.listing.free && ['pending_payment', 'rejected'].includes(data.listing.status);
+  useEffect(() => {
+    if (!waiting || !profile) return undefined;
+    const timer = setInterval(() => {
+      if (document.visibilityState !== 'visible') return;
+      api.payment(id).then((payload) => {
+        if (payload.listing.status !== data.listing.status) setData(payload);
+      }).catch(() => {});
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [waiting, profile, id, data]);
+
   const markPaid = async () => {
     setMarking(true);
     try {
@@ -101,8 +115,8 @@ export function Payment() {
       <div className="shell section editorial-page payment-page payment-page--status">
         <div className="card panel">
           <p className="eyebrow row" style={{ gap: 6 }}><CheckIcon /> {t('payment.statusAwaitingTitle')}</p>
-          <h1>{t('payment.markedTitle')}</h1>
-          <p className="lead">{listing.free ? t('payment.freeMarkedBody') : t('payment.markedBody')}</p>
+          <h1>{listing.payment_verified ? t('payment.verifiedTitle') : t('payment.markedTitle')}</h1>
+          <p className="lead">{listing.free ? t('payment.freeMarkedBody') : listing.payment_verified ? t('payment.verifiedBody') : t('payment.markedBody')}</p>
           <p className="small muted" style={{ marginTop: 16 }}>
             {t('payment.markedRef', { ref: listing.ref })}
           </p>
@@ -185,6 +199,11 @@ export function Payment() {
               <Row label={t('payment.accountHolder')} value={payment.account_holder} />
             </div>
             <p className="small muted" style={{ marginTop: 16 }}>{t('payment.referenceHint')}</p>
+          </div>
+
+          <div className="notice">
+            <p className="notice__title">{t('payment.autoTitle')}</p>
+            <p className="small" style={{ margin: 0 }}>{t('payment.autoBody')}</p>
           </div>
 
           <div className="notice">
