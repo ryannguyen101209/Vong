@@ -22,6 +22,10 @@ services:
         sync: false
       - key: CORS_ORIGIN
         sync: false        # exact public HTTPS origin; comma-separated if needed
+      - key: RESEND_API_KEY
+        sync: false        # optional: turns on automatic emails
+      - key: MAIL_FROM
+        sync: false        # e.g. Vòng <hello@usevong.com>, on a domain verified in Resend
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE

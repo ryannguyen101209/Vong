@@ -2,6 +2,13 @@ import express from 'express';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
+import { emailUser } from '../mailer.js';
+
+/** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
+function sellerEmailFor(id) {
+  const r = db.prepare('SELECT l.title_en, l.title_vi, COALESCE(u.email, l.seller_email) AS email FROM listings l LEFT JOIN users u ON u.id = l.seller_id WHERE l.id = ?').get(id);
+  return r ?? null;
+}
 
 export const router = express.Router();
 
@@ -66,6 +73,9 @@ router.post('/listings/:id/approve', (req, res) => {
     "UPDATE listings SET status = 'published', reviewed_at = ?, published_at = ?, reject_reason = NULL WHERE id = ?"
   ).run(now, now, row.id);
 
+  const to = sellerEmailFor(row.id);
+  if (to) emailUser(to.email, 'listing_approved', { listingId: row.id, titleEn: to.title_en, titleVi: to.title_vi });
+
   res.json({ id: row.id, status: 'published' });
 });
 
@@ -84,6 +94,9 @@ router.post('/listings/:id/reject', (req, res) => {
 
   db.prepare("UPDATE listings SET status = 'rejected', reject_reason = ?, reviewed_at = ? WHERE id = ?")
     .run(reason, new Date().toISOString(), row.id);
+
+  const to = sellerEmailFor(row.id);
+  if (to) emailUser(to.email, 'listing_rejected', { listingId: row.id, titleEn: to.title_en, titleVi: to.title_vi, reason });
 
   res.json({ id: row.id, status: 'rejected', reject_reason: reason });
 });
