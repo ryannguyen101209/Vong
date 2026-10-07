@@ -3,6 +3,7 @@ import express from 'express';
 import { rateLimit } from 'express-rate-limit';
 import { db } from '../db.js';
 import { requireUser } from '../accounts.js';
+import { claimMessageEmail, emailUser, mailEnabled } from '../mailer.js';
 
 export const router = express.Router();
 router.use(requireUser);
@@ -56,11 +57,19 @@ router.post('/:id/messages', writeLimit, (req, res) => {
   if (!body || body.length > 2000 || typeof clientId !== 'string' || !/^[a-zA-Z0-9-]{8,64}$/.test(clientId)) return res.status(400).json({ error: 'invalid_message' });
   const message = db.transaction(() => {
     const existing = db.prepare('SELECT id, sender_id, body, created_at, client_id FROM chat_messages WHERE conversation_id = ? AND sender_id = ? AND client_id = ?').get(req.conversation.id, req.user.id, clientId);
-    if (existing) return existing;
+    if (existing) return { ...existing, replay: true };
     const now = new Date().toISOString();
     const result = db.prepare('INSERT INTO chat_messages (conversation_id, sender_id, body, client_id, created_at) VALUES (?, ?, ?, ?, ?)').run(req.conversation.id, req.user.id, body, clientId, now);
     db.prepare('UPDATE conversations SET updated_at = ? WHERE id = ?').run(now, req.conversation.id);
     return { id: Number(result.lastInsertRowid), sender_id: req.user.id, body, created_at: now, client_id: clientId };
   })();
-  res.status(201).json({ message });
+  const { replay, ...saved } = message;
+  if (!replay && mailEnabled()) {
+    const toId = req.conversation.buyer_id === req.user.id ? req.conversation.seller_id : req.conversation.buyer_id;
+    const recipient = db.prepare('SELECT email FROM users WHERE id = ?').get(toId);
+    if (recipient?.email && claimMessageEmail(db, req.conversation.id, toId)) {
+      emailUser(recipient.email, 'new_message', { fromName: req.user.name, titleEn: req.conversation.title_en, titleVi: req.conversation.title_vi, body });
+    }
+  }
+  res.status(201).json({ message: saved });
 });

@@ -187,20 +187,32 @@ that fire on an incoming transfer), then match the webhook's transfer note
 against the listing's reference code and approve automatically. Until then, the
 queue is the product.
 
-**Nothing is emailed automatically.** Sellers now give an email address when
-they post, and the admin queue shows it. After you approve or reject a listing,
-an "Email the seller" button appears that opens a **prefilled draft in your own
-mail app** — the right message, the listing title, the link and the reference
-code already filled in. You press send. That is a deliberate stopgap, not a
-pretence: the app itself sends nothing.
+**Emails go out automatically once you add a Resend key.** Three things send an
+email, all bilingual (Vietnamese first, English below):
 
-To make it automatic you need a mail service — Resend and SendGrid both have
-free tiers big enough for a project this size. It is roughly an afternoon's
-work: add the API key to `.env`, and call the service from the approve and
-reject handlers in `server/src/routes/admin.js`, where the seller's email is
-already loaded. The message templates are already written, in both languages,
-in the `admin.emailApprovedBody` / `admin.emailRejectedBody` keys of
-`client/src/i18n/`.
+- a listing is **approved** (the seller is told it is live, with the link),
+- a listing is **rejected** (the seller gets your reason and a link to edit it),
+- someone gets a **new chat message** (a preview of up to 140 characters and a
+  link to Messages). It sends at most one email per conversation and recipient
+  every 10 minutes, so a fast back-and-forth does not flood an inbox.
+
+Setup:
+
+1. Create a free account at [resend.com](https://resend.com) and verify the
+   `usevong.com` domain (add the DNS records it shows you). Until the domain is
+   verified, Resend only delivers to your own address.
+2. Set `RESEND_API_KEY` and `MAIL_FROM` (for example `Vòng <hello@usevong.com>`)
+   in the host's environment. `MAIL_REPLY_TO` is optional.
+
+With no `RESEND_API_KEY` nothing is sent and nothing breaks. The email goes to
+the seller's account email (their Google address). Emails never contain a phone
+number or another user's email. A failed send is dropped silently so it can
+never block a seller or a chat message. The code is in `server/src/mailer.js`.
+
+The admin queue's **"Email the seller"** button still opens a prefilled draft
+in your own mail app, built from the `admin.emailApprovedBody` /
+`admin.emailRejectedBody` keys of `client/src/i18n/`. It is useful if you want
+to add a personal note, but with automatic email on you do not need it.
 
 Seller emails are stored but never sent to the browser on public pages — an
 address on a public listing page is a spam magnet. Only the admin views see them.
