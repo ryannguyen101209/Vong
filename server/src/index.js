@@ -11,6 +11,7 @@ import { usingDefaultPassword } from './auth.js';
 import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
+import { router as paymentsRouter } from './routes/payments.js';
 import { mountSharePages } from './share-pages.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
@@ -28,6 +29,9 @@ const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http:/
 app.use(cors({ origin: allowedOrigins, credentials: true }));
 app.use(express.json({ limit: '1mb' }));
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_requests' } }));
+// The bank webhook is called by SePay's servers, not a browser: it has its own API key
+// and must sit before the browser-origin check.
+app.use('/api/payments', paymentsRouter);
 app.use('/api', protectWrites, sessionUser);
 app.use('/api/auth', createAuthRouter());
 app.use('/api/conversations', conversationsRouter);

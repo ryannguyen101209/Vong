@@ -221,7 +221,7 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
 /** GET /api/listings/:id/payment — the VietQR payload for this listing's fee. */
 router.get('/:id/payment', requireUser, (req, res) => {
   const row = db
-    .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0')
+    .prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi, reject_reason, payment_verified_at FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0')
     .get(req.params.id, req.user.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
 
@@ -233,6 +233,7 @@ router.get('/:id/payment', requireUser, (req, res) => {
     title_en: row.title_en,
     title_vi: row.title_vi,
     reject_reason: row.reject_reason,
+    payment_verified: !!row.payment_verified_at,
   };
   // A free first listing has nothing to pay: no QR, no bank details.
   if (listing.free) return res.json({ listing, payment: null });

@@ -159,6 +159,42 @@ The bank BIN list in `vietqr.js` is accurate at the time of writing but you
 should confirm your own bank's BIN against
 [napas.com.vn](https://napas.com.vn) or [vietqr.io](https://vietqr.io).
 
+### Automatic payment confirmation (SePay)
+
+Without this, you open your bank app, find the transfer and press Approve. With
+it, the site notices the money itself. [SePay](https://sepay.vn) watches your
+bank account and calls `POST /api/payments/sepay` on your site for every
+incoming transfer. The seller's transfer note already carries the listing
+reference (`VONG-XXXXXX`), so the site matches the money to the listing.
+
+What happens when a transfer arrives:
+
+- It matches a listing and covers the fee: the listing is marked **payment
+  verified**, the seller gets a "payment received" email, and you get a phone
+  alert. By default the listing then waits in your queue so you can still look
+  at the photos and text before approving. Set `PAYMENT_AUTO_PUBLISH=true` and
+  it goes live straight away instead.
+- The amount is below the fee, the note has no reference, or a second payment
+  arrives for a listing already paid: nothing changes and you get a phone alert.
+- The same SePay transaction sent twice (retries) is applied once.
+
+Setup:
+
+1. Create a SePay account and link the bank account that receives the fees
+   (check [sepay.vn](https://sepay.vn) for the banks it supports and for current pricing).
+2. In SePay, create a webhook: URL `https://usevong.com/api/payments/sepay`,
+   authentication type **API Key**, event type money in. Choose any long random
+   key and put the same value in Render as `SEPAY_API_KEY` (at least 16 characters).
+3. Optional: set `SEPAY_ACCOUNT_NUMBER` to your account number so transfers on
+   any other linked account are ignored, and `PAYMENT_AUTO_PUBLISH=true` to skip
+   the manual approval for paid listings.
+4. Send a test from SePay, then make one real 10,000 VND transfer with a test
+   listing's reference as the note and check that it turns green.
+
+With no `SEPAY_API_KEY` the webhook is switched off and the manual flow keeps
+working exactly as before. The seller's "I have paid" button stays as a fallback.
+Matching code: `server/src/payments.js`.
+
 ---
 
 ## Editing the text

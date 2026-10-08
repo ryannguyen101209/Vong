@@ -241,6 +241,7 @@ function Queue({ token, onAuthError }) {
                 <h3 style={{ marginBottom: 6, fontSize: '1.1rem' }}>{localized(listing, 'title')}</h3>
                 <div className="row" style={{ gap: 6, marginBottom: 8, flexWrap: 'wrap' }}>
                   {listing.is_first_listing && <span className="badge badge--positive">{t('admin.firstListing')}</span>}
+                  {listing.payment_verified_at && <span className="badge badge--positive">{t('admin.paymentVerified')}</span>}
                   {listing.status === 'pending_payment' && <span className="badge">{t('status.pending_payment')}</span>}
                   <SellerCount listing={listing} />
                 </div>

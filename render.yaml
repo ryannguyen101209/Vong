@@ -26,6 +26,12 @@ services:
         sync: false        # optional: turns on automatic emails
       - key: MAIL_FROM
         sync: false        # e.g. Vòng <hello@usevong.com>, on a domain verified in Resend
+      - key: SEPAY_API_KEY
+        sync: false        # optional: turns on automatic payment confirmation
+      - key: SEPAY_ACCOUNT_NUMBER
+        sync: false
+      - key: PAYMENT_AUTO_PUBLISH
+        value: "false"      # true = paid listings go live without your approval
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE
