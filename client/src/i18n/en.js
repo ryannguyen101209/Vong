@@ -258,6 +258,8 @@ export default {
     sellerLabel: 'Sold by {{name}}',
     viewListing: 'View listing',
     inbox: 'Messages',
+    unreadCount: '{{count}} conversations with new messages',
+    unreadInThread: '{{count}} new',
     selectThread: 'Choose a conversation',
     privateNotice: 'Only you and the other person can access this conversation.',
     sendError: 'Your message was not sent. Try again.',

@@ -258,6 +258,8 @@ export default {
     sellerLabel: 'Người bán: {{name}}',
     viewListing: 'Xem tin đăng',
     inbox: 'Tin nhắn',
+    unreadCount: '{{count}} cuộc trò chuyện có tin mới',
+    unreadInThread: '{{count}} tin mới',
     selectThread: 'Chọn một cuộc trò chuyện',
     privateNotice: 'Chỉ bạn và người còn lại có thể xem cuộc trò chuyện này.',
     sendError: 'Chưa gửi được tin nhắn. Bạn thử lại nhé.',

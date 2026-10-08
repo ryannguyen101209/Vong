@@ -4,13 +4,14 @@ import { useI18n } from '../i18n/index.jsx';
 import { useSaved } from '../lib/saved.jsx';
 import { useTheme } from '../lib/theme.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { useUnreadCount } from '../lib/unread.js';
 import { Logo } from './Logo.jsx';
 import { MenuIcon, CloseIcon, SunIcon, MoonIcon, MessageIcon } from './Icons.jsx';
 
 const LINKS = [
   { to: '/browse', key: 'nav.browse' },
-  { to: '/saved', key: 'nav.saved', showCount: true },
-  { to: '/messages', key: 'nav.messages' },
+  { to: '/saved', key: 'nav.saved', badge: 'saved' },
+  { to: '/messages', key: 'nav.messages', badge: 'unread' },
   { to: '/my-listings', key: 'nav.myListings' },
 ];
 
@@ -19,6 +20,7 @@ export function Header() {
   const { count } = useSaved();
   const { theme, toggleTheme } = useTheme();
   const { profile, openSignIn, signOut } = useAuth();
+  const unread = useUnreadCount(Boolean(profile));
   const [menuOpen, setMenuOpen] = useState(false);
   const location = useLocation();
 
@@ -32,7 +34,10 @@ export function Header() {
       className={({ isActive }) => `nav__link${isActive ? ' is-active' : ''}`}
     >
       {t(link.key)}
-      {link.showCount && count > 0 && <span className="nav__count">{count}</span>}
+      {link.badge === 'saved' && count > 0 && <span className="nav__count">{count}</span>}
+      {link.badge === 'unread' && unread > 0 && (
+        <span className="nav__count" aria-label={t('messages.unreadCount', { count: unread })}>{unread}</span>
+      )}
     </NavLink>
   ));
 
@@ -77,6 +82,7 @@ export function Header() {
             aria-controls="mobile-nav"
           >
             {menuOpen ? <CloseIcon /> : <MenuIcon />}
+            {!menuOpen && unread > 0 && <span className="menu-dot" aria-hidden="true" />}
             <span className="sr-only">{t('nav.menu')}</span>
           </button>
         </div>

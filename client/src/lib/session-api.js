@@ -24,6 +24,7 @@ export const sessionApi = {
   google: (credential) => post('/api/auth/google', { credential }),
   logout: () => post('/api/auth/logout'),
   inbox: () => sessionRequest('/api/conversations'),
+  unread: () => sessionRequest('/api/conversations/unread'),
   start: (listingId) => post('/api/conversations', { listingId }),
   messages: (id, cursor = {}) => sessionRequest(`/api/conversations/${encodeURIComponent(id)}/messages?${new URLSearchParams(cursor)}`),
   send: (id, body, clientId) => post(`/api/conversations/${encodeURIComponent(id)}/messages`, { body, clientId }),
