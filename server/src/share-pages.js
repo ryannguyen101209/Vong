@@ -52,11 +52,11 @@ function coverImage(row) {
 
 /** Builds the <head> tags for one listing. Exported for tests. */
 export function listingMeta(row) {
-  const english = Boolean(row.title_en);
-  const lang = english ? 'en' : 'vi';
-  const title = row.title_en || row.title_vi;
+  // Vietnamese first, like the site itself; English only when there is no Vietnamese title.
+  const lang = row.title_vi ? 'vi' : 'en';
+  const title = row.title_vi || row.title_en;
   const district = DISTRICTS[lang][row.district] || DISTRICTS.shared[row.district] || '';
-  const description = row.description_en || row.description_vi;
+  const description = lang === 'vi' ? row.description_vi || row.description_en : row.description_en || row.description_vi;
   const headline = `${title} · ${formatVnd(row.price_vnd)}${district ? ` · ${district}` : ''}`;
   return {
     title: `${headline} | Vòng`,

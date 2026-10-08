@@ -4,7 +4,10 @@ import vi from './vi.js';
 
 const DICTIONARIES = { en, vi };
 export const LANGUAGES = Object.keys(DICTIONARIES);
-const STORAGE_KEY = 'vong.lang';
+// Only a language the visitor picked with the switch is remembered. The old key
+// also stored the automatic English default, so it is no longer read.
+const STORAGE_KEY = 'vong.lang.choice';
+const DEFAULT_LANGUAGE = 'vi';
 
 const I18nContext = createContext(null);
 
@@ -12,12 +15,18 @@ function readStoredLanguage() {
   try {
     const stored = localStorage.getItem(STORAGE_KEY);
     if (stored && LANGUAGES.includes(stored)) return stored;
-    // First visit: a Vietnamese browser gets Vietnamese.
-    if (navigator.language?.toLowerCase().startsWith('vi')) return 'vi';
   } catch {
-    /* Storage can be blocked; English is a fine fallback. */
+    /* Storage can be blocked; fall back to the default. */
   }
-  return 'en';
+  return DEFAULT_LANGUAGE;
+}
+
+function rememberLanguage(lang) {
+  try {
+    localStorage.setItem(STORAGE_KEY, lang);
+  } catch {
+    /* ignore */
+  }
 }
 
 /** Walk a dotted key path, e.g. "home.heroTitle". */
@@ -30,19 +39,20 @@ export function LanguageProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.lang = lang;
-    try {
-      localStorage.setItem(STORAGE_KEY, lang);
-    } catch {
-      /* ignore */
-    }
   }, [lang]);
 
   const setLang = useCallback((next) => {
-    if (LANGUAGES.includes(next)) setLangState(next);
+    if (!LANGUAGES.includes(next)) return;
+    rememberLanguage(next);
+    setLangState(next);
   }, []);
 
   const toggleLang = useCallback(() => {
-    setLangState((current) => (current === 'en' ? 'vi' : 'en'));
+    setLangState((current) => {
+      const next = current === 'en' ? 'vi' : 'en';
+      rememberLanguage(next);
+      return next;
+    });
   }, []);
 
   /**
