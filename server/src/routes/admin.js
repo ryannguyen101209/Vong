@@ -34,7 +34,11 @@ const ADMIN_COLUMNS = `
      WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
        AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))
   ) = 0 AND listings.seller_id IS NOT NULL AS is_first_listing,
-  (SELECT COUNT(*) FROM listings o WHERE o.seller_id = listings.seller_id AND o.is_seed = 0) AS seller_total
+  (SELECT COUNT(*) FROM listings o WHERE o.seller_id = listings.seller_id AND o.is_seed = 0) AS seller_total,
+  CASE WHEN listings.seller_id IS NULL THEN NULL ELSE 1 + (SELECT COUNT(*) FROM listings o
+     WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
+       AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))
+  ) END AS seller_index
 `;
 
 /** GET /api/admin/listings?status=... — the review queue. */
@@ -99,6 +103,18 @@ router.post('/listings/:id/reject', (req, res) => {
   if (to) emailUser(to.email, 'listing_rejected', { listingId: row.id, titleEn: to.title_en, titleVi: to.title_vi, reason });
 
   res.json({ id: row.id, status: 'rejected', reject_reason: reason });
+});
+
+/**
+ * DELETE /api/admin/listings/:id — the owner takes a listing down. Same as a
+ * seller deleting it: hidden everywhere, but the row is kept so chats stay
+ * intact and the seller's listing count (and free first listing) is unchanged.
+ */
+router.delete('/listings/:id', (req, res) => {
+  const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);
+  if (!row || row.status === 'removed') return res.status(404).json({ error: 'not_found' });
+  db.prepare("UPDATE listings SET status = 'removed' WHERE id = ?").run(row.id);
+  res.json({ id: row.id, status: 'removed' });
 });
 
 /** GET/PUT /api/admin/settings — bank details and the listing fee. */

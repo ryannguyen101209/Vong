@@ -243,7 +243,7 @@ function Queue({ token, onAuthError }) {
                   {listing.is_first_listing && <span className="badge badge--positive">{t('admin.firstListing')}</span>}
                   {listing.payment_verified_at && <span className="badge badge--positive">{t('admin.paymentVerified')}</span>}
                   {listing.status === 'pending_payment' && <span className="badge">{t('status.pending_payment')}</span>}
-                  <span className="badge">{t('admin.sellerTotal', { n: listing.seller_total })}</span>
+                  <SellerCount listing={listing} />
                 </div>
                 <p className="small muted" style={{ marginBottom: 10 }}>
                   {listing.seller_name} · {listing.seller_phone} · {t(`districts.${listing.district}`)} ·{' '}
@@ -298,6 +298,7 @@ function Queue({ token, onAuthError }) {
                   >
                     {t('admin.reject')}
                   </button>
+                  <DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} />
                 </div>
               </div>
             </article>
@@ -315,17 +316,63 @@ function Queue({ token, onAuthError }) {
   );
 }
 
+/** Takes a listing down. The first click asks, the second deletes. */
+function DeleteButton({ token, id, onDeleted, onAuthError }) {
+  const { t } = useI18n();
+  const [confirming, setConfirming] = useState(false);
+  const [busy, setBusy] = useState(false);
+
+  const remove = async () => {
+    setBusy(true);
+    try {
+      await api.admin.remove(token, id);
+      onDeleted();
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      setBusy(false);
+      setConfirming(false);
+    }
+  };
+
+  if (!confirming) {
+    return (
+      <button type="button" className="btn btn--ghost btn--small" onClick={() => setConfirming(true)}>
+        {t('admin.delete')}
+      </button>
+    );
+  }
+  return (
+    <span className="row" style={{ gap: 6 }}>
+      <button type="button" className="btn btn--danger btn--small" disabled={busy} onClick={remove}>
+        {t('admin.confirmDelete')}
+      </button>
+      <button type="button" className="btn btn--ghost btn--small" disabled={busy} onClick={() => setConfirming(false)}>
+        {t('common.cancel')}
+      </button>
+    </span>
+  );
+}
+
+/** "Listing #3 of 7 from this seller", or nothing for listings with no account. */
+function SellerCount({ listing }) {
+  const { t } = useI18n();
+  if (!listing.seller_index) return null;
+  return <span className="badge">{t('admin.sellerTotal', { index: listing.seller_index, n: listing.seller_total })}</span>;
+}
+
 function AllListings({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [status, setStatus] = useState('published');
   const [listings, setListings] = useState([]);
 
-  useEffect(() => {
+  const load = useCallback(() => {
     api.admin
       .listings(token, status)
       .then((data) => setListings(data.listings))
       .catch((error) => error.status === 401 && onAuthError());
   }, [token, status, onAuthError]);
+
+  useEffect(load, [load]);
 
   return (
     <>
@@ -343,11 +390,13 @@ function AllListings({ token, onAuthError }) {
           <thead>
             <tr>
               <th>{t('sell.titleLabel')}</th>
+              <th>{t('admin.sellerColumn')}</th>
               <th>{t('listing.reference')}</th>
               <th>{t('sell.priceLabel')}</th>
               <th>{t('listing.district')}</th>
               <th>{t('listing.views')}</th>
               <th>{t('listing.posted')}</th>
+              <th />
             </tr>
           </thead>
           <tbody>
@@ -359,11 +408,19 @@ function AllListings({ token, onAuthError }) {
                     <div className="small muted">{listing.reject_reason}</div>
                   )}
                 </td>
+                <td>
+                  <div>{listing.seller_name}</div>
+                  <div className="row" style={{ gap: 6, marginTop: 4, flexWrap: 'wrap' }}>
+                    {listing.is_first_listing && <span className="badge badge--positive">{t('admin.firstListing')}</span>}
+                    <SellerCount listing={listing} />
+                  </div>
+                </td>
                 <td style={{ fontFamily: 'ui-monospace, monospace' }}>{listing.ref}</td>
                 <td>{formatPrice(listing.price_vnd, lang)}</td>
                 <td>{t(`districts.${listing.district}`)}</td>
                 <td>{listing.views}</td>
                 <td>{formatDateTime(listing.created_at, lang)}</td>
+                <td><DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} /></td>
               </tr>
             ))}
           </tbody>
