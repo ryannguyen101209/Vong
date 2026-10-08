@@ -13,6 +13,16 @@ const SORTS = [
   { value: 'price_desc', key: 'browse.sortPriceDesc' },
 ];
 
+// Price bands in dong. Kept in the URL by key, so ?price=under_200k can be shared.
+// max is inclusive, so each band stops one dong short of the next one's min.
+const PRICE_BANDS = [
+  { value: 'under_200k', max: 199_999 },
+  { value: '200k_500k', min: 200_000, max: 499_999 },
+  { value: '500k_1m', min: 500_000, max: 999_999 },
+  { value: '1m_3m', min: 1_000_000, max: 2_999_999 },
+  { value: 'over_3m', min: 3_000_000 },
+];
+
 export function Browse() {
   const { t } = useI18n();
   // Filters live in the URL so a filtered view can be shared or bookmarked.
@@ -20,15 +30,24 @@ export function Browse() {
   const search = params.get('q') ?? '';
   const category = params.get('category') ?? '';
   const sort = params.get('sort') ?? 'newest';
+  const district = params.get('district') ?? '';
+  const price = params.get('price') ?? '';
+  const band = PRICE_BANDS.find((item) => item.value === price);
 
   const [searchInput, setSearchInput] = useState(search);
   const [categories, setCategories] = useState([]);
+  const [districts, setDistricts] = useState([]);
   const [listings, setListings] = useState([]);
   const [status, setStatus] = useState('loading');
   const requestId = useRef(0);
 
   useEffect(() => {
-    api.meta().then((meta) => setCategories(meta.categories)).catch(() => setCategories([]));
+    api.meta()
+      .then((meta) => {
+        setCategories(meta.categories);
+        setDistricts(meta.districts);
+      })
+      .catch(() => setCategories([]));
   }, []);
 
   // Keep the box in step when the URL changes from outside (back button, links).
@@ -50,7 +69,7 @@ export function Browse() {
     const currentRequest = ++requestId.current;
     setStatus('loading');
     api
-      .listings({ search, category, sort })
+      .listings({ search, category, district, minPrice: band?.min, maxPrice: band?.max, sort })
       .then((data) => {
         if (currentRequest !== requestId.current) return;
         setListings(data.listings);
@@ -59,7 +78,7 @@ export function Browse() {
       .catch(() => {
         if (currentRequest === requestId.current) setStatus('error');
       });
-  }, [search, category, sort]);
+  }, [search, category, district, band, sort]);
 
   useEffect(() => {
     load();
@@ -73,7 +92,7 @@ export function Browse() {
     setParams(next);
   };
 
-  const hasFilters = Boolean(search || category || sort !== 'newest');
+  const hasFilters = Boolean(search || category || district || band || sort !== 'newest');
 
   const resultLabel = useMemo(
     () => (listings.length === 1 ? t('browse.resultsOne') : t('browse.resultsMany', { count: listings.length })),
@@ -98,6 +117,26 @@ export function Browse() {
               placeholder={t('browse.searchPlaceholder')}
               onChange={(event) => setSearchInput(event.target.value)}
             />
+          </label>
+
+          <label>
+            <span className="sr-only">{t('browse.districtLabel')}</span>
+            <select className="select" value={district} onChange={(event) => update('district', event.target.value)}>
+              <option value="">{t('browse.allDistricts')}</option>
+              {districts.map((value) => (
+                <option key={value} value={value}>{t(`districts.${value}`)}</option>
+              ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="sr-only">{t('browse.priceLabel')}</span>
+            <select className="select" value={band ? price : ''} onChange={(event) => update('price', event.target.value)}>
+              <option value="">{t('browse.anyPrice')}</option>
+              {PRICE_BANDS.map((option) => (
+                <option key={option.value} value={option.value}>{t(`browse.price_${option.value}`)}</option>
+              ))}
+            </select>
           </label>
 
           <label>

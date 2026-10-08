@@ -24,10 +24,13 @@ async function request(path, options = {}) {
 export const api = {
   meta: () => request('/api/meta'),
 
-  listings: ({ search = '', category = '', sort = 'newest', ids } = {}) => {
+  listings: ({ search = '', category = '', district = '', minPrice, maxPrice, sort = 'newest', ids } = {}) => {
     const params = new URLSearchParams();
     if (search) params.set('search', search);
     if (category) params.set('category', category);
+    if (district) params.set('district', district);
+    if (minPrice != null) params.set('min_price', String(minPrice));
+    if (maxPrice != null) params.set('max_price', String(maxPrice));
     if (sort) params.set('sort', sort);
     if (ids?.length) params.set('ids', ids.join(','));
     return request(`/api/listings?${params.toString()}`);
