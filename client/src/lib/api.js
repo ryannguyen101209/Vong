@@ -102,6 +102,26 @@ export const api = {
         headers: { authorization: `Bearer ${token}` },
       }),
 
+    /** Downloads the database backup as a file. Resolves once the browser has it. */
+    downloadBackup: async (token) => {
+      const base = (import.meta.env.VITE_API_BASE_URL || '').replace(/\/$/, '');
+      const response = await fetch(`${base}/api/admin/backup`, { headers: { authorization: `Bearer ${token}` } });
+      if (!response.ok) throw new ApiError(response.status, null);
+      const name = /filename="([^"]+)"/.exec(response.headers.get('content-disposition') || '')?.[1] || 'vong-backup.db.gz';
+      const url = URL.createObjectURL(await response.blob());
+      const link = Object.assign(document.createElement('a'), { href: url, download: name });
+      document.body.append(link);
+      link.click();
+      link.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 10_000);
+    },
+
+    emailBackup: (token) =>
+      request('/api/admin/backup/email', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` },
+      }),
+
     settings: (token) =>
       request('/api/admin/settings', { headers: { authorization: `Bearer ${token}` } }),
 

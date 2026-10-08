@@ -13,6 +13,7 @@ import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
 import { mountSharePages } from './share-pages.js';
+import { startBackupSchedule } from './backup.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
@@ -127,6 +128,7 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Vong API listening on http://localhost:${PORT}`);
+  startBackupSchedule();
   if (usingDefaultPassword()) {
     console.log('⚠  ADMIN_PASSWORD is not set — the admin page accepts "vong-admin". Set it in .env before deploying.');
   }

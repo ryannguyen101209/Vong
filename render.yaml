@@ -26,6 +26,8 @@ services:
         sync: false        # optional: turns on automatic emails
       - key: MAIL_FROM
         sync: false        # e.g. Vòng <hello@usevong.com>, on a domain verified in Resend
+      - key: BACKUP_EMAIL
+        sync: false        # optional: where the daily database backup is emailed
       - key: SEPAY_API_KEY
         sync: false        # optional: turns on automatic payment confirmation
       - key: SEPAY_ACCOUNT_NUMBER
