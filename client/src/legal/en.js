@@ -162,7 +162,7 @@ export default {
           '- Have your account and data deleted.',
           '- Withdraw consent and object to processing.',
           '- Complain to us or to the competent authority.',
-          'Send your request through the Contact page with your account email. We reply within the time the law sets.',
+          'Send your request through the Contact page or to vong-inquiries@outlook.com, with your account email. We reply within the time the law sets.',
         ],
       },
       {

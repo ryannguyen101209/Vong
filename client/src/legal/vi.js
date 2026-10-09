@@ -161,7 +161,7 @@ export default {
           '- Yêu cầu xóa tài khoản và dữ liệu của bạn.',
           '- Rút lại sự đồng ý và phản đối việc xử lý dữ liệu.',
           '- Khiếu nại với tụi mình hoặc cơ quan có thẩm quyền.',
-          'Gửi yêu cầu qua trang Liên hệ, ghi email tài khoản của bạn. Tụi mình trả lời trong thời hạn pháp luật quy định.',
+          'Gửi yêu cầu qua trang Liên hệ hoặc email vong-inquiries@outlook.com, ghi email tài khoản của bạn. Tụi mình trả lời trong thời hạn pháp luật quy định.',
         ],
       },
       {

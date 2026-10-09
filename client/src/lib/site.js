@@ -1,8 +1,8 @@
 /*
- * Your public contact details. These are placeholders -- put your real Zalo
- * number and email here before you share the site with anyone.
+ * Your public contact details, shown on the Contact page. Leave zalo empty to
+ * hide that row.
  */
 export const SITE = {
-  zalo: '0900 000 000',
-  email: 'xinchao@vong.example',
+  zalo: '',
+  email: 'vong-inquiries@outlook.com',
 };

@@ -94,10 +94,12 @@ export function Contact() {
         <aside className="card panel">
           <p className="eyebrow">{t('contact.otherWaysTitle')}</p>
           <div className="detail-rows">
-            <div className="detail-row">
-              <span className="detail-row__label">{t('contact.zaloLabel')}</span>
-              <span className="detail-row__value">{SITE.zalo}</span>
-            </div>
+            {SITE.zalo && (
+              <div className="detail-row">
+                <span className="detail-row__label">{t('contact.zaloLabel')}</span>
+                <span className="detail-row__value">{SITE.zalo}</span>
+              </div>
+            )}
             <div className="detail-row">
               <span className="detail-row__label">{t('contact.emailUsLabel')}</span>
               <span className="detail-row__value">

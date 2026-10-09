@@ -35,8 +35,8 @@ function LoginForm({ onSuccess }) {
         /* Session storage can be blocked; the token still works in memory. */
       }
       onSuccess(session.token);
-    } catch {
-      setError(true);
+    } catch (err) {
+      setError(err.status === 429 ? 'admin.loginLocked' : 'admin.loginError');
     } finally {
       setBusy(false);
     }
@@ -49,7 +49,7 @@ function LoginForm({ onSuccess }) {
         <p className="muted small" style={{ marginBottom: 24 }}>{t('admin.loginLead')}</p>
 
         <form className="form" onSubmit={submit}>
-          <Field label={t('admin.passwordLabel')} error={error ? t('admin.loginError') : undefined}>
+          <Field label={t('admin.passwordLabel')} error={error ? t(error) : undefined}>
             {(props) => (
               <input
                 {...props}
@@ -404,6 +404,11 @@ function AllListings({ token, onAuthError }) {
               <tr key={listing.id}>
                 <td>
                   <a href={`/listing/${listing.id}`}>{localized(listing, 'title')}</a>
+                  {listing.edited_at && (
+                    <div style={{ marginTop: 4 }}>
+                      <span className="badge badge--warning">{t('admin.editedAfterReview', { when: formatDateTime(listing.edited_at, lang) })}</span>
+                    </div>
+                  )}
                   {listing.reject_reason && (
                     <div className="small muted">{listing.reject_reason}</div>
                   )}

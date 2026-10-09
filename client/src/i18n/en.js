@@ -483,6 +483,7 @@ export default {
     passwordLabel: 'Password',
     login: 'Sign in',
     loggingIn: 'Signing in…',
+    loginLocked: 'Too many wrong passwords. Wait 15 minutes and try again.',
     loginError: 'That password is not right.',
     logout: 'Sign out',
     defaultPasswordWarning:
@@ -491,6 +492,7 @@ export default {
     tabAll: 'All listings',
     tabSettings: 'Settings',
     tabReports: 'Reports',
+    editedAfterReview: 'Edited by the seller after approval · {{when}}',
     reportsLead: 'Listings people have reported. Take a listing down if it breaks the rules, or dismiss the report if it is fine.',
     noReports: 'No open reports.',
     reportDismiss: 'Dismiss',

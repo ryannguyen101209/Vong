@@ -72,7 +72,7 @@ app.post('/api/presence', (req, res) => {
 
 app.get('/api/health', (req, res) => {
   const { n } = db.prepare("SELECT COUNT(*) AS n FROM listings WHERE status = 'published' AND is_seed = 0").get();
-  res.json({ ok: true, published_listings: n, admin_password_is_default: usingDefaultPassword() });
+  res.json({ ok: true, published_listings: n });
 });
 
 // Owner-only totals for the private dashboard (disabled unless ANALYTICS_KEY is set).
@@ -132,6 +132,8 @@ app.listen(PORT, () => {
   console.log(`Vong API listening on http://localhost:${PORT}`);
   startBackupSchedule();
   if (usingDefaultPassword()) {
-    console.log('⚠  ADMIN_PASSWORD is not set — the admin page accepts "vong-admin". Set it in .env before deploying.');
+    console.log(process.env.NODE_ENV === 'production'
+      ? '⚠  ADMIN_PASSWORD is not set, so admin login is switched off. Set it in the host\'s environment settings.'
+      : '⚠  ADMIN_PASSWORD is not set — the admin page accepts "vong-admin". Set it in .env before deploying.');
   }
 });

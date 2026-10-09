@@ -338,14 +338,29 @@ router.patch('/:id', requireUser, (req, res) => {
   const { errors, values } = validateListing(merged);
   if (Object.keys(errors).length > 0) return res.status(400).json({ error: 'validation_failed', fields: errors });
 
+  // An approved listing changed after review: flag it and tell the owner, so a
+  // harmless listing cannot be quietly turned into a scam once it is live.
+  const before = {
+    title: row.title_en ?? row.title_vi, description: row.description_en ?? row.description_vi,
+    category: row.category, price: row.price_vnd, district: row.district, condition: row.condition,
+  };
+  const after = {
+    title: values.title, description: values.description,
+    category: merged.category, price: values.price, district: merged.district, condition: merged.condition,
+  };
+  const recheck = ['published', 'sold'].includes(row.status) && Object.keys(before).some((key) => String(before[key]) !== String(after[key]));
+
   db.prepare(`
     UPDATE listings SET
       title_en = @title_en, title_vi = @title_vi,
       description_en = @description_en, description_vi = @description_vi,
       category = @category, price_vnd = @price_vnd, district = @district, condition = @condition,
-      seller_name = @seller_name, seller_phone = @seller_phone
+      seller_name = @seller_name, seller_phone = @seller_phone,
+      edited_at = CASE WHEN @recheck THEN @now ELSE edited_at END
     WHERE id = @id
   `).run({
+    recheck: recheck ? 1 : 0,
+    now: new Date().toISOString(),
     id: row.id,
     title_en: lang === 'en' ? values.title : row.title_en,
     title_vi: lang === 'vi' ? values.title : row.title_vi,
@@ -358,6 +373,14 @@ router.patch('/:id', requireUser, (req, res) => {
     seller_name: values.sellerName,
     seller_phone: values.sellerPhone,
   });
+  if (recheck) {
+    notifyOwner({
+      title: 'Approved listing edited',
+      message: `${values.title} (${row.ref})`,
+      tags: ['pencil2'],
+      path: '/admin',
+    });
+  }
   res.json({ id: row.id });
 });
 
