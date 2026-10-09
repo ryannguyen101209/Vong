@@ -168,6 +168,23 @@ export default {
     share: 'Share',
     linkCopied: 'Link copied',
     shareText: '{{title}} for {{price}} on Vòng',
+    report: 'Report this listing',
+    reportTitle: 'Report this listing',
+    reportLead: 'We will review the listing. The seller is not told who reported it.',
+    reportReasons: {
+      prohibited: 'Banned or not allowed for sale',
+      scam: 'Looks like a scam',
+      wrong_info: 'Photos, price or description are false',
+      offensive: 'Offensive or inappropriate',
+      other: 'Something else',
+    },
+    reportDetails: 'More details (optional)',
+    reportDetailsRequired: 'Tell us what happened',
+    reportSubmit: 'Send report',
+    reportSending: 'Sending…',
+    reportThanks: 'Thank you. We will look at this listing soon.',
+    reportError: 'Could not send the report. Please try again.',
+    reportRules: 'Read the listing rules',
     contactTitle: 'Here is how to reach {{name}}',
     contactBody:
       'Message or call this number — it works on Zalo too. Vòng does not pass messages along, so this conversation is between the two of you from here.',
@@ -199,6 +216,9 @@ export default {
     freeSubmitSummary: 'Free, this is your first listing',
     freeSubmitSummaryBody: 'Nothing to pay. We review it and publish it.',
     feeNoticeTitle: 'Free to write, {{fee}} to publish',
+    agreePrefix: 'By posting, you agree to the ',
+    agreeJoin: ' and ',
+    agreeSuffix: '.',
     feeNoticeBody:
       'You will see a QR code on the next page. Your listing goes live once we have checked the transfer.',
     photoLabel: 'Photos',
@@ -262,7 +282,9 @@ export default {
     loadError: 'Google sign-in could not load. Please try again.',
     previewTitle: 'Sign-in is not available yet.',
     previewBody: 'We’re finishing account setup. Please check back soon.',
-    terms: 'By continuing, you agree to keep transactions respectful and safe.',
+    termsPrefix: 'By continuing, you agree to the ',
+    termsJoin: ' and ',
+    termsSuffix: '.',
   },
 
   messages: {
@@ -408,11 +430,11 @@ export default {
       },
       {
         q: 'How do I contact a seller?',
-        a: 'Open the listing and tap “Request to buy”. That reveals the seller’s phone number, which usually works on Zalo as well. Vòng does not carry messages between you.',
+        a: 'Open the listing and tap “Message seller” to chat on Vòng, or “Show phone number” to call or message them on Zalo. Both need you to sign in.',
       },
       {
         q: 'What if I get scammed?',
-        a: 'We cannot recover your money, and we will not claim otherwise. Meet in a public place, look at the item before paying, and be wary of anyone who wants a deposit before you have seen anything. If someone is behaving badly, tell us through the contact page and we will take their listings down.',
+        a: 'We cannot recover your money, and we will not claim otherwise. Meet in a public place, look at the item before paying, and be wary of anyone who wants a deposit before you have seen anything. If a listing looks dodgy, tap “Report this listing” on it and we will look into it and take it down.',
       },
       {
         q: 'Can I edit or delete my listing?',
@@ -468,6 +490,11 @@ export default {
     tabQueue: 'Payment queue',
     tabAll: 'All listings',
     tabSettings: 'Settings',
+    tabReports: 'Reports',
+    reportsLead: 'Listings people have reported. Take a listing down if it breaks the rules, or dismiss the report if it is fine.',
+    noReports: 'No open reports.',
+    reportDismiss: 'Dismiss',
+    reportOpen: 'Open listing',
     queueLead: 'Everything waiting on you: paid claims first, then listings still awaiting payment. Check your bank app, then approve or reject.',
     queueEmptyTitle: 'Queue is empty',
     queueEmptyBody: 'Nothing is waiting for approval right now.',
@@ -627,5 +654,9 @@ export default {
     legalBody:
       'Vòng charges sellers a listing fee only. We take no commission and never hold payment between buyer and seller.',
     madeIn: 'Made in Saigon',
+    legalLinks: 'Legal',
+    terms: 'Terms of Service',
+    privacy: 'Privacy',
+    rules: 'Listing rules',
   },
 };

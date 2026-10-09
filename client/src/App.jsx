@@ -11,6 +11,7 @@ import { Saved } from './pages/Saved.jsx';
 import { About } from './pages/About.jsx';
 import { Faq } from './pages/Faq.jsx';
 import { Contact } from './pages/Contact.jsx';
+import { Legal } from './pages/Legal.jsx';
 import { Admin } from './pages/Admin.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { Messages } from './pages/Messages.jsx';
@@ -67,6 +68,9 @@ export function App() {
           <Route path="/about" element={<About />} />
           <Route path="/faq" element={<Faq />} />
           <Route path="/contact" element={<Contact />} />
+          <Route path="/terms" element={<Legal page="terms" />} />
+          <Route path="/privacy" element={<Legal page="privacy" />} />
+          <Route path="/rules" element={<Legal page="rules" />} />
           <Route path="/admin" element={<Admin />} />
           <Route path="*" element={<NotFound />} />
         </Routes>

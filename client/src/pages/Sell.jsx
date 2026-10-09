@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, digitsOnly } from '../lib/format.js';
@@ -7,6 +7,7 @@ import { Field } from '../components/Field.jsx';
 import { UploadIcon, CloseIcon, PlusIcon } from '../components/Icons.jsx';
 import { ErrorState } from '../components/States.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { legalTitle } from './Legal.jsx';
 
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -407,6 +408,13 @@ export function Sell() {
           <div>
             <strong>{meta.first_listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
             <span>{meta.first_listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
+            <span className="sell-submit__agree">
+              {t('sell.agreePrefix')}
+              <Link to="/rules" target="_blank">{legalTitle(lang, 'rules')}</Link>
+              {t('sell.agreeJoin')}
+              <Link to="/terms" target="_blank">{legalTitle(lang, 'terms')}</Link>
+              {t('sell.agreeSuffix')}
+            </span>
           </div>
           <button type="submit" className="btn btn--accent" disabled={submitting}>
           {submitting ? t('sell.submitting') : t(meta.first_listing_free ? 'sell.freeSubmit' : 'sell.submit')}

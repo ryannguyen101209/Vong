@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { CloseIcon } from './Icons.jsx';
+import { legalTitle } from '../pages/Legal.jsx';
 
 const GOOGLE_SCRIPT = 'https://accounts.google.com/gsi/client';
 
@@ -25,7 +26,7 @@ function loadGoogleIdentity() {
 }
 
 export function SignInDialog() {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const { signInOpen, closeSignIn, completeGoogleSignIn, googleConfigured, googleClientId, authError } = useAuth();
   const buttonRef = useRef(null);
   const dialogRef = useRef(null);
@@ -107,7 +108,13 @@ export function SignInDialog() {
           </div>
         )}
         {authError && <p role="alert" className="field__error">{t('auth.loadError')}</p>}
-        <p className="auth-terms">{t('auth.terms')}</p>
+        <p className="auth-terms">
+          {t('auth.termsPrefix')}
+          <a href="/terms" target="_blank" rel="noopener">{legalTitle(lang, 'terms')}</a>
+          {t('auth.termsJoin')}
+          <a href="/privacy" target="_blank" rel="noopener">{legalTitle(lang, 'privacy')}</a>
+          {t('auth.termsSuffix')}
+        </p>
       </section>
     </div>
   );

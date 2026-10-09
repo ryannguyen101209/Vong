@@ -229,6 +229,20 @@ if (!hadReads) {
   `);
 }
 
+// Anyone can flag a public listing; the owner sees open reports in the admin page.
+db.exec(`
+  CREATE TABLE IF NOT EXISTS listing_reports (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    listing_id  TEXT NOT NULL REFERENCES listings(id) ON DELETE CASCADE,
+    reason      TEXT NOT NULL,
+    details     TEXT,
+    reporter_id TEXT REFERENCES users(id) ON DELETE SET NULL,
+    created_at  TEXT NOT NULL,
+    resolved_at TEXT
+  );
+  CREATE INDEX IF NOT EXISTS idx_reports_open ON listing_reports(resolved_at, created_at);
+`);
+
 export const DEFAULT_SETTINGS = {
   bank_bin: '970436',
   bank_name: 'Vietcombank',

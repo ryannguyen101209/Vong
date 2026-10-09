@@ -9,6 +9,7 @@ import { ShareButton } from '../components/ShareButton.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { ReportListing } from '../components/ReportListing.jsx';
 
 export function ListingDetail() {
   const { id } = useParams();
@@ -244,6 +245,9 @@ export function ListingDetail() {
               <span>{t('listing.payBankTransfer')}</span>
             </div>
           </div>
+          {['published', 'sold'].includes(listing.status) && profile?.id !== listing.seller_id && (
+            <ReportListing listingId={listing.id} />
+          )}
         </aside>
       </div>
     </div>
