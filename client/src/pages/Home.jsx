@@ -15,40 +15,24 @@ const CATEGORY_PHOTOS = {
   household: '/vong-higgsfield-household.webp',
 };
 
-/** True when the visitor asked their device for less motion. */
-function usePrefersReducedMotion() {
-  const query = '(prefers-reduced-motion: reduce)';
-  const [reduced, setReduced] = useState(() => window.matchMedia?.(query).matches ?? false);
-  useEffect(() => {
-    const list = window.matchMedia?.(query);
-    if (!list) return undefined;
-    const update = () => setReduced(list.matches);
-    list.addEventListener('change', update);
-    return () => list.removeEventListener('change', update);
-  }, []);
-  return reduced;
-}
-
-/** Full-screen greeting: the ring film, one big word, one way in. */
+/**
+ * Full-screen greeting on a still photo. Where the browser supports
+ * scroll-linked animation, the photo stays pinned and the greeting pops up as
+ * the visitor scrolls (all in styles.css); elsewhere it is simply shown.
+ */
 function Welcome() {
   const { t } = useI18n();
-  const reduced = usePrefersReducedMotion();
   return (
-    <section className="welcome" aria-labelledby="welcome-title">
-      {reduced ? (
-        <img className="welcome__media" src="/vong-higgsfield-chair-film-poster.webp" alt="" />
-      ) : (
-        <video className="welcome__media" poster="/vong-higgsfield-chair-film-poster.webp" autoPlay muted loop playsInline aria-hidden="true">
-          <source src="/vong-higgsfield-chair-film.webm" type="video/webm" />
-          <source src="/vong-higgsfield-chair-film.mp4" type="video/mp4" />
-        </video>
-      )}
-      <h1 id="welcome-title" className="welcome__word">{t('home.welcomeWord')}</h1>
-      <div className="welcome__bar">
-        <p className="welcome__line">{t('home.welcomeLine')}</p>
-        <Link to="/browse" className="welcome__cta">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
-      </div>
-    </section>
+    <div className="welcome-scroll">
+      <section className="welcome" aria-labelledby="welcome-title">
+        <img className="welcome__media" src="/vong-higgsfield-chair.webp" alt="" width="2688" height="1520" fetchPriority="high" />
+        <h1 id="welcome-title" className="welcome__word">{t('home.welcomeWord')}</h1>
+        <div className="welcome__bar">
+          <p className="welcome__line">{t('home.welcomeLine')}</p>
+          <Link to="/browse" className="welcome__cta">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
+        </div>
+      </section>
+    </div>
   );
 }
 

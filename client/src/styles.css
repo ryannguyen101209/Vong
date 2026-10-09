@@ -1274,12 +1274,31 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 }
 .welcome__cta:hover { background: #1f2c25; color: #f4f1ec; }
 .welcome__cta:active { transform: scale(0.98); }
-@media (prefers-reduced-motion: no-preference) {
-  .welcome__word { animation: rise-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
-  .welcome__bar { animation: rise-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+/* Pinned photo, greeting pops up with the first half-screen of scrolling. Only where
+   scroll-linked animation exists and motion is welcome; otherwise it is just shown. */
+@supports (animation-timeline: scroll()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .welcome-scroll { height: 175dvh; }
+    .welcome { position: sticky; top: 84px; }
+    .welcome__word, .welcome__bar {
+      animation: welcome-pop linear both;
+      animation-timeline: scroll(root);
+    }
+    .welcome__word { animation-name: welcome-word; animation-range: 0 38vh; }
+    .welcome__bar { animation-range: 12vh 50vh; }
+  }
+}
+/* The word is faintly there on load, so visitors know there is more; scrolling brings it in. */
+@keyframes welcome-word {
+  from { opacity: 0.2; transform: translateY(40px) scale(0.95); }
+  to { opacity: 1; transform: none; }
+}
+@keyframes welcome-pop {
+  from { opacity: 0; transform: translateY(64px) scale(0.92); }
+  to { opacity: 1; transform: none; }
 }
 @media (max-width: 720px) {
-  .welcome { margin: 8px 8px 0; min-height: calc(100dvh - 66px - 8px); }
+  .welcome { margin: 8px 8px 0; min-height: calc(100dvh - 66px - 8px); top: 74px; }
   /* A tall phone screen would crop the chair to a fragment. Give the film a band
      in the middle instead, its top and bottom edges faded into the backdrop. */
   .welcome__media {
