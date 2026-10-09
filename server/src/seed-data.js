@@ -4,7 +4,7 @@
  * sold, and how pickup works. Both language variants are hand-written.
  */
 
-export const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'hobby'];
+export const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'sports', 'hobby'];
 // Every district as people in Saigon still name them (the pre-2021 / pre-2025 map).
 // 'thao_dien' is no longer offered but stays labelled in the UI for older listings.
 export const DISTRICTS = [
