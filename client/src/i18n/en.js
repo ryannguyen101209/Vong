@@ -551,6 +551,7 @@ export default {
     electronics: 'Electronics',
     books: 'Books',
     household: 'Household',
+    sports: 'Sports',
     hobby: 'Hobby',
   },
 
