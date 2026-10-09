@@ -592,6 +592,10 @@ main { flex: 1; }
 
 .prose { max-width: 66ch; }
 .prose p { margin-bottom: 1.1em; line-height: 1.75; }
+/* "Translate" link above a listing description */
+.translate-bar { margin: -4px 0 14px; }
+.translate-bar .link-quiet { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; }
+.translate-bar__error { color: var(--danger); }
 
 .seller-card { display: flex; flex-direction: column; gap: 14px; }
 .seller-card__row { display: flex; align-items: center; gap: 14px; }
@@ -1096,8 +1100,3 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
 .gallery__thumb:hover { opacity: 1; }
 .gallery__thumb.is-active { border-color: var(--accent); opacity: 1; }
 @media (max-width: 560px) { .gallery__thumb { width: 60px; height: 60px; } }
-
-/* Listing translation link */
-.translate-bar { margin: -4px 0 14px; }
-.translate-bar .link-quiet { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; }
-.translate-bar__error { color: var(--danger); }
