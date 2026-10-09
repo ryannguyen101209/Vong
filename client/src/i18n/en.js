@@ -59,6 +59,8 @@ export default {
   },
 
   home: {
+    welcomeWord: 'Welcome',
+    welcomeLine: 'The secondhand market for Saigon. Buy what you love, sell what you no longer use.',
     heroWordTop: 'SECOND',
     heroWordBottom: 'ROUND',
     heroImageAlt: 'Pre-owned furniture, clothes and everyday objects in afternoon light',

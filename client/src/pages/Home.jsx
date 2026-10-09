@@ -6,7 +6,7 @@ import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon, SearchIcon } from '../components/Icons.jsx';
 
-// Real product photos for the categories that have one; the rest get a plain tile.
+// Product photos for the categories that have one; the rest get a text tile.
 const CATEGORY_PHOTOS = {
   furniture: '/vong-higgsfield-chair.webp',
   clothing: '/vong-higgsfield-clothing.webp',
@@ -14,6 +14,43 @@ const CATEGORY_PHOTOS = {
   books: '/vong-higgsfield-books.webp',
   household: '/vong-higgsfield-household.webp',
 };
+
+/** True when the visitor asked their device for less motion. */
+function usePrefersReducedMotion() {
+  const query = '(prefers-reduced-motion: reduce)';
+  const [reduced, setReduced] = useState(() => window.matchMedia?.(query).matches ?? false);
+  useEffect(() => {
+    const list = window.matchMedia?.(query);
+    if (!list) return undefined;
+    const update = () => setReduced(list.matches);
+    list.addEventListener('change', update);
+    return () => list.removeEventListener('change', update);
+  }, []);
+  return reduced;
+}
+
+/** Full-screen greeting: the ring film, one big word, one way in. */
+function Welcome() {
+  const { t } = useI18n();
+  const reduced = usePrefersReducedMotion();
+  return (
+    <section className="welcome" aria-labelledby="welcome-title">
+      {reduced ? (
+        <img className="welcome__media" src="/vong-higgsfield-chair-film-poster.webp" alt="" />
+      ) : (
+        <video className="welcome__media" poster="/vong-higgsfield-chair-film-poster.webp" autoPlay muted loop playsInline aria-hidden="true">
+          <source src="/vong-higgsfield-chair-film.webm" type="video/webm" />
+          <source src="/vong-higgsfield-chair-film.mp4" type="video/mp4" />
+        </video>
+      )}
+      <h1 id="welcome-title" className="welcome__word">{t('home.welcomeWord')}</h1>
+      <div className="welcome__bar">
+        <p className="welcome__line">{t('home.welcomeLine')}</p>
+        <Link to="/browse" className="welcome__cta">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
+      </div>
+    </section>
+  );
+}
 
 export function Home() {
   const { t } = useI18n();
@@ -46,13 +83,15 @@ export function Home() {
   }
 
   return (
+    <>
+    <Welcome />
     <div className="shell marketplace">
       <section className="market-hero" aria-labelledby="market-title">
         <div className="market-hero__copy">
-          <h1 id="market-title">
+          <h2 id="market-title" className="market-hero__title">
             {/* One sentence per line, so the second never breaks into an orphan word. */}
             {t('market.title').split(/(?<=[.!?])\s+/).map((sentence) => <span key={sentence} className="market-hero__line">{sentence}</span>)}
-          </h1>
+          </h2>
           <p className="lead">{t('market.lead')}</p>
           <form className="market-search" role="search" onSubmit={onSearch}>
             <SearchIcon />
@@ -103,5 +142,6 @@ export function Home() {
         <Link to="/sell" className="btn btn--accent">{t('market.sell')} <ArrowUpRightIcon size={18} /></Link>
       </section>
     </div>
+    </>
   );
 }

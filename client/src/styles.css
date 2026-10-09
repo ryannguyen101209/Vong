@@ -922,7 +922,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
 .market-hero { display: grid; grid-template-columns: 1fr; background: var(--surface-sunk); border-radius: 12px; overflow: hidden; }
 .market-hero__copy { padding: 40px; align-self: center; }
 .market-hero .eyebrow { font-size: .65rem; letter-spacing: .1em; margin-bottom: 18px; }
-.market-hero h1 { max-width: 24ch; font-size: clamp(2.4rem, 4.2vw, 3.6rem); line-height: 1.03; font-weight: 600; }
+.market-hero__title { max-width: 24ch; font-size: clamp(2.4rem, 4.2vw, 3.6rem); line-height: 1.03; font-weight: 600; }
 .market-hero .lead { max-width: 37ch; font-size: 1rem; margin: 18px 0 24px; }
 .market-hero__free { margin-top: 14px; font-size: .92rem; font-weight: 600; color: var(--accent-ink); }
 .market-hero__image { position: relative; min-height: 320px; }
@@ -1000,7 +1000,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
   .marketplace { padding-top: 18px; }
   .market-hero { grid-template-columns: 1fr; min-height: auto; }
   .market-hero__copy { padding: 26px; }
-  .market-hero h1 { max-width: 18ch; font-size: 2.55rem; }
+  .market-hero__title { max-width: 18ch; font-size: 2.55rem; }
   .market-hero__image { display: none; }
   .market-hero .eyebrow { font-size: .6rem; }
   .market-hero .lead { margin-block: 12px 20px; }
@@ -1030,7 +1030,7 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
   .brand > svg { display: none; }
   .header__inner { gap: 4px; }
   .market-hero__copy { padding: 22px; }
-  .market-hero h1 { font-size: 2.2rem; }
+  .market-hero__title { font-size: 2.2rem; }
   .market-search { gap: 8px; padding-left: 10px; }
   .market-search .btn { padding-inline: 12px; }
 }
@@ -1141,7 +1141,7 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
   background: none; border-radius: 0; overflow: visible;
 }
 .market-hero__copy { padding: 0; }
-.market-hero h1 { font-size: clamp(2.5rem, 4.8vw, 4rem); line-height: 1.02; letter-spacing: -0.045em; max-width: 12ch; margin-bottom: 18px; }
+.market-hero__title { font-size: clamp(2.5rem, 4.8vw, 4rem); line-height: 1.02; letter-spacing: -0.045em; max-width: 12ch; margin-bottom: 18px; }
 .market-hero .lead { font-size: 1.08rem; max-width: 34ch; margin: 0 0 28px; color: var(--ink-soft); }
 .market-hero__image { position: relative; aspect-ratio: 5 / 4; min-height: 0; border-radius: 16px; overflow: hidden; background: var(--surface-sunk); }
 .market-hero__image img { position: static; width: 100%; height: 100%; object-fit: cover; object-position: 66% 62%; }
@@ -1200,12 +1200,12 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 
 @media (max-width: 900px) {
   .market-hero { grid-template-columns: 1fr; gap: 24px; }
-  .market-hero h1 { max-width: 14ch; }
+  .market-hero__title { max-width: 14ch; }
   .market-hero__image { aspect-ratio: 16 / 10; }
   .category-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 720px) {
-  .market-hero h1 { font-size: 2.6rem; }
+  .market-hero__title { font-size: 2.6rem; }
   .market-hero .lead { margin-bottom: 20px; }
   .market-hero__image { display: block; }
   .market-search { max-width: none; }
@@ -1243,5 +1243,51 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
   .category-tiles { scroll-padding-inline: var(--gutter); }
 }
 /* Vietnamese stacks accents above letters; leave room between headline lines. */
-.market-hero h1 { line-height: 1.1; }
+.market-hero__title { line-height: 1.1; }
 .market-hero .lead { max-width: 38ch; }
+
+/* Welcome screen: the ring film fills the first screen, one big word greets the visitor. */
+.welcome {
+  position: relative; overflow: hidden; isolation: isolate;
+  margin: 12px clamp(12px, 2vw, 24px) 0; border-radius: 16px;
+  min-height: calc(100dvh - 72px - 12px - clamp(12px, 2vw, 24px));
+  background: #f3efe9; color: #1f2c25; /* matches the film's backdrop */
+}
+.welcome__media { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%; object-fit: cover; object-position: 55% 78%; }
+.welcome__word {
+  position: absolute; left: 0; right: 0; top: clamp(20px, 6vh, 64px); margin: 0; padding-inline: 16px;
+  text-align: center; text-transform: uppercase; color: inherit;
+  font-size: clamp(4rem, 14.5vw, 14rem); font-weight: 700; letter-spacing: -0.055em; line-height: 0.95;
+}
+.welcome__bar {
+  position: absolute; left: 0; right: 0; bottom: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr); align-items: end; gap: 20px;
+  padding: clamp(20px, 3vw, 36px);
+}
+.welcome__line { margin: 0; max-width: 34ch; font-size: 0.95rem; line-height: 1.5; color: #3b4a41; }
+.welcome__cta {
+  grid-column: 2; display: inline-flex; align-items: center; gap: 8px;
+  padding: 15px 30px; border: 1.5px solid currentColor; border-radius: 10px;
+  color: #1f2c25; background: rgb(255 255 255 / 0.45); backdrop-filter: blur(8px);
+  font-weight: 600; text-decoration: none; white-space: nowrap;
+  transition: background 0.25s cubic-bezier(0.16, 1, 0.3, 1), color 0.25s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s;
+}
+.welcome__cta:hover { background: #1f2c25; color: #f4f1ec; }
+.welcome__cta:active { transform: scale(0.98); }
+@media (prefers-reduced-motion: no-preference) {
+  .welcome__word { animation: rise-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .welcome__bar { animation: rise-in 0.9s cubic-bezier(0.16, 1, 0.3, 1) 0.15s both; }
+}
+@media (max-width: 720px) {
+  .welcome { margin: 8px 8px 0; min-height: calc(100dvh - 66px - 8px); }
+  /* A tall phone screen would crop the chair to a fragment. Give the film a band
+     in the middle instead, its top and bottom edges faded into the backdrop. */
+  .welcome__media {
+    inset: auto 0; top: 30%; height: 50%; object-position: 52% 70%;
+    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+    mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  }
+  .welcome__word { font-size: clamp(3.4rem, 19vw, 6rem); top: 28px; }
+  .welcome__bar { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+  .welcome__cta { grid-column: auto; justify-content: center; }
+}
