@@ -6,6 +6,15 @@ import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon, SearchIcon } from '../components/Icons.jsx';
 
+// Real product photos for the categories that have one; the rest get a plain tile.
+const CATEGORY_PHOTOS = {
+  furniture: '/vong-higgsfield-chair.webp',
+  clothing: '/vong-higgsfield-clothing.webp',
+  electronics: '/vong-higgsfield-camera.webp',
+  books: '/vong-higgsfield-books.webp',
+  household: '/vong-higgsfield-household.webp',
+};
+
 export function Home() {
   const { t } = useI18n();
   const navigate = useNavigate();
@@ -40,33 +49,48 @@ export function Home() {
     <div className="shell marketplace">
       <section className="market-hero" aria-labelledby="market-title">
         <div className="market-hero__copy">
-          <p className="eyebrow">{t('home.heroLocation')} / {t('market.eyebrow')}</p>
-          <h1 id="market-title">{t('market.title')}</h1>
+          <h1 id="market-title">
+            {/* One sentence per line, so the second never breaks into an orphan word. */}
+            {t('market.title').split(/(?<=[.!?])\s+/).map((sentence) => <span key={sentence} className="market-hero__line">{sentence}</span>)}
+          </h1>
           <p className="lead">{t('market.lead')}</p>
-          <div className="row">
-            <Link to="/browse" className="btn btn--accent">{t('home.heroCtaSecondary')} <ArrowUpRightIcon size={18} /></Link>
-            <Link to="/sell" className="btn btn--ghost">{t('market.sell')}</Link>
-          </div>
-          <p className="market-hero__free">{t('market.freeNote')}</p>
+          <form className="market-search" role="search" onSubmit={onSearch}>
+            <SearchIcon />
+            <label className="sr-only" htmlFor="market-search">{t('browse.searchLabel')}</label>
+            <input id="market-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('browse.searchPlaceholder')} />
+            <button type="submit" className="btn btn--accent">{t('market.search')}</button>
+          </form>
+        </div>
+        <div className="market-hero__image">
+          <img src="/vong-higgsfield-chair.webp" alt={t('market.imageAlt')} width="2688" height="1520" fetchPriority="high" />
         </div>
       </section>
 
-      <section className="market-discover" aria-label={t('browse.searchLabel')}>
-        <form className="market-search" role="search" onSubmit={onSearch}>
-          <SearchIcon />
-          <label className="sr-only" htmlFor="market-search">{t('browse.searchLabel')}</label>
-          <input id="market-search" type="search" value={search} onChange={(event) => setSearch(event.target.value)} placeholder={t('browse.searchPlaceholder')} />
-          <button type="submit" className="btn btn--accent">{t('market.search')}</button>
-        </form>
-        <nav className="market-categories" aria-label={t('market.categories')}>
-          <Link to="/browse" className="chip chip--active">{t('browse.allCategories')}</Link>
-          {categories.map((category) => <Link className="chip" key={category} to={'/browse?category=' + encodeURIComponent(category)}>{t('categories.' + category)}</Link>)}
-        </nav>
+      <section className="market-discover" aria-labelledby="categories-title">
+        <h2 id="categories-title" className="sr-only">{t('market.categories')}</h2>
+        {/* Rendered only once categories arrive: on a phone the row snaps, and a lone
+            "see all" tile rendered first would stay snapped as the others load in. */}
+        {categories.length > 0 && <nav className="category-tiles" aria-label={t('market.categories')}>
+          {categories.map((category) => CATEGORY_PHOTOS[category] ? (
+            <Link className="category-tile" key={category} to={'/browse?category=' + encodeURIComponent(category)}>
+              <span className="category-tile__media"><img src={CATEGORY_PHOTOS[category]} alt="" loading="lazy" /></span>
+              <span className="category-tile__label">{t('categories.' + category)}</span>
+            </Link>
+          ) : (
+            // No photo yet: the name itself fills the tile.
+            <Link className="category-tile category-tile--text" key={category} to={'/browse?category=' + encodeURIComponent(category)}>
+              <span className="category-tile__media"><span>{t('categories.' + category)}</span></span>
+            </Link>
+          ))}
+          <Link to="/browse" className="category-tile category-tile--text category-tile--all">
+            <span className="category-tile__media"><span>{t('home.recentViewAll')} <ArrowUpRightIcon size={20} /></span></span>
+          </Link>
+        </nav>}
       </section>
 
       <section aria-label={t('home.recentTitle')} className="market-listings">
         {(status !== 'ready' || listings.length > 0) && <div className="market-section-head">
-          <div><h2 id="recent-title">{t('home.recentTitle')}</h2><p className="muted">{t('home.recentLead')}</p></div>
+          <h2 id="recent-title">{t('home.recentTitle')}</h2>
           <Link to="/browse" className="market-text-link">{t('home.recentViewAll')} <ArrowUpRightIcon size={18} /></Link>
         </div>}
         {status === 'loading' && <LoadingGrid count={8} />}
@@ -75,7 +99,7 @@ export function Home() {
       </section>
 
       <section className="market-sell" aria-labelledby="sell-title">
-        <div><p className="eyebrow">{t('market.sellEyebrow')}</p><h2 id="sell-title">{t('market.sellTitle')}</h2><p>{t('market.sellBody')}</p></div>
+        <div><h2 id="sell-title">{t('market.sellTitle')}</h2><p>{t('market.sellBody')}</p></div>
         <Link to="/sell" className="btn btn--accent">{t('market.sell')} <ArrowUpRightIcon size={18} /></Link>
       </section>
     </div>

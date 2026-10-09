@@ -135,9 +135,9 @@ export default {
     priceLabel: 'Khoảng giá',
     anyPrice: 'Mọi mức giá',
     price_under_200k: 'Dưới 200k',
-    price_200k_500k: '200k – 500k',
-    price_500k_1m: '500k – 1 triệu',
-    price_1m_3m: '1 – 3 triệu',
+    price_200k_500k: '200k-500k',
+    price_500k_1m: '500k-1 triệu',
+    price_1m_3m: '1-3 triệu',
     price_over_3m: 'Trên 3 triệu',
   },
 
