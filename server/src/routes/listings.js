@@ -62,9 +62,16 @@ const SORTS = {
   price_desc: 'price_vnd DESC',
 };
 
-/** GET /api/listings — published listings, with search / category / sort. */
+/** A whole number of dong from a query value, or null when absent or invalid. */
+function priceParam(value) {
+  if (value === undefined || value === '') return null;
+  const n = Number(value);
+  return Number.isSafeInteger(n) && n >= 0 ? n : null;
+}
+
+/** GET /api/listings — published listings, with search / category / district / price / sort. */
 router.get('/', (req, res) => {
-  const { search = '', category = '', sort = 'newest', ids = '' } = req.query;
+  const { search = '', category = '', district = '', sort = 'newest', ids = '' } = req.query;
 
   const where = [];
   const params = {};
@@ -84,6 +91,16 @@ router.get('/', (req, res) => {
     where.push('category = @category');
     params.category = category;
   }
+
+  if (district && DISTRICTS.includes(String(district))) {
+    where.push('district = @district');
+    params.district = district;
+  }
+
+  const minPrice = priceParam(req.query.min_price);
+  const maxPrice = priceParam(req.query.max_price);
+  if (minPrice !== null) { where.push('price_vnd >= @minPrice'); params.minPrice = minPrice; }
+  if (maxPrice !== null) { where.push('price_vnd <= @maxPrice'); params.maxPrice = maxPrice; }
 
   if (search) {
     // Matches either language, plus the district name as people type it.

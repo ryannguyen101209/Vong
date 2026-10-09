@@ -481,8 +481,11 @@ main { flex: 1; }
 .filters__row { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
 /* On a phone the search box and the sort select fight for the same row; stack them. */
 @media (max-width: 560px) {
-  .filters__row { flex-direction: column; align-items: stretch; }
-  .filters__row .select { width: 100%; }
+  .filters__row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  /* Search and sort take a full row; district and price share one. */
+  .filters__row > .search-field,
+  .filters__row > label:last-child { grid-column: 1 / -1; }
+  .filters__row .select { width: 100%; min-width: 0; }
 }
 
 .select {
