@@ -168,6 +168,23 @@ export default {
     share: 'Chia sẻ',
     linkCopied: 'Đã sao chép link',
     shareText: '{{title}} giá {{price}} trên Vòng',
+    report: 'Báo cáo tin này',
+    reportTitle: 'Báo cáo tin này',
+    reportLead: 'Tụi mình sẽ xem lại tin. Người bán không biết ai đã báo cáo.',
+    reportReasons: {
+      prohibited: 'Hàng cấm hoặc không được phép bán',
+      scam: 'Có dấu hiệu lừa đảo',
+      wrong_info: 'Ảnh, giá hoặc mô tả sai sự thật',
+      offensive: 'Nội dung xúc phạm hoặc không phù hợp',
+      other: 'Lý do khác',
+    },
+    reportDetails: 'Thêm chi tiết (không bắt buộc)',
+    reportDetailsRequired: 'Cho tụi mình biết chuyện gì xảy ra',
+    reportSubmit: 'Gửi báo cáo',
+    reportSending: 'Đang gửi…',
+    reportThanks: 'Cảm ơn bạn. Tụi mình sẽ xem tin này sớm.',
+    reportError: 'Chưa gửi được báo cáo. Bạn thử lại nhé.',
+    reportRules: 'Xem quy định đăng tin',
     contactTitle: 'Liên hệ {{name}} theo số này',
     contactBody:
       'Bạn nhắn hoặc gọi số này, số này dùng Zalo được luôn. Vòng không chuyển tin nhắn giùm, nên từ đây là chuyện giữa hai bạn với nhau.',
@@ -199,6 +216,9 @@ export default {
     freeSubmitSummary: 'Miễn phí, đây là tin đầu tiên của bạn',
     freeSubmitSummaryBody: 'Không cần trả gì. Tụi mình duyệt rồi đăng.',
     feeNoticeTitle: 'Viết tin miễn phí, {{fee}} để đăng',
+    agreePrefix: 'Khi đăng tin, bạn đồng ý với ',
+    agreeJoin: ' và ',
+    agreeSuffix: '.',
     feeNoticeBody:
       'Trang kế tiếp sẽ hiện mã QR. Tin của bạn lên sóng ngay sau khi tụi mình kiểm tra thấy tiền về.',
     photoLabel: 'Hình ảnh',
@@ -262,7 +282,9 @@ export default {
     loadError: 'Không tải được đăng nhập Google. Bạn thử lại nhé.',
     previewTitle: 'Đăng nhập chưa sẵn sàng.',
     previewBody: 'Tụi mình đang hoàn tất thiết lập tài khoản. Bạn quay lại sau nhé.',
-    terms: 'Khi tiếp tục, bạn đồng ý giao dịch lịch sự và an toàn.',
+    termsPrefix: 'Khi tiếp tục, bạn đồng ý với ',
+    termsJoin: ' và ',
+    termsSuffix: '.',
   },
 
   messages: {
@@ -408,11 +430,11 @@ export default {
       },
       {
         q: 'Làm sao liên hệ người bán?',
-        a: 'Bạn mở tin đăng rồi bấm “Hỏi mua”. Số điện thoại người bán sẽ hiện ra, số đó thường dùng Zalo được luôn. Vòng không chuyển tin nhắn qua lại giùm hai bên.',
+        a: 'Bạn mở tin đăng rồi bấm “Nhắn người bán” để nhắn ngay trên Vòng, hoặc bấm “Xem số điện thoại” để gọi hay nhắn Zalo. Cả hai đều cần đăng nhập.',
       },
       {
         q: 'Lỡ bị lừa thì sao?',
-        a: 'Tụi mình không lấy lại tiền giùm bạn được, và cũng không hứa hẹn gì khác. Bạn hẹn chỗ đông người, xem hàng rồi mới trả tiền, và cảnh giác với ai đòi đặt cọc khi bạn còn chưa thấy món đồ. Gặp người có dấu hiệu gian, bạn báo qua trang liên hệ để tụi mình gỡ tin của họ.',
+        a: 'Tụi mình không lấy lại tiền giùm bạn được, và cũng không hứa hẹn gì khác. Bạn hẹn chỗ đông người, xem hàng rồi mới trả tiền, và cảnh giác với ai đòi đặt cọc khi bạn còn chưa thấy món đồ. Gặp tin có dấu hiệu gian, bạn bấm “Báo cáo tin này” ngay trên tin để tụi mình xem và gỡ.',
       },
       {
         q: 'Mình sửa hoặc xoá tin đăng được không?',
@@ -468,6 +490,11 @@ export default {
     tabQueue: 'Hàng chờ duyệt',
     tabAll: 'Tất cả tin',
     tabSettings: 'Cài đặt',
+    tabReports: 'Báo cáo',
+    reportsLead: 'Tin bị người dùng báo cáo. Gỡ tin nếu vi phạm, hoặc bỏ qua nếu tin vẫn ổn.',
+    noReports: 'Không có báo cáo nào đang chờ.',
+    reportDismiss: 'Bỏ qua',
+    reportOpen: 'Xem tin',
     queueLead: 'Mọi thứ đang chờ bạn: đã báo chuyển khoản trước, rồi đến món chưa thanh toán. Kiểm tra app ngân hàng rồi duyệt hoặc từ chối.',
     queueEmptyTitle: 'Hàng chờ trống',
     queueEmptyBody: 'Hiện không có tin nào đang chờ duyệt.',
@@ -627,5 +654,9 @@ export default {
     legalBody:
       'Vòng chỉ thu phí đăng tin từ người bán. Tụi mình không lấy hoa hồng và không bao giờ giữ tiền giữa người mua và người bán.',
     madeIn: 'Làm tại Sài Gòn',
+    legalLinks: 'Pháp lý',
+    terms: 'Điều khoản sử dụng',
+    privacy: 'Quyền riêng tư',
+    rules: 'Quy định đăng tin',
   },
 };

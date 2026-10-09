@@ -115,6 +115,8 @@ router.delete('/listings/:id', (req, res) => {
   const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);
   if (!row || row.status === 'removed') return res.status(404).json({ error: 'not_found' });
   db.prepare("UPDATE listings SET status = 'removed' WHERE id = ?").run(row.id);
+  // Taking it down settles any reports about it.
+  db.prepare('UPDATE listing_reports SET resolved_at = ? WHERE listing_id = ? AND resolved_at IS NULL').run(new Date().toISOString(), row.id);
   res.json({ id: row.id, status: 'removed' });
 });
 
@@ -179,4 +181,24 @@ router.put('/settings', (req, res) => {
 /** GET /api/admin/messages — contact form submissions, newest first. */
 router.get('/messages', (req, res) => {
   res.json({ messages: db.prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 100').all() });
+});
+
+/** GET /api/admin/reports — open reports, newest first, with the listing they are about. */
+router.get('/reports', (req, res) => {
+  const reports = db.prepare(`
+    SELECT r.id, r.listing_id, r.reason, r.details, r.created_at,
+           l.ref, l.title_en, l.title_vi, l.status, l.seller_name
+    FROM listing_reports r JOIN listings l ON l.id = r.listing_id
+    WHERE r.resolved_at IS NULL
+    ORDER BY r.created_at DESC LIMIT 200
+  `).all();
+  res.json({ reports });
+});
+
+/** POST /api/admin/reports/:id/dismiss — the listing is fine; close the report. */
+router.post('/reports/:id/dismiss', (req, res) => {
+  const result = db.prepare('UPDATE listing_reports SET resolved_at = ? WHERE id = ? AND resolved_at IS NULL')
+    .run(new Date().toISOString(), Number(req.params.id));
+  if (result.changes === 0) return res.status(404).json({ error: 'not_found' });
+  res.json({ ok: true });
 });

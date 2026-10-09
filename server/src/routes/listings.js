@@ -417,6 +417,36 @@ router.post('/:id/translate', translateLimit, async (req, res, next) => {
   }
 });
 
+export const REPORT_REASONS = ['prohibited', 'scam', 'wrong_info', 'offensive', 'other'];
+const reportLimit = rateLimit({ windowMs: 60 * 60_000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_reports' } });
+
+/**
+ * POST /api/listings/:id/report { reason, details? } — flags a public listing for
+ * the owner to review. No account needed, so nobody has to sign in to report a scam.
+ */
+router.post('/:id/report', reportLimit, (req, res) => {
+  const reason = String(req.body?.reason ?? '');
+  const details = String(req.body?.details ?? '').trim().slice(0, 1000);
+  if (!REPORT_REASONS.includes(reason)) return res.status(400).json({ error: 'bad_reason' });
+  if (reason === 'other' && details.length < 5) return res.status(400).json({ error: 'details_required' });
+
+  const row = db
+    .prepare("SELECT id, ref, title_en, title_vi FROM listings WHERE id = ? AND status IN ('published', 'sold') AND is_seed = 0")
+    .get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+
+  db.prepare('INSERT INTO listing_reports (listing_id, reason, details, reporter_id, created_at) VALUES (?, ?, ?, ?, ?)')
+    .run(row.id, reason, details || null, req.user?.id ?? null, new Date().toISOString());
+
+  notifyOwner({
+    title: `Listing reported: ${reason}`,
+    message: `${row.title_vi || row.title_en} (${row.ref})`,
+    tags: ['warning'],
+    path: '/admin',
+  });
+  res.status(201).json({ ok: true });
+});
+
 router.post('/:id/buy-request', requireUser, (req, res) => {
   const row = db
     .prepare("SELECT id, seller_name, seller_phone FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0")

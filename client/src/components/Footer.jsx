@@ -35,6 +35,15 @@ export function Footer() {
             <Link to="/admin">{t('nav.admin')}</Link>
           </div>
         </div>
+
+        <div>
+          <p className="footer__title">{t('footer.legalLinks')}</p>
+          <div className="footer__links">
+            <Link to="/terms">{t('footer.terms')}</Link>
+            <Link to="/privacy">{t('footer.privacy')}</Link>
+            <Link to="/rules">{t('footer.rules')}</Link>
+          </div>
+        </div>
       </div>
 
       <div className="shell footer__bottom">

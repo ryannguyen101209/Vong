@@ -64,6 +64,13 @@ export const api = {
 
   deleteListing: (id) => request(`/api/listings/${id}`, { method: 'DELETE' }),
 
+  reportListing: (id, body) =>
+    request(`/api/listings/${id}/report`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify(body),
+    }),
+
   buyRequest: (id) => request(`/api/listings/${id}/buy-request`, { method: 'POST' }),
 
   translate: (id, to) =>
@@ -104,6 +111,15 @@ export const api = {
         method: 'POST',
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify({ reason }),
+      }),
+
+    reports: (token) =>
+      request('/api/admin/reports', { headers: { authorization: `Bearer ${token}` } }),
+
+    dismissReport: (token, id) =>
+      request(`/api/admin/reports/${id}/dismiss`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}` },
       }),
 
     remove: (token, id) =>

@@ -431,6 +431,60 @@ function AllListings({ token, onAuthError }) {
   );
 }
 
+/** Listings people reported: take the listing down, or dismiss the report. */
+function Reports({ token, onAuthError, onCount }) {
+  const { t, lang, localized } = useI18n();
+  const [reports, setReports] = useState(null);
+
+  const load = useCallback(() => {
+    api.admin
+      .reports(token)
+      .then((data) => { setReports(data.reports); onCount(data.reports.length); })
+      .catch((error) => error.status === 401 && onAuthError());
+  }, [token, onAuthError, onCount]);
+
+  useEffect(load, [load]);
+
+  const dismiss = (id) =>
+    api.admin.dismissReport(token, id).then(load).catch((error) => error.status === 401 && onAuthError());
+
+  if (!reports) return <p className="muted">{t('common.loading')}</p>;
+
+  return (
+    <>
+      <p className="muted" style={{ marginBottom: 20, maxWidth: '62ch' }}>{t('admin.reportsLead')}</p>
+      {reports.length === 0 ? (
+        <div className="card panel"><p className="muted small" style={{ margin: 0 }}>{t('admin.noReports')}</p></div>
+      ) : (
+        <div className="stack" style={{ gap: 14 }}>
+          {reports.map((report) => (
+            <div key={report.id} className="card panel admin-report">
+              <div className="spread" style={{ alignItems: 'flex-start', gap: 16, flexWrap: 'wrap' }}>
+                <div>
+                  <p className="notice__title" style={{ marginBottom: 4 }}>
+                    <a href={`/listing/${report.listing_id}`} target="_blank" rel="noopener">{localized(report, 'title')}</a>
+                  </p>
+                  <p className="small muted" style={{ margin: 0 }}>
+                    {report.seller_name} · <span style={{ fontFamily: 'ui-monospace, monospace' }}>{report.ref}</span> · {formatDateTime(report.created_at, lang)}
+                  </p>
+                </div>
+                <span className="badge badge--danger">{t(`listing.reportReasons.${report.reason}`)}</span>
+              </div>
+              {report.details && <p className="admin-report__details">{report.details}</p>}
+              <div className="row" style={{ gap: 8, marginTop: 14, flexWrap: 'wrap' }}>
+                <DeleteButton token={token} id={report.listing_id} onDeleted={load} onAuthError={onAuthError} />
+                <button type="button" className="btn btn--ghost btn--small" onClick={() => dismiss(report.id)}>
+                  {t('admin.reportDismiss')}
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </>
+  );
+}
+
 function Settings({ token, onAuthError }) {
   const { t } = useI18n();
   const [banks, setBanks] = useState([]);
@@ -619,6 +673,7 @@ export function Admin() {
   const { t } = useI18n();
   const [token, setToken] = useState(readToken);
   const [tab, setTab] = useState('queue');
+  const [openReports, setOpenReports] = useState(0);
   const [defaultPassword, setDefaultPassword] = useState(false);
 
   const signOut = useCallback(() => {
@@ -636,6 +691,7 @@ export function Admin() {
       .settings(token)
       .then((data) => setDefaultPassword(data.default_password))
       .catch((error) => error.status === 401 && signOut());
+    api.admin.reports(token).then((data) => setOpenReports(data.reports.length)).catch(() => {});
   }, [token, signOut]);
 
   if (!token) return <LoginForm onSuccess={setToken} />;
@@ -659,6 +715,7 @@ export function Admin() {
         {[
           ['queue', 'admin.tabQueue'],
           ['all', 'admin.tabAll'],
+          ['reports', 'admin.tabReports'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
           <button
@@ -670,12 +727,14 @@ export function Admin() {
             onClick={() => setTab(key)}
           >
             {t(label)}
+            {key === 'reports' && openReports > 0 && <span className="tab__count">{openReports}</span>}
           </button>
         ))}
       </div>
 
       {tab === 'queue' && <Queue token={token} onAuthError={signOut} />}
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
+      {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>
   );
