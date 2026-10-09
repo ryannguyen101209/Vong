@@ -1100,3 +1100,12 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
 .gallery__thumb:hover { opacity: 1; }
 .gallery__thumb.is-active { border-color: var(--accent); opacity: 1; }
 @media (max-width: 560px) { .gallery__thumb { width: 60px; height: 60px; } }
+
+/* Unread messages */
+.thread-link__top { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.thread-link--unread small { color: var(--ink); font-weight: 600; }
+.icon-btn { position: relative; }
+.menu-dot {
+  position: absolute; top: 6px; right: 6px; width: 9px; height: 9px;
+  border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--page);
+}

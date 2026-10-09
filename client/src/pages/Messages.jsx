@@ -3,6 +3,7 @@ import { Link, useSearchParams } from 'react-router-dom';
 import { useAuth } from '../lib/auth.jsx';
 import { useI18n } from '../i18n/index.jsx';
 import { sessionApi } from '../lib/session-api.js';
+import { unreadChanged } from '../lib/unread.js';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 
 export function Messages() {
@@ -67,12 +68,20 @@ function Inbox({ profile }) {
           {status === 'loading' && <p role="status">{t('common.loading')}</p>}
           {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
           {status === 'ready' && threads.length === 0 && <p className="muted">{t('messages.emptyBody')}</p>}
-          {threads.map((thread) => (
-            <Link className="thread-link" aria-current={thread.id === conversationId ? 'page' : undefined} to={'/messages?conversation=' + thread.id} key={thread.id}>
-              <strong>{thread.other_name}</strong><span>{localized(thread, 'title')}</span>
-              <small>{thread.last_message || t('messages.startTitle')}</small>
-            </Link>
-          ))}
+          {threads.map((thread) => {
+            // The open conversation is being read right now, so it never shows as unread.
+            const unread = thread.id === conversationId ? 0 : thread.unread || 0;
+            return (
+              <Link className={'thread-link' + (unread ? ' thread-link--unread' : '')} aria-current={thread.id === conversationId ? 'page' : undefined} to={'/messages?conversation=' + thread.id} key={thread.id}>
+                <span className="thread-link__top">
+                  <strong>{thread.other_name}</strong>
+                  {unread > 0 && <span className="nav__count" aria-label={t('messages.unreadInThread', { count: unread })}>{unread}</span>}
+                </span>
+                <span>{localized(thread, 'title')}</span>
+                <small>{thread.last_message || t('messages.startTitle')}</small>
+              </Link>
+            );
+          })}
         </nav>
         {conversationId
           ? <Conversation key={conversationId} id={conversationId} profile={profile} />
@@ -114,7 +123,10 @@ function Conversation({ id, profile }) {
         setConversation(data.conversation);
         if (!initialized) { setMessages(data.messages); setHasOlder(data.hasMore); }
         else merge(data.messages);
-        cursor = Math.max(cursor, ...data.messages.map((message) => message.id));
+        const newest = Math.max(cursor, ...data.messages.map((message) => message.id));
+        // The server marked these as read; let the header badge catch up.
+        if (newest > cursor || !initialized) unreadChanged();
+        cursor = newest;
         initialized = true;
         setStatus('ready'); setRefreshError(false);
         if (nearBottom) requestAnimationFrame(() => { if (live && scrollRef.current) scrollRef.current.scrollTop = scrollRef.current.scrollHeight; });

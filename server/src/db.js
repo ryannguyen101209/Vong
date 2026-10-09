@@ -209,6 +209,26 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_chat_conversation ON chat_messages(conversation_id, id);
 `);
 
+// The newest message each person has seen in each conversation, for unread counts.
+const hadReads = db.prepare("SELECT 1 FROM sqlite_master WHERE type = 'table' AND name = 'conversation_reads'").get();
+db.exec(`
+  CREATE TABLE IF NOT EXISTS conversation_reads (
+    conversation_id TEXT NOT NULL REFERENCES conversations(id) ON DELETE CASCADE,
+    user_id TEXT NOT NULL REFERENCES users(id),
+    last_read_id INTEGER NOT NULL DEFAULT 0,
+    PRIMARY KEY (conversation_id, user_id)
+  );
+`);
+if (!hadReads) {
+  // First start with this table: count everything already sent as read, so
+  // nobody opens the site to a pile of old "unread" messages.
+  db.exec(`
+    INSERT OR IGNORE INTO conversation_reads (conversation_id, user_id, last_read_id)
+    SELECT c.id, u.user_id, COALESCE((SELECT MAX(id) FROM chat_messages WHERE conversation_id = c.id), 0)
+    FROM conversations c JOIN (SELECT id, buyer_id AS user_id FROM conversations UNION ALL SELECT id, seller_id FROM conversations) u ON u.id = c.id;
+  `);
+}
+
 export const DEFAULT_SETTINGS = {
   bank_bin: '970436',
   bank_name: 'Vietcombank',
