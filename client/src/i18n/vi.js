@@ -484,6 +484,7 @@ export default {
     login: 'Đăng nhập',
     loggingIn: 'Đang đăng nhập…',
     loginError: 'Mật khẩu không đúng.',
+    loginLocked: 'Sai mật khẩu quá nhiều lần. Đợi 15 phút rồi thử lại.',
     logout: 'Đăng xuất',
     defaultPasswordWarning:
       'Chưa đặt ADMIN_PASSWORD nên hệ thống đang dùng mật khẩu mặc định. Hãy đặt trong file .env trước khi đưa lên mạng.',
@@ -491,6 +492,7 @@ export default {
     tabAll: 'Tất cả tin',
     tabSettings: 'Cài đặt',
     tabReports: 'Báo cáo',
+    editedAfterReview: 'Người bán sửa sau khi duyệt · {{when}}',
     reportsLead: 'Tin bị người dùng báo cáo. Gỡ tin nếu vi phạm, hoặc bỏ qua nếu tin vẫn ổn.',
     noReports: 'Không có báo cáo nào đang chờ.',
     reportDismiss: 'Bỏ qua',

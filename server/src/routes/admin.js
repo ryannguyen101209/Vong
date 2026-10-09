@@ -1,4 +1,5 @@
 import express from 'express';
+import { rateLimit } from 'express-rate-limit';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
@@ -13,8 +14,11 @@ function sellerEmailFor(id) {
 
 export const router = express.Router();
 
+// Wrong passwords only: 10 per 15 minutes per address, so the password cannot be guessed by brute force.
+const loginLimit = rateLimit({ windowMs: 15 * 60_000, limit: 10, skipSuccessfulRequests: true, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_attempts' } });
+
 /** POST /api/admin/login — password in, bearer token out. */
-router.post('/login', (req, res) => {
+router.post('/login', loginLimit, (req, res) => {
   const session = login(req.body?.password);
   if (!session) return res.status(401).json({ error: 'bad_password' });
   res.json({ ...session, default_password: usingDefaultPassword() });
@@ -30,7 +34,7 @@ router.use(requireAdmin);
 const ADMIN_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd,
   district, condition, seller_name, seller_phone, seller_email, image_path, status, reject_reason,
-  fee_vnd, views, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at,
+  fee_vnd, views, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at, edited_at,
   (SELECT COUNT(*) FROM listings o
      WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
        AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))

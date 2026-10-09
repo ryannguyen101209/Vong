@@ -9,8 +9,10 @@ import crypto from 'node:crypto';
 const TOKEN_TTL_MS = 1000 * 60 * 60 * 8; // 8 hours
 const tokens = new Map(); // token -> expiry timestamp
 
+/** The admin password. In production there is no default: no password set means no admin login. */
 export function adminPassword() {
-  return process.env.ADMIN_PASSWORD || 'vong-admin';
+  if (process.env.ADMIN_PASSWORD) return process.env.ADMIN_PASSWORD;
+  return process.env.NODE_ENV === 'production' ? '' : 'vong-admin';
 }
 
 export function usingDefaultPassword() {
@@ -19,6 +21,7 @@ export function usingDefaultPassword() {
 
 export function login(password) {
   const expected = adminPassword();
+  if (!expected) return null;
   const given = String(password ?? '');
   // Constant-time compare so the password can't be guessed a character at a time.
   const a = Buffer.from(given.padEnd(64).slice(0, 64));
