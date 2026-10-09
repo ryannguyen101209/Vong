@@ -127,21 +127,25 @@ export function buildEmail(kind, data) {
 /** True when email is configured. Callers check this before doing throttle bookkeeping. */
 export const mailEnabled = () => Boolean(process.env.RESEND_API_KEY?.trim());
 
-/** Send one email. No-op without RESEND_API_KEY or a recipient. Never throws. */
-export function sendMail({ to, subject, html, text }) {
+/**
+ * Send one email. No-op without RESEND_API_KEY or a recipient. Never throws.
+ * Resolves to true when the provider accepted it; most callers ignore that.
+ */
+export function sendMail({ to, subject, html, text, attachments, timeoutMs = TIMEOUT_MS }) {
   const key = process.env.RESEND_API_KEY?.trim();
-  if (!key || !to) return;
+  if (!key || !to) return Promise.resolve(false);
   const api = (process.env.RESEND_API_URL || 'https://api.resend.com').replace(/\/+$/, '');
   const from = process.env.MAIL_FROM?.trim() || 'Vòng <onboarding@resend.dev>';
   const payload = { from, to: [to], subject, html, text };
   if (process.env.MAIL_REPLY_TO?.trim()) payload.reply_to = process.env.MAIL_REPLY_TO.trim();
+  if (attachments?.length) payload.attachments = attachments;
 
-  fetch(`${api}/emails`, {
+  return fetch(`${api}/emails`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${key}` },
     body: JSON.stringify(payload),
-    signal: AbortSignal.timeout(TIMEOUT_MS),
-  }).catch(() => {});
+    signal: AbortSignal.timeout(timeoutMs),
+  }).then((response) => response.ok, () => false);
 }
 
 /** Build and send in one call. */

@@ -159,6 +159,24 @@ The bank BIN list in `vietqr.js` is accurate at the time of writing but you
 should confirm your own bank's BIN against
 [napas.com.vn](https://napas.com.vn) or [vietqr.io](https://vietqr.io).
 
+### Backups
+
+Every listing, account, chat and payment record is in one SQLite file
+(`DATABASE_FILE`). If the host's disk is lost, so is the site, so keep copies
+somewhere else:
+
+- **Admin > Settings > Backup > Download backup** saves a gzipped copy of the
+  database at any time. It is taken safely while the site is running.
+- **Daily email:** set `BACKUP_EMAIL` (and `RESEND_API_KEY`) and a copy is
+  emailed once a day. The "Email one now" button in the same panel checks the
+  setup. Copies over 25 MB are not attached; you get a note to download instead.
+- **Restore:** `gunzip vong-backup-YYYY-MM-DD.db.gz`, stop the site, put the file
+  at `DATABASE_FILE`, start the site.
+
+The backup is the database only. Uploaded photos (`UPLOADS_DIR`) are not
+included. The backup email contains sellers' phone numbers and emails, so send
+it to a private inbox. Code: `server/src/backup.js`.
+
 ### Automatic payment confirmation (SePay)
 
 Without this, you open your bank app, find the transfer and press Approve. With

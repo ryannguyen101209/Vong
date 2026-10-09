@@ -2,7 +2,8 @@ import express from 'express';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
-import { emailUser } from '../mailer.js';
+import { emailUser, mailEnabled } from '../mailer.js';
+import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
 
 /** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
 function sellerEmailFor(id) {
@@ -119,7 +120,31 @@ router.delete('/listings/:id', (req, res) => {
 
 /** GET/PUT /api/admin/settings — bank details and the listing fee. */
 router.get('/settings', (req, res) => {
-  res.json({ settings: getSettings(), banks: BANKS, default_password: usingDefaultPassword() });
+  res.json({
+    settings: getSettings(), banks: BANKS, default_password: usingDefaultPassword(),
+    backup: { email: backupEmail() ? backupEmail().replace(/^(.).*(@.*)$/, '$1…$2') : null, mail_enabled: mailEnabled(), last_sent: lastEmailedBackup() },
+  });
+});
+
+/** GET /api/admin/backup — download a gzipped copy of the whole database. */
+router.get('/backup', async (req, res, next) => {
+  try {
+    const gz = await snapshot();
+    res.set({
+      'Content-Type': 'application/gzip',
+      'Content-Disposition': `attachment; filename="${backupFilename()}"`,
+      'Cache-Control': 'no-store',
+    });
+    res.send(gz);
+  } catch (err) {
+    next(err);
+  }
+});
+
+/** POST /api/admin/backup/email — email a backup now (to check the setup works). */
+router.post('/backup/email', async (req, res) => {
+  const outcome = await emailBackup();
+  res.status(outcome === 'sent' ? 200 : outcome === 'off' ? 409 : 502).json({ outcome, last_sent: lastEmailedBackup() });
 });
 
 router.put('/settings', (req, res) => {

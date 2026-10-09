@@ -438,6 +438,7 @@ function Settings({ token, onAuthError }) {
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState(null);
   const [messages, setMessages] = useState([]);
+  const [backup, setBackup] = useState(null);
 
   useEffect(() => {
     api.admin
@@ -445,6 +446,7 @@ function Settings({ token, onAuthError }) {
       .then((data) => {
         setBanks(data.banks);
         setForm(data.settings);
+        setBackup(data.backup ?? null);
       })
       .catch((error) => error.status === 401 && onAuthError());
     api.admin.messages(token).then((data) => setMessages(data.messages)).catch(() => {});
@@ -539,6 +541,8 @@ function Settings({ token, onAuthError }) {
         <p className="small muted">{t('admin.previewBody')}</p>
       </div>
 
+      <BackupPanel token={token} backup={backup} onBackup={setBackup} onAuthError={onAuthError} />
+
       <div className="card panel" style={{ marginTop: 28 }}>
         <h3 style={{ fontSize: '1.1rem' }}>{t('admin.messagesTitle')}</h3>
         {messages.length === 0 ? (
@@ -555,6 +559,59 @@ function Settings({ token, onAuthError }) {
         )}
       </div>
     </>
+  );
+}
+
+/** Download the database, and see / test the daily backup email. */
+function BackupPanel({ token, backup, onBackup, onAuthError }) {
+  const { t, lang } = useI18n();
+  const [busy, setBusy] = useState(null);
+  const [result, setResult] = useState(null);
+
+  const run = async (kind) => {
+    setBusy(kind);
+    setResult(null);
+    try {
+      if (kind === 'download') {
+        await api.admin.downloadBackup(token);
+      } else {
+        const data = await api.admin.emailBackup(token);
+        onBackup({ ...backup, last_sent: data.last_sent });
+        setResult('emailed');
+      }
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      setResult(kind === 'download' ? 'downloadFailed' : 'emailFailed');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const emailOn = Boolean(backup?.email && backup?.mail_enabled);
+  return (
+    <div className="card panel" style={{ marginTop: 28, maxWidth: 620 }}>
+      <h3 style={{ fontSize: '1.1rem' }}>{t('admin.backupTitle')}</h3>
+      <p className="small muted">{t('admin.backupBody')}</p>
+      <p className="small" style={{ marginBottom: 16 }}>
+        {emailOn
+          ? t('admin.backupEmailOn', {
+              email: backup.email,
+              last: backup.last_sent ? formatDateTime(backup.last_sent.created_at, lang) : t('admin.backupNever'),
+            })
+          : t('admin.backupEmailOff')}
+      </p>
+      <div className="row" style={{ gap: 8, flexWrap: 'wrap' }}>
+        <button type="button" className="btn btn--small" disabled={busy !== null} onClick={() => run('download')}>
+          {busy === 'download' ? t('admin.backupPreparing') : t('admin.backupDownload')}
+        </button>
+        {emailOn && (
+          <button type="button" className="btn btn--ghost btn--small" disabled={busy !== null} onClick={() => run('email')}>
+            {busy === 'email' ? t('admin.backupSending') : t('admin.backupEmailNow')}
+          </button>
+        )}
+      </div>
+      {result && <p className="small" role="status" style={{ marginTop: 12, marginBottom: 0 }}>{t(`admin.backup_${result}`)}</p>}
+    </div>
   );
 }
 
