@@ -13,10 +13,10 @@ import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
 import { mountSharePages } from './share-pages.js';
-import { translationEnabled } from './translate.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
+import { translationEnabled } from './translate.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 dotenv.config({ path: path.join(SERVER_ROOT, '.env') });
