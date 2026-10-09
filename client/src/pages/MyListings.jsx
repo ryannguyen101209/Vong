@@ -6,6 +6,7 @@ import { api } from '../lib/api.js';
 import { formatPrice, formatDate } from '../lib/format.js';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ListingImage } from '../components/ListingCard.jsx';
+import { ShareButton } from '../components/ShareButton.jsx';
 
 const BADGE = {
   pending_payment: 'badge--warning',
@@ -107,6 +108,14 @@ function Manager() {
                     )}
                     {(listing.status === 'published' || listing.status === 'sold') && (
                       <Link to={`/listing/${listing.id}`} className="btn btn--ghost btn--small">{t('myListings.view')}</Link>
+                    )}
+                    {listing.status === 'published' && (
+                      <ShareButton
+                        small
+                        url={`${window.location.origin}/listing/${listing.id}`}
+                        title={localized(listing, 'title')}
+                        text={t('listing.shareText', { title: localized(listing, 'title'), price: formatPrice(listing.price_vnd, lang) })}
+                      />
                     )}
                     {listing.status === 'published' && (
                       <button type="button" className="btn btn--accent btn--small" disabled={isBusy} onClick={() => run(listing.id, api.markSold)}>

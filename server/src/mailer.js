@@ -47,13 +47,16 @@ export function buildEmail(kind, data) {
     const titleVi = clip(data.titleVi || data.titleEn, 80);
     const titleEn = clip(data.titleEn || data.titleVi, 80);
     const url = `${base}/listing/${encodeURIComponent(data.listingId)}`;
+    const facebook = `https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(url)}`;
+    const shareVi = `<br><br>Muốn bán nhanh hơn? Gửi link này qua Zalo, hoặc <a href="${esc(facebook)}" style="color:${GREEN}">chia sẻ lên Facebook</a>. Link hiện sẵn ảnh và giá.`;
+    const shareEn = `<br><br>Want it to sell faster? Send the link on Zalo, or <a href="${esc(facebook)}" style="color:${GREEN}">share it on Facebook</a>. The link shows the photo and price.`;
     return {
       subject: `Tin "${titleVi}" đã lên sàn · Your listing is live`,
-      text: `Tin "${titleVi}" của bạn đã được duyệt và đang hiển thị trên Vòng. Người mua giờ có thể nhắn cho bạn.\n${url}\n\n---\nYour listing "${titleEn}" is approved and live on Vòng. Buyers can message you now.\n${url}`,
+      text: `Tin "${titleVi}" của bạn đã được duyệt và đang hiển thị trên Vòng. Người mua giờ có thể nhắn cho bạn.\n${url}\nMuốn bán nhanh hơn? Gửi link này qua Zalo hoặc chia sẻ lên Facebook.\n\n---\nYour listing "${titleEn}" is approved and live on Vòng. Buyers can message you now.\n${url}\nWant it to sell faster? Share the link on Zalo or Facebook.`,
       html: layout({
         heading: { vi: 'Tin của bạn đã lên sàn', en: 'Your listing is live' },
-        bodyVi: `Tin <b>${esc(titleVi)}</b> đã được duyệt và đang hiển thị trên Vòng. Có người quan tâm là họ sẽ nhắn cho bạn ngay trên web.`,
-        bodyEn: `<b>${esc(titleEn)}</b> is approved and visible on Vòng. Buyers will message you right on the site.`,
+        bodyVi: `Tin <b>${esc(titleVi)}</b> đã được duyệt và đang hiển thị trên Vòng. Có người quan tâm là họ sẽ nhắn cho bạn ngay trên web.${shareVi}`,
+        bodyEn: `<b>${esc(titleEn)}</b> is approved and visible on Vòng. Buyers will message you right on the site.${shareEn}`,
         button: { vi: 'Xem tin', en: 'View listing' }, url,
       }),
     };

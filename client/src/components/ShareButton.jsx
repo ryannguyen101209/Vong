@@ -7,7 +7,7 @@ import { ShareIcon, CheckIcon } from './Icons.jsx';
  * and copies the link everywhere else. The shared link carries the listing's
  * own photo and price, so every share works as an advert for the item.
  */
-export function ShareButton({ url, title, text }) {
+export function ShareButton({ url, title, text, small = false }) {
   const { t } = useI18n();
   const [copied, setCopied] = useState(false);
   const timer = useRef(null);
@@ -45,7 +45,7 @@ export function ShareButton({ url, title, text }) {
   };
 
   return (
-    <button type="button" className="save-btn save-btn--inline" onClick={share} aria-live="polite">
+    <button type="button" className={small ? 'btn btn--ghost btn--small' : 'save-btn save-btn--inline'} onClick={share} aria-live="polite">
       {copied ? <CheckIcon /> : <ShareIcon />}
       <span>{copied ? t('listing.linkCopied') : t('listing.share')}</span>
     </button>

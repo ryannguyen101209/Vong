@@ -10,6 +10,7 @@ import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { ReportListing } from '../components/ReportListing.jsx';
+import { ShareYourListing } from '../components/ShareYourListing.jsx';
 
 export function ListingDetail() {
   const { id } = useParams();
@@ -184,6 +185,14 @@ export function ListingDetail() {
               </tbody>
             </table>
           </div>
+
+          {listing.status === 'published' && profile?.id && profile.id === listing.seller_id && (
+            <ShareYourListing
+              url={`${window.location.origin}/listing/${listing.id}`}
+              title={title}
+              text={t('listing.shareText', { title, price: formatPrice(listing.price_vnd, lang) })}
+            />
+          )}
 
           <div className="card panel seller-card">
             <div className="seller-card__row">
