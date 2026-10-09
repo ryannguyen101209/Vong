@@ -48,6 +48,12 @@ try {
   const token = admin_.body.token;
   assert.ok(token, 'admin can sign in');
 
+  // Both new accounts were welcomed; the rest of this test counts from zero.
+  await wait(300);
+  assert.deepEqual(sent.map((m) => m.to[0]).sort(), ['buyer@example.test', 'seller@example.test']);
+  assert.ok(sent.every((m) => /Welcome to Vòng/.test(m.subject)));
+  sent.length = 0;
+
   const listing = { title: 'Email flow chair', description: 'A test listing used to check that emails go out at the right moments.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const a = await request('/api/listings', { cookie: seller.cookie, body: listing });
   const b = await request('/api/listings', { cookie: seller.cookie, body: { ...listing, title: 'Email flow desk' } });
