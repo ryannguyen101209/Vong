@@ -1,6 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { db } from './db.js';
+import { CATEGORIES, DISTRICTS as DISTRICT_KEYS } from './seed-data.js';
 
 /**
  * Link previews and search indexing.
@@ -31,6 +32,17 @@ const DISTRICTS = {
   },
 };
 
+const CATEGORY_NAMES = {
+  furniture: 'Nội thất', clothing: 'Quần áo', electronics: 'Đồ điện tử', books: 'Sách',
+  household: 'Đồ gia dụng', sports: 'Đồ thể thao', hobby: 'Đồ sở thích',
+};
+// schema.org item conditions, for Google's product results.
+const CONDITION_SCHEMA = {
+  like_new: 'https://schema.org/UsedCondition', good: 'https://schema.org/UsedCondition',
+  fair: 'https://schema.org/UsedCondition', well_used: 'https://schema.org/UsedCondition',
+};
+const districtName = (key) => DISTRICTS.vi[key] || DISTRICTS.shared[key] || '';
+
 const escapeHtml = (value) => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 
@@ -58,13 +70,54 @@ export function listingMeta(row) {
   const district = DISTRICTS[lang][row.district] || DISTRICTS.shared[row.district] || '';
   const description = lang === 'vi' ? row.description_vi || row.description_en : row.description_en || row.description_vi;
   const headline = `${title} · ${formatVnd(row.price_vnd)}${district ? ` · ${district}` : ''}`;
+  const url = `${SITE}/listing/${encodeURIComponent(row.id)}`;
+  const image = coverImage(row);
   return {
     title: `${headline} | Vòng`,
     ogTitle: headline,
     description: shorten(description, 180),
-    url: `${SITE}/listing/${encodeURIComponent(row.id)}`,
-    image: coverImage(row),
+    url,
+    image,
     imageAlt: title,
+    // Lets Google show the price and that it is secondhand in search results.
+    jsonLd: {
+      '@context': 'https://schema.org',
+      '@type': 'Product',
+      name: title,
+      description: shorten(description, 500),
+      image: [image],
+      ...(CATEGORY_NAMES[row.category] ? { category: CATEGORY_NAMES[row.category] } : {}),
+      offers: {
+        '@type': 'Offer',
+        url,
+        price: Math.round(Number(row.price_vnd) || 0),
+        priceCurrency: 'VND',
+        itemCondition: CONDITION_SCHEMA[row.condition] || 'https://schema.org/UsedCondition',
+        availability: row.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
+        ...(district ? { availableAtOrFrom: { '@type': 'Place', name: `${district}, TP. Hồ Chí Minh` } } : {}),
+      },
+    },
+  };
+}
+
+/** Title and description for a category and/or district page, or null if neither is known. */
+export function browseMeta(category, district) {
+  const cat = CATEGORY_NAMES[category] ? category : '';
+  const dist = DISTRICT_KEYS.includes(district) ? district : '';
+  if (!cat && !dist) return null;
+  const what = cat ? CATEGORY_NAMES[cat] : 'Đồ cũ';
+  const where = dist ? districtName(dist) : 'Sài Gòn';
+  const params = new URLSearchParams();
+  if (cat) params.set('category', cat);
+  if (dist) params.set('district', dist);
+  const lowerWhat = cat ? `${what.charAt(0).toLowerCase()}${what.slice(1)} cũ` : 'đồ cũ';
+  return {
+    title: `${what}${cat ? ' cũ' : ''} ở ${where} | Vòng`,
+    ogTitle: `${what}${cat ? ' cũ' : ''} ở ${where}`,
+    description: `Mua bán ${lowerWhat} ở ${where}, TP. Hồ Chí Minh. Xem ảnh thật, giá rõ ràng, nhắn người bán trực tiếp trên Vòng. Không hoa hồng.`,
+    url: `${SITE}/browse?${params.toString()}`,
+    image: `${SITE}/og-image.png`,
+    imageAlt: 'Vòng',
   };
 }
 
@@ -89,7 +142,11 @@ export function renderListingHead(html, meta) {
   set(/\s*<meta property="og:image:width" content="[^"]*"\s*\/?>/, '');
   set(/\s*<meta property="og:image:height" content="[^"]*"\s*\/?>/, '');
   set(/<meta name="twitter:image" content="[^"]*"\s*\/?>/, `<meta name="twitter:image" content="${img}" />`);
-  set(/\n(\s*)<\/head>/, (m, indent) => `\n${indent}  <link rel="canonical" href="${u}" />\n${indent}</head>`);
+  // In a JSON block, "<" is escaped so text from a listing can never close the <script> tag.
+  const ld = meta.jsonLd
+    ? `\n    <script type="application/ld+json">${JSON.stringify(meta.jsonLd).replace(/</g, '\\u003c')}</script>`
+    : '';
+  set(/\n(\s*)<\/head>/, (m, indent) => `\n${indent}  <link rel="canonical" href="${u}" />${ld}\n${indent}</head>`);
   return html;
 }
 
@@ -102,7 +159,7 @@ export function mountSharePages(app, clientDist) {
   };
 
   const findListing = db.prepare(`
-    SELECT id, title_en, title_vi, description_en, description_vi, price_vnd, district, image_path, images
+    SELECT id, title_en, title_vi, description_en, description_vi, price_vnd, district, category, condition, status, image_path, images
     FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0
   `);
 
@@ -113,6 +170,14 @@ export function mountSharePages(app, clientDist) {
     res.type('html').send(renderListingHead(readTemplate(), listingMeta(row)));
   });
 
+  // Category and district pages get their own title, so each can be found on Google.
+  app.get('/browse', (req, res, next) => {
+    const meta = browseMeta(String(req.query.category ?? ''), String(req.query.district ?? ''));
+    if (!meta) return next();
+    res.set('Cache-Control', 'public, max-age=300');
+    res.type('html').send(renderListingHead(readTemplate(), meta).replace('<meta property="og:type" content="product" />', '<meta property="og:type" content="website" />'));
+  });
+
   const liveListings = db.prepare(`
     SELECT id, COALESCE(published_at, created_at) AS updated
     FROM listings WHERE status = 'published' AND is_seed = 0
@@ -120,13 +185,19 @@ export function mountSharePages(app, clientDist) {
   `);
 
   app.get('/sitemap.xml', (req, res) => {
-    const pages = ['/', '/browse', '/about', '/faq', '/contact']
+    const pages = ['/', '/browse', '/about', '/faq', '/contact', '/rules', '/terms', '/privacy']
       .map((p) => `  <url><loc>${SITE}${p}</loc></url>`);
+    // Only categories and districts that have something for sale, so no empty pages are listed.
+    const live = db.prepare("SELECT DISTINCT category, district FROM listings WHERE status = 'published' AND is_seed = 0").all();
+    const browse = [
+      ...new Set(live.map((r) => r.category).filter((c) => CATEGORY_NAMES[c]).map((c) => `category=${c}`)),
+      ...new Set(live.map((r) => r.district).filter((d) => DISTRICT_KEYS.includes(d)).map((d) => `district=${d}`)),
+    ].map((q) => `  <url><loc>${SITE}/browse?${q.replace('&', '&amp;')}</loc></url>`);
     const listings = liveListings.all().map((r) =>
       `  <url><loc>${SITE}/listing/${encodeURIComponent(r.id)}</loc><lastmod>${String(r.updated).slice(0, 10)}</lastmod></url>`);
     res.set('Cache-Control', 'public, max-age=3600');
     res.type('application/xml').send(
-      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...pages, ...listings].join('\n')}\n</urlset>\n`,
+      `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${[...pages, ...browse, ...listings].join('\n')}\n</urlset>\n`,
     );
   });
 

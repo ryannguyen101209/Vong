@@ -1343,3 +1343,7 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
   .legal-nav { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; margin-inline: calc(-1 * var(--gutter)); padding-inline: var(--gutter); }
   .legal-nav::-webkit-scrollbar { display: none; }
 }
+/* A seller's own live listing: nudge them to share it. */
+.share-own { margin-bottom: 16px; }
+.share-own__actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.share-own__actions > * { min-height: 46px; width: 100%; justify-content: center; }

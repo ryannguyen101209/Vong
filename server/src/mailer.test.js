@@ -33,6 +33,8 @@ assert.equal(got[0].url, '/emails');
 assert.equal(got[0].auth, 'Bearer re_test');
 assert.deepEqual(got[0].body.to, ['seller@example.test']);
 assert.equal(got[0].body.from, 'Vòng <hello@example.test>');
+// The approval email nudges the seller to share the listing.
+assert.ok(got[0].body.html.includes('facebook.com/sharer/sharer.php?u=' + encodeURIComponent('https://example.test/listing/abc')));
 assert.match(got[0].body.subject, /Ghế gỗ teak/);
 assert.match(got[0].body.text, /https:\/\/example\.test\/listing\/abc/);
 
