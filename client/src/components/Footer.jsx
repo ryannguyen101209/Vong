@@ -1,6 +1,6 @@
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
-import { LogoMark } from './Logo.jsx';
+import { Logo } from './Logo.jsx';
 
 export function Footer() {
   const { t } = useI18n();
@@ -10,9 +10,8 @@ export function Footer() {
     <footer className="footer">
       <div className="shell footer__grid">
         <div>
-          <div className="row" style={{ gap: 10, marginBottom: 14 }}>
-            <LogoMark size={28} />
-            <span className="brand__word">{t('common.appName')}</span>
+          <div className="row" style={{ marginBottom: 14 }}>
+            <Logo />
           </div>
           <p className="small muted" style={{ maxWidth: '38ch' }}>{t('footer.blurb')}</p>
         </div>

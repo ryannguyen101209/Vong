@@ -8,6 +8,16 @@ const MARK_PATH =
   'M 8 76 C 52 76 84 70 96 44 C 104 26 96 14 84 16 C 70 18 66 40 76 62 L 120 146 ' +
   'C 124 152 130 152 134 144 L 172 40 C 176 28 184 24 192 28';
 
+/*
+ * In the wordmark the mark is the V of "Vòng". It is drawn heavier than the
+ * standalone mark so its stroke matches DM Sans Bold, and its viewBox is cropped
+ * to the stroke so the bottom of the V sits on the text baseline and the top of
+ * the loop lines up with the cap height.
+ */
+const WORD_STROKE = 20;
+const WORD_TOP = 14 - WORD_STROKE / 2;
+const WORD_HEIGHT = 150.5 + WORD_STROKE / 2 - WORD_TOP;
+
 export function LogoMark({ size = 32, className = '' }) {
   return (
     <svg
@@ -56,12 +66,26 @@ export function LogoTile({ size = 56, className = '' }) {
   );
 }
 
-/** Mark plus the wordmark, used in the header and the footer. */
-export function Logo({ size = 30 }) {
+/** The wordmark: the looped mark is the V, followed by "òng". Used in the header and the footer. */
+export function Logo({ className = '' }) {
   return (
-    <>
-      <LogoMark size={size} />
-      <span className="brand__word">Vòng</span>
-    </>
+    <span className={`brand__word ${className}`.trim()} role="img" aria-label="Vòng">
+      <svg
+        className="brand__v"
+        viewBox={`-10 ${WORD_TOP} 216 ${WORD_HEIGHT}`}
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d={MARK_PATH}
+          fill="none"
+          stroke="currentColor"
+          strokeWidth={WORD_STROKE}
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        />
+      </svg>
+      <span aria-hidden="true">òng</span>
+    </span>
   );
 }

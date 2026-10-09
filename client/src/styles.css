@@ -905,6 +905,9 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
 .header { background: var(--page); backdrop-filter: none; }
 .header__inner { height: 76px; }
 .brand__word { font-family: var(--sans); font-size: 1.65rem; letter-spacing: -.06em; }
+.brand__word { white-space: nowrap; }
+/* The looped mark drawn as the V of the wordmark: cap height, sitting on the baseline. */
+.brand__v { display: inline-block; height: .72em; width: auto; aspect-ratio: 216 / 156.5; vertical-align: -.02em; margin-right: -.02em; overflow: visible; }
 .icon-btn { border: 0; background: transparent; padding-inline: 8px; }
 .header__sell, .header__signin { white-space: nowrap; }
 .account-chip { display: flex; align-items: center; gap: 8px; min-height: 40px; border: 0; border-radius: 8px; background: var(--surface-sunk); cursor: pointer; }
@@ -987,8 +990,6 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
   .account-chip { width: 34px; min-width: 34px; padding: 3px; justify-content: center; }
   .account-chip span { display: none; }
   .header__tools .icon-btn { min-width: 34px; padding-inline: 6px; }
-  .brand { gap: 5px; }
-  .brand > svg { width: 28px; }
   .brand__word { font-size: 1.4rem; }
   .marketplace { padding-top: 18px; }
   .market-hero { grid-template-columns: 1fr; min-height: auto; }
@@ -1020,7 +1021,6 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
   .footer__grid > :first-child { grid-column: 1 / -1; }
 }
 @media (max-width: 380px) {
-  .brand > svg { display: none; }
   .header__inner { gap: 4px; }
   .market-hero__copy { padding: 22px; }
   .market-hero h1 { font-size: 2.2rem; }
