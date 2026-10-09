@@ -112,10 +112,10 @@ export function buildEmail(kind, data) {
     const url = `${base}/sell`;
     return {
       subject: 'Chào mừng bạn đến với Vòng · Welcome to Vòng',
-      text: `${hi.vi}\n\nCảm ơn bạn đã tham gia Vòng, chợ đồ cũ cho người Sài Gòn.\n- Dạo xem đồ cũ quanh bạn và lưu món ưng ý.\n- Nhắn người bán ngay trên web, không cần đưa số điện thoại.\n- Món đầu tiên bạn đăng bán là miễn phí.\n\nĐăng món đầu tiên: ${url}\n\n---\n${hi.en}\n\nThanks for joining Vòng, the secondhand market for Saigon.\n- Browse used things near you and save the ones you like.\n- Message sellers right on the site, no phone number needed.\n- Your first listing is free.\n\nPost your first listing: ${url}`,
+      text: `${hi.vi}\n\nCảm ơn bạn đã tham gia Vòng, chợ đồ cũ cho người Sài Gòn.\n- Xem đồ cũ quanh bạn và lưu lại món ưng ý.\n- Nhắn người bán ngay trên web, không cần đưa số điện thoại.\n- Món đầu tiên bạn đăng bán là miễn phí.\n\nĐăng món đầu tiên: ${url}\n\n---\n${hi.en}\n\nThanks for joining Vòng, the secondhand market for Saigon.\n- Browse used things near you and save the ones you like.\n- Message sellers right on the site, no phone number needed.\n- Your first listing is free.\n\nPost your first listing: ${url}`,
       html: layout({
         heading: { vi: 'Chào mừng bạn đến với Vòng', en: 'Welcome to Vòng' },
-        bodyVi: `${esc(hi.vi)}<br><br>Cảm ơn bạn đã tham gia Vòng, chợ đồ cũ cho người Sài Gòn.<br>• Dạo xem đồ cũ quanh bạn và lưu món ưng ý.<br>• Nhắn người bán ngay trên web, không cần đưa số điện thoại.<br>• <b>Món đầu tiên bạn đăng bán là miễn phí.</b>`,
+        bodyVi: `${esc(hi.vi)}<br><br>Cảm ơn bạn đã tham gia Vòng, chợ đồ cũ cho người Sài Gòn.<br>• Xem đồ cũ quanh bạn và lưu lại món ưng ý.<br>• Nhắn người bán ngay trên web, không cần đưa số điện thoại.<br>• <b>Món đầu tiên bạn đăng bán là miễn phí.</b>`,
         bodyEn: `${esc(hi.en)}<br><br>Thanks for joining Vòng, the secondhand market for Saigon. Browse used things near you, message sellers right on the site, and post your first listing for free.`,
         button: { vi: 'Đăng món đầu tiên', en: 'Post your first listing' }, url,
       }),
