@@ -12,7 +12,7 @@
 import { buildVietQrPayload, findBank, BANKS } from '../../../server/src/vietqr.js';
 
 const STORAGE_KEY = 'vong.demo.state';
-const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'hobby'];
+const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'sports', 'hobby'];
 const DISTRICTS = ['district_1', 'district_3', 'district_7', 'binh_thanh', 'thao_dien'];
 const CONDITIONS = ['like_new', 'good', 'fair', 'well_used'];
 

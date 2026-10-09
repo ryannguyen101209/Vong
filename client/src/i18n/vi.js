@@ -554,6 +554,7 @@ export default {
     electronics: 'Đồ điện tử',
     books: 'Sách',
     household: 'Đồ gia dụng',
+    sports: 'Thể thao',
     hobby: 'Sở thích',
   },
 
