@@ -151,6 +151,7 @@ export default {
     views: 'Views',
     reference: 'Reference',
     translate: 'Translate to English',
+    translateWithGoogle: 'Translate to English with Google',
     translating: 'Translating…',
     showOriginal: 'Show original',
     machineTranslated: 'Machine-translated',

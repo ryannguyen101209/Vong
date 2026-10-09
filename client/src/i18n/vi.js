@@ -151,6 +151,7 @@ export default {
     views: 'Lượt xem',
     reference: 'Mã tin',
     translate: 'Dịch sang tiếng Việt',
+    translateWithGoogle: 'Dịch sang tiếng Việt bằng Google',
     translating: 'Đang dịch…',
     showOriginal: 'Xem bản gốc',
     machineTranslated: 'Bản dịch tự động',
