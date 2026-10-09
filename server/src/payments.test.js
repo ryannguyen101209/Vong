@@ -59,6 +59,11 @@ try {
   assert.deepEqual(findRefs('no reference here'), []);
 
   const login = await (await fetch(`${base}/api/auth/google`, { method: 'POST', headers: { 'X-Vong-Request': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ credential: 'seller' }) })).headers.get('set-cookie');
+  // The new seller was welcomed; the payment emails below count from zero.
+  await wait(300);
+  assert.equal(sent.length, 1);
+  assert.match(sent[0].subject, /Welcome to Vòng/);
+  sent.length = 0;
   const listing = { title: 'Payment test chair', description: 'A test listing used to check automatic payment matching works properly.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (title) => (await api('/api/listings', { cookie: login, body: { ...listing, title } })).body;
   await make('free first');                 // first listing is free: nothing to pay

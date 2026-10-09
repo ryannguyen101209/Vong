@@ -3,6 +3,7 @@ import express from 'express';
 import { OAuth2Client } from 'google-auth-library';
 import { rateLimit } from 'express-rate-limit';
 import { db } from './db.js';
+import { emailUser } from './mailer.js';
 
 const google = new OAuth2Client();
 const COOKIE = 'vong_session';
@@ -55,7 +56,9 @@ export function createAuthRouter(verify = async (credential, audience) => {
     catch { return res.status(401).json({ error: 'invalid_credential' }); }
     if (!claims?.sub || !claims.email || claims.email_verified !== true) return res.status(401).json({ error: 'invalid_credential' });
     try {
+      let isNew = false;
       const profile = db.transaction(() => {
+        isNew = !db.prepare('SELECT 1 FROM users WHERE google_sub = ?').get(claims.sub);
         db.prepare(`INSERT INTO users (id, google_sub, name, email, picture, created_at)
           VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(google_sub) DO UPDATE SET
           name = excluded.name, email = excluded.email, picture = excluded.picture`).run(
@@ -67,6 +70,8 @@ export function createAuthRouter(verify = async (credential, audience) => {
         res.cookie(COOKIE, token, { ...cookieOptions(), maxAge: TTL });
         return user;
       })();
+      // A brand-new account gets one welcome email; signing in again sends nothing.
+      if (isNew) emailUser(profile.email, 'welcome', { name: profile.name });
       res.json({ profile });
     } catch (error) { next(error); }
   });
