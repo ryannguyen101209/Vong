@@ -13,6 +13,10 @@ const CATEGORY_PHOTOS = {
   electronics: '/vong-higgsfield-camera.webp',
   books: '/vong-higgsfield-books.webp',
   household: '/vong-higgsfield-household.webp',
+  // Unsplash License (free to use, no attribution required), cropped and warmed to match:
+  // images.unsplash.com/photo-1600185365483-26d7a4cc7519 and images.unsplash.com/photo-1556449895-a33c9dba33dd
+  sports: '/vong-unsplash-sports.webp',
+  hobby: '/vong-unsplash-hobby.webp',
 };
 
 /**
