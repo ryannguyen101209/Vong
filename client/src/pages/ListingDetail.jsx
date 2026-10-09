@@ -18,10 +18,23 @@ export function ListingDetail() {
   const [status, setStatus] = useState('loading');
   const [contact, setContact] = useState(null);
   const [requesting, setRequesting] = useState(false);
+  const [canTranslate, setCanTranslate] = useState(false);
+  // { lang, title, description } once fetched; shown while showTranslation is on.
+  const [translation, setTranslation] = useState(null);
+  const [showTranslation, setShowTranslation] = useState(false);
+  const [translating, setTranslating] = useState(false);
+  const [translateError, setTranslateError] = useState(false);
+
+  useEffect(() => {
+    api.meta().then((meta) => setCanTranslate(Boolean(meta.translation))).catch(() => {});
+  }, []);
 
   useEffect(() => {
     setStatus('loading');
     setContact(null);
+    setTranslation(null);
+    setShowTranslation(false);
+    setTranslateError(false);
     api
       .listing(id)
       .then((data) => {
@@ -47,9 +60,27 @@ export function ListingDetail() {
     return <div className="shell section editorial-page listing-page"><ErrorState /></div>;
   }
 
-  const title = localized(listing, 'title');
-  const description = localized(listing, 'description');
+  // Sellers write in one language. Offer a machine translation when it is not the visitor's.
+  const sourceLang = listing.title_vi || listing.description_vi ? 'vi' : 'en';
+  const hasOwnText = Boolean(listing[`description_${lang}`]);
+  const offerTranslation = canTranslate && !hasOwnText && sourceLang !== lang;
+  const translated = showTranslation && translation?.lang === lang ? translation : null;
+
+  const title = translated?.title || localized(listing, 'title');
+  const description = translated?.description || localized(listing, 'description');
   const paragraphs = description.split(/\n\s*\n/).filter(Boolean);
+
+  const toggleTranslation = () => {
+    if (translated) { setShowTranslation(false); return; }
+    if (translation?.lang === lang) { setShowTranslation(true); return; }
+    setTranslating(true);
+    setTranslateError(false);
+    api
+      .translate(listing.id, lang)
+      .then((data) => { setTranslation(data); setShowTranslation(true); })
+      .catch(() => setTranslateError(true))
+      .finally(() => setTranslating(false));
+  };
 
   const requestToBuy = () => {
     if (!profile) { openSignIn(); return; }
@@ -84,7 +115,16 @@ export function ListingDetail() {
 
           <div className="card panel" style={{ marginTop: 28 }}>
             <h2 style={{ fontSize: '1.3rem' }}>{t('listing.descriptionTitle')}</h2>
-            <div className="prose">
+            {offerTranslation && (
+              <p className="translate-bar small">
+                {translated && <span className="muted">{t('listing.machineTranslated')} · </span>}
+                <button type="button" className="link-quiet" onClick={toggleTranslation} disabled={translating}>
+                  {translating ? t('listing.translating') : translated ? t('listing.showOriginal') : t('listing.translate')}
+                </button>
+                {translateError && <span className="translate-bar__error" role="alert"> {t('listing.translateFailed')}</span>}
+              </p>
+            )}
+            <div className="prose" lang={translated ? lang : sourceLang}>
               {paragraphs.map((paragraph, index) => (
                 <p key={index}>{paragraph}</p>
               ))}
@@ -94,7 +134,7 @@ export function ListingDetail() {
 
         <aside className="detail__aside">
           <div className="card panel">
-            <h1 style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2rem)' }}>{title}</h1>
+            <h1 style={{ fontSize: 'clamp(1.5rem, 3.2vw, 2rem)' }} lang={translated ? lang : sourceLang}>{title}</h1>
             <p className="detail__price" style={{ marginBottom: 20 }}>
               {formatPrice(listing.price_vnd, lang)}
             </p>

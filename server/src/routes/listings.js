@@ -8,6 +8,8 @@ import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
+import { rateLimit } from 'express-rate-limit';
+import { translateListing, TranslationError } from '../translate.js';
 
 export const router = express.Router();
 
@@ -376,6 +378,28 @@ router.delete('/:id', requireUser, (req, res) => {
  * POST /api/listings/:id/buy-request — reveals the seller's phone/Zalo and logs
  * the interest. Vong does not carry messages or money between the two people.
  */
+// Each translation that is not already saved costs a model call, so cap how often one visitor can ask.
+const translateLimit = rateLimit({ windowMs: 60 * 60_000, limit: 30, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_translations' } });
+
+/**
+ * POST /api/listings/:id/translate { to: 'en' | 'vi' } — the title and description
+ * in the other language, machine-translated and saved. Public listings only.
+ */
+router.post('/:id/translate', translateLimit, async (req, res, next) => {
+  const row = db
+    .prepare("SELECT id, title_en, title_vi, description_en, description_vi FROM listings WHERE id = ? AND status IN ('published', 'sold')")
+    .get(req.params.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  try {
+    const result = await translateListing(row, String(req.body?.to ?? ''));
+    res.json({ lang: req.body.to, title: result.title, description: result.description, machine: true });
+  } catch (error) {
+    if (!(error instanceof TranslationError)) return next(error);
+    const status = { bad_language: 400, same_language: 400, disabled: 404, busy: 503, failed: 502 }[error.code] ?? 500;
+    res.status(status).json({ error: `translation_${error.code}` });
+  }
+});
+
 router.post('/:id/buy-request', requireUser, (req, res) => {
   const row = db
     .prepare("SELECT id, seller_name, seller_phone FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0")

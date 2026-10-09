@@ -16,6 +16,7 @@ import { mountSharePages } from './share-pages.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
+import { translationEnabled } from './translate.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 dotenv.config({ path: path.join(SERVER_ROOT, '.env') });
@@ -57,6 +58,7 @@ app.get('/api/meta', (req, res) => {
     fee_vnd: settings.fee_vnd,
     first_listing_free: isFirstListing(req.user?.id),
     max_photos: MAX_PHOTOS,
+    translation: translationEnabled(),
   });
 });
 

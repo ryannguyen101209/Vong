@@ -32,6 +32,8 @@ services:
         sync: false
       - key: PAYMENT_AUTO_PUBLISH
         value: "false"      # true = paid listings go live without your approval
+      - key: ANTHROPIC_API_KEY
+        sync: false        # optional: turns on the "Translate" button on listings
       # Keep the database and uploaded photos on the mounted disk, so they
       # survive a redeploy. Without this, every deploy wipes your listings.
       - key: DATABASE_FILE

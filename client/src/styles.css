@@ -592,6 +592,10 @@ main { flex: 1; }
 
 .prose { max-width: 66ch; }
 .prose p { margin-bottom: 1.1em; line-height: 1.75; }
+/* "Translate" link above a listing description */
+.translate-bar { margin: -4px 0 14px; }
+.translate-bar .link-quiet { padding: 0; border: 0; background: none; cursor: pointer; font: inherit; }
+.translate-bar__error { color: var(--danger); }
 
 .seller-card { display: flex; flex-direction: column; gap: 14px; }
 .seller-card__row { display: flex; align-items: center; gap: 14px; }
