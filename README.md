@@ -159,6 +159,23 @@ The bank BIN list in `vietqr.js` is accurate at the time of writing but you
 should confirm your own bank's BIN against
 [napas.com.vn](https://napas.com.vn) or [vietqr.io](https://vietqr.io).
 
+### Translating listings
+
+Sellers write a listing in one language. When a visitor reads the site in the
+other language, the listing page shows **"Dịch sang tiếng Việt" / "Translate to
+English"** under the description. It translates the title and description with
+the Claude API, marks the result as machine-translated, and offers "Show
+original".
+
+- Set `ANTHROPIC_API_KEY` (from [console.anthropic.com](https://console.anthropic.com))
+  to turn it on. Without it the link is hidden.
+- Each listing is translated at most once per language: the result is saved
+  and served to every later visitor, until the seller edits the listing.
+- `TRANSLATE_MODEL` picks the model (default `claude-haiku-5-5`). One visitor can
+  request at most 30 translations an hour.
+
+Code: `server/src/translate.js`.
+
 ### Automatic payment confirmation (SePay)
 
 Without this, you open your bank app, find the transfer and press Approve. With

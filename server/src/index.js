@@ -13,6 +13,7 @@ import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
 import { mountSharePages } from './share-pages.js';
+import { translationEnabled } from './translate.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
@@ -57,6 +58,7 @@ app.get('/api/meta', (req, res) => {
     fee_vnd: settings.fee_vnd,
     first_listing_free: isFirstListing(req.user?.id),
     max_photos: MAX_PHOTOS,
+    translation: translationEnabled(),
   });
 });
 

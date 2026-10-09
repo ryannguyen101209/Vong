@@ -63,6 +63,13 @@ export const api = {
 
   buyRequest: (id) => request(`/api/listings/${id}/buy-request`, { method: 'POST' }),
 
+  translate: (id, to) =>
+    request(`/api/listings/${id}/translate`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ to }),
+    }),
+
   contact: (body) =>
     request('/api/contact', {
       method: 'POST',
