@@ -1,6 +1,6 @@
 /* ==========================================================================
    Vòng design system
-   A quiet, product-first marketplace. DM Sans throughout.
+   A quiet, product-first marketplace. Be Vietnam Pro throughout.
    ========================================================================== */
 
 :root {
@@ -36,8 +36,8 @@
   --radius-lg: 24px;
   --radius-pill: 999px;
 
-  --serif: 'DM Sans', sans-serif;
-  --sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  --serif: 'Be Vietnam Pro', sans-serif;
+  --sans: 'Be Vietnam Pro', -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
 
   --shell: 1180px;
   --gutter: 20px;
@@ -1112,3 +1112,136 @@ h2 { font-size: clamp(1.4rem, 2.4vw, 1.85rem); }
   position: absolute; top: 6px; right: 6px; width: 9px; height: 9px;
   border-radius: 50%; background: var(--accent); box-shadow: 0 0 0 2px var(--page);
 }
+
+/* ==========================================================================
+   Clean layer
+   Shape rule: controls (buttons, inputs, chips, nav links) are 10px; photos,
+   tiles and panels are 16px; the search bar is 14px because it wraps a 10px
+   button. Green stays the only accent.
+   ========================================================================== */
+:root {
+  --radius-sm: 10px;
+  --radius: 10px;
+  --radius-lg: 16px;
+  --radius-pill: 10px;
+}
+body { font-size: 16px; line-height: 1.6; }
+h1, h2, h3 { font-weight: 700; letter-spacing: -0.035em; }
+h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
+
+.btn, .icon-btn, .chip, .nav__link, .select, .search-field input, .input, .textarea, .field select, .account-chip { border-radius: 10px; }
+.btn { font-weight: 600; letter-spacing: -0.005em; }
+.header__inner { height: 72px; }
+
+/* Home: split hero with a real photo, search as the main action. */
+.marketplace { padding-top: clamp(20px, 3vw, 40px); }
+.market-hero {
+  display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  gap: clamp(28px, 5vw, 64px); align-items: center;
+  background: none; border-radius: 0; overflow: visible;
+}
+.market-hero__copy { padding: 0; }
+.market-hero h1 { font-size: clamp(2.5rem, 4.8vw, 4rem); line-height: 1.02; letter-spacing: -0.045em; max-width: 12ch; margin-bottom: 18px; }
+.market-hero .lead { font-size: 1.08rem; max-width: 34ch; margin: 0 0 28px; color: var(--ink-soft); }
+.market-hero__image { position: relative; aspect-ratio: 5 / 4; min-height: 0; border-radius: 16px; overflow: hidden; background: var(--surface-sunk); }
+.market-hero__image img { position: static; width: 100%; height: 100%; object-fit: cover; object-position: 66% 62%; }
+.market-search { border-radius: 14px; padding: 6px 6px 6px 18px; background: var(--surface); border-color: var(--line-strong); max-width: 520px; }
+.market-search input { padding-block: 12px; font-size: 1rem; }
+.market-search .btn { min-height: 46px; padding-inline: 22px; }
+
+@media (prefers-reduced-motion: no-preference) {
+  .market-hero__copy > * { animation: rise-in 0.6s cubic-bezier(0.16, 1, 0.3, 1) both; }
+  .market-hero__copy > :nth-child(2) { animation-delay: 60ms; }
+  .market-hero__copy > :nth-child(3) { animation-delay: 120ms; }
+  .market-hero__image { animation: rise-in 0.7s cubic-bezier(0.16, 1, 0.3, 1) 80ms both; }
+}
+@keyframes rise-in { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
+
+/* Categories as photo tiles. */
+.market-discover { padding-block: clamp(36px, 5vw, 64px) 8px; }
+.category-tiles { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 16px; }
+.category-tile { display: flex; flex-direction: column; gap: 10px; text-decoration: none; color: var(--ink); }
+.category-tile__media {
+  display: block; aspect-ratio: 16 / 10; border-radius: 16px; overflow: hidden;
+  background: var(--surface-sunk);
+}
+.category-tile__media img { width: 100%; height: 100%; object-fit: cover; object-position: center 58%; transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.category-tile:hover .category-tile__media img { transform: scale(1.04); }
+.category-tile__label { display: inline-flex; align-items: center; gap: 6px; font-weight: 600; font-size: 0.95rem; }
+.category-tile:hover .category-tile__label { color: var(--accent); }
+.category-tile--all .category-tile__media { background: var(--accent); }
+
+/* Listing cards: price leads, one quiet meta line. */
+.market-listings { padding-top: clamp(36px, 5vw, 64px); }
+.market-section-head { margin-bottom: 20px; align-items: baseline; }
+.market-section-head h2 { margin: 0; }
+.grid-listings, .skeleton-grid { gap: 36px 20px; }
+.listing-card__media { border-radius: 16px; aspect-ratio: 1; }
+.listing-card__media img { transition: transform 0.5s cubic-bezier(0.16, 1, 0.3, 1); }
+.listing-card:hover .listing-card__media img { transform: scale(1.03); }
+.listing-card__body { padding-top: 14px; gap: 4px; }
+.listing-card__price { font-size: 1.06rem; font-weight: 700; color: var(--ink); letter-spacing: -0.01em; }
+.listing-card__title { font-size: 0.95rem; font-weight: 500; color: var(--ink-soft); line-height: 1.4; }
+.listing-card__meta { margin: 2px 0 0; font-size: 0.8rem; color: var(--ink-faint); }
+.save-btn:not(.save-btn--inline) { width: 36px; height: 36px; border: 0; background: color-mix(in srgb, var(--surface) 90%, transparent); }
+
+.market-sell { margin-top: clamp(48px, 6vw, 80px); padding: clamp(28px, 4vw, 48px); border-radius: 16px; }
+.market-sell h2 { margin-bottom: 8px; }
+
+/* Listing page: fewer boxes, no hairline under every spec. */
+.detail__media, .gallery__main .detail__media { border: 0; box-shadow: none; border-radius: 16px; }
+.detail__description { margin-top: 32px; }
+.detail__description h2 { font-size: 1.15rem; }
+.detail__aside .card { box-shadow: none; }
+.spec-table th, .spec-table td { border-bottom: 0; padding: 7px 0; }
+
+/* Footer: plain labels, no all-caps. */
+.footer__title { text-transform: none; letter-spacing: -0.01em; font-size: 0.92rem; color: var(--ink); font-weight: 600; }
+
+@media (max-width: 900px) {
+  .market-hero { grid-template-columns: 1fr; gap: 24px; }
+  .market-hero h1 { max-width: 14ch; }
+  .market-hero__image { aspect-ratio: 16 / 10; }
+  .category-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-width: 720px) {
+  .market-hero h1 { font-size: 2.6rem; }
+  .market-hero .lead { margin-bottom: 20px; }
+  .market-hero__image { display: block; }
+  .market-search { max-width: none; }
+  .market-search .btn { padding-inline: 16px; }
+  /* Tiles become one swipeable row on a phone. */
+  .category-tiles {
+    display: grid; grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: 44%;
+    overflow-x: auto; scroll-snap-type: x mandatory; gap: 12px;
+    margin-inline: calc(var(--gutter) * -1); padding-inline: var(--gutter); scrollbar-width: none;
+  }
+  .category-tiles::-webkit-scrollbar { display: none; }
+  .category-tile { scroll-snap-align: start; }
+  .category-tile__media { aspect-ratio: 4 / 3; }
+  .grid-listings, .skeleton-grid { gap: 28px 12px; }
+}
+
+.market-hero__line { display: block; }
+/* Tiles without a photo carry their name inside, bottom-left. */
+.category-tile--text .category-tile__media {
+  display: flex; align-items: flex-end; padding: 18px 20px;
+  background: var(--accent-soft); color: var(--accent-ink);
+  font-size: clamp(1.05rem, 1.6vw, 1.35rem); font-weight: 700; letter-spacing: -0.02em;
+  transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.category-tile--text .category-tile__media > span { display: inline-flex; align-items: center; gap: 8px; }
+.category-tile--text:hover .category-tile__media { background: color-mix(in srgb, var(--accent) 16%, var(--accent-soft)); }
+.category-tile--all .category-tile__media { background: var(--accent); color: #fff; }
+:root[data-theme='dark'] .category-tile--all .category-tile__media { color: #1d2d20; }
+.category-tile--all:hover .category-tile__media { background: color-mix(in srgb, var(--accent) 88%, var(--ink)); }
+/* Listing page: message the seller is the main action; the rest share one even row. */
+.seller-actions { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.seller-actions > :nth-child(-n + 2) { grid-column: 1 / -1; }
+.seller-actions > * { min-height: 46px; width: 100%; height: auto; padding-inline: 10px; justify-content: center; }
+@media (max-width: 720px) {
+  .category-tiles { scroll-padding-inline: var(--gutter); }
+}
+/* Vietnamese stacks accents above letters; leave room between headline lines. */
+.market-hero h1 { line-height: 1.1; }
+.market-hero .lead { max-width: 38ch; }

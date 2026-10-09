@@ -135,9 +135,9 @@ export default {
     priceLabel: 'Price',
     anyPrice: 'Any price',
     price_under_200k: 'Under 200k ₫',
-    price_200k_500k: '200k – 500k ₫',
-    price_500k_1m: '500k – 1M ₫',
-    price_1m_3m: '1M – 3M ₫',
+    price_200k_500k: '200k-500k ₫',
+    price_500k_1m: '500k-1M ₫',
+    price_1m_3m: '1M-3M ₫',
     price_over_3m: 'Over 3M ₫',
   },
 

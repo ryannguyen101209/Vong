@@ -125,8 +125,8 @@ export function ListingDetail() {
         <div>
           <Gallery listing={listing} title={title} />
 
-          <div className="card panel" style={{ marginTop: 28 }}>
-            <h2 style={{ fontSize: '1.3rem' }}>{t('listing.descriptionTitle')}</h2>
+          <div className="detail__description">
+            <h2>{t('listing.descriptionTitle')}</h2>
             {offerTranslation && (
               <p className="translate-bar small">
                 {translated && <span className="muted">{t('listing.machineTranslated')} · </span>}

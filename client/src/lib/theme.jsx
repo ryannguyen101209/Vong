@@ -1,15 +1,13 @@
 /*
- * Theme follows the operating system unless the visitor picks one, in which
- * case the choice sticks. The actual colours are in styles.css.
+ * The site is light by default. Only a theme the visitor picks with the toggle
+ * is remembered. The actual colours are in styles.css.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 
-const STORAGE_KEY = 'vong.theme';
+// The old key also stored the automatic, system-based theme, so it is no longer read.
+const STORAGE_KEY = 'vong.theme.choice';
+const DEFAULT_THEME = 'light';
 const ThemeContext = createContext(null);
-
-function systemTheme() {
-  return window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
 
 function readStoredTheme() {
   try {
@@ -18,7 +16,15 @@ function readStoredTheme() {
   } catch {
     /* ignore */
   }
-  return systemTheme();
+  return DEFAULT_THEME;
+}
+
+function rememberTheme(theme) {
+  try {
+    localStorage.setItem(STORAGE_KEY, theme);
+  } catch {
+    /* ignore */
+  }
 }
 
 export function ThemeProvider({ children }) {
@@ -26,15 +32,14 @@ export function ThemeProvider({ children }) {
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
-    try {
-      localStorage.setItem(STORAGE_KEY, theme);
-    } catch {
-      /* ignore */
-    }
   }, [theme]);
 
   const toggleTheme = useCallback(() => {
-    setTheme((current) => (current === 'dark' ? 'light' : 'dark'));
+    setTheme((current) => {
+      const next = current === 'dark' ? 'light' : 'dark';
+      rememberTheme(next);
+      return next;
+    });
   }, []);
 
   const value = useMemo(() => ({ theme, toggleTheme }), [theme, toggleTheme]);

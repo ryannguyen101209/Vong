@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useI18n } from '../i18n/index.jsx';
-import { formatPrice, formatDate } from '../lib/format.js';
+import { formatPrice } from '../lib/format.js';
 import { SaveButton } from './SaveButton.jsx';
 import { BoxIcon } from './Icons.jsx';
 
@@ -31,22 +31,13 @@ export function ListingCard({ listing }) {
       </div>
 
       <div className="listing-card__body">
+        <span className="listing-card__price">{formatPrice(listing.price_vnd, lang)}</span>
         <Link to={`/listing/${listing.id}`} style={{ textDecoration: 'none' }}>
           <h3 className="listing-card__title">{title}</h3>
         </Link>
-        <span className="listing-card__price">{formatPrice(listing.price_vnd, lang)}</span>
-        <div className="listing-card__meta">
-          {[
-            t(`districts.${listing.district}`),
-            t(`conditions.${listing.condition}`),
-            formatDate(listing.published_at || listing.created_at, lang),
-          ].map((item, index) => (
-            <span key={item}>
-              {index > 0 && <span aria-hidden="true" className="dot">·</span>}
-              {item}
-            </span>
-          ))}
-        </div>
+        <p className="listing-card__meta">
+          {t(`districts.${listing.district}`)} · {t(`conditions.${listing.condition}`)}
+        </p>
       </div>
     </article>
   );
