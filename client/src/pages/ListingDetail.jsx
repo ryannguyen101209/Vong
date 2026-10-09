@@ -63,7 +63,19 @@ export function ListingDetail() {
   // Sellers write in one language. Offer a machine translation when it is not the visitor's.
   const sourceLang = listing.title_vi || listing.description_vi ? 'vi' : 'en';
   const hasOwnText = Boolean(listing[`description_${lang}`]);
-  const offerTranslation = canTranslate && !hasOwnText && sourceLang !== lang;
+  const needsTranslation = !hasOwnText && sourceLang !== lang;
+  // With the site's own translator switched on, translate in place. Otherwise
+  // (free, no key needed) hand the text to Google Translate in a new tab.
+  const offerTranslation = canTranslate && needsTranslation;
+  const googleTranslateUrl = needsTranslation && !canTranslate
+    ? 'https://translate.google.com/?' + new URLSearchParams({
+        sl: sourceLang,
+        tl: lang,
+        op: 'translate',
+        // Long descriptions are cut so the link stays short enough to open.
+        text: `${localized(listing, 'title')}\n\n${localized(listing, 'description')}`.slice(0, 1800),
+      })
+    : null;
   const translated = showTranslation && translation?.lang === lang ? translation : null;
 
   const title = translated?.title || localized(listing, 'title');
@@ -122,6 +134,13 @@ export function ListingDetail() {
                   {translating ? t('listing.translating') : translated ? t('listing.showOriginal') : t('listing.translate')}
                 </button>
                 {translateError && <span className="translate-bar__error" role="alert"> {t('listing.translateFailed')}</span>}
+              </p>
+            )}
+            {googleTranslateUrl && (
+              <p className="translate-bar small">
+                <a className="link-quiet" href={googleTranslateUrl} target="_blank" rel="noopener noreferrer">
+                  {t('listing.translateWithGoogle')} ↗
+                </a>
               </p>
             )}
             <div className="prose" lang={translated ? lang : sourceLang}>
