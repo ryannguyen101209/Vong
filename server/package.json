@@ -9,7 +9,7 @@
     "start": "node src/index.js",
     "seed": "node src/seed.js",
     "reset": "node src/seed.js --reset",
-    "test": "node src/vietqr.test.js && node src/accounts.test.js && node src/presence.test.js && node src/notify.test.js && node src/mailer.test.js && node src/email-flow.test.js && node src/payments.test.js && node src/admin.test.js && node src/browse.test.js"
+    "test": "node src/vietqr.test.js && node src/accounts.test.js && node src/presence.test.js && node src/notify.test.js && node src/mailer.test.js && node src/email-flow.test.js && node src/payments.test.js && node src/admin.test.js && node src/labels.test.js && node src/browse.test.js"
   },
   "dependencies": {
     "better-sqlite3": "^11.7.0",
