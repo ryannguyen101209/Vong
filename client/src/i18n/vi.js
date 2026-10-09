@@ -59,6 +59,8 @@ export default {
   },
 
   home: {
+    welcomeWord: 'Chào bạn',
+    welcomeLine: 'Chợ đồ cũ cho người Sài Gòn. Mua món bạn thích, bán món bạn không còn dùng.',
     heroWordTop: 'VÒNG',
     heroWordBottom: 'NỮA',
     heroImageAlt: 'Bàn ghế, quần áo và đồ dùng cũ trong nắng chiều',
