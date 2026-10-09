@@ -1230,7 +1230,7 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
   font-size: clamp(1.05rem, 1.6vw, 1.35rem); font-weight: 700; letter-spacing: -0.02em;
   transition: background 0.3s cubic-bezier(0.16, 1, 0.3, 1);
 }
-.category-tile--text .category-tile__media > span { display: inline-flex; align-items: center; gap: 8px; }
+.category-tile--text .category-tile__media > span { display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; }
 .category-tile--text:hover .category-tile__media { background: color-mix(in srgb, var(--accent) 16%, var(--accent-soft)); }
 .category-tile--all .category-tile__media { background: var(--accent); color: #fff; }
 :root[data-theme='dark'] .category-tile--all .category-tile__media { color: #1d2d20; }
@@ -1241,6 +1241,7 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 .seller-actions > * { min-height: 46px; width: 100%; height: auto; padding-inline: 10px; justify-content: center; }
 @media (max-width: 720px) {
   .category-tiles { scroll-padding-inline: var(--gutter); }
+  .category-tile--text .category-tile__media { padding: 14px 16px; font-size: 1rem; }
 }
 /* Vietnamese stacks accents above letters; leave room between headline lines. */
 .market-hero__title { line-height: 1.1; }
