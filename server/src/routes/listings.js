@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
-import { db, getSettings, isFirstListing, UPLOADS_DIR } from '../db.js';
+import { db, getSettings, isFirstListing, UPLOADS_DIR, DEFAULT_SETTINGS } from '../db.js';
 import { newId, newRef, transferNote } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
@@ -259,6 +259,12 @@ router.get('/:id/payment', requireUser, (req, res) => {
 
   const settings = getSettings();
   const bank = findBank(settings.bank_bin);
+
+  // The QR now carries the account number, so on the live site never show the
+  // built-in example account: a seller would be sending money to nobody.
+  if (process.env.NODE_ENV === 'production' && settings.account_number === DEFAULT_SETTINGS.account_number) {
+    return res.status(503).json({ error: 'payment_not_configured', detail: 'bank account is still the example' });
+  }
 
   let payload;
   try {

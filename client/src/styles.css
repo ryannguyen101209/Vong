@@ -630,6 +630,7 @@ main { flex: 1; }
   display: grid; place-items: center; gap: 14px;
 }
 .qr-frame img { width: 100%; max-width: 300px; }
+.qr-frame__placeholder { width: 100%; max-width: 300px; aspect-ratio: 1; border-radius: 10px; background: var(--surface-sunk); }
 .qr-frame__brand { font-family: var(--serif); font-weight: 700; color: var(--navy); font-size: 0.95rem; letter-spacing: 0.02em; }
 
 .detail-rows { display: flex; flex-direction: column; gap: 2px; }
