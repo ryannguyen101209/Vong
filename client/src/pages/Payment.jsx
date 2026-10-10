@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { PAYMENT_QR } from '../lib/paymentQr.js';
+import QRCode from 'qrcode';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice } from '../lib/format.js';
@@ -8,6 +8,23 @@ import { ErrorState } from '../components/States.jsx';
 import { LogoMark } from '../components/Logo.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
+
+/**
+ * Draws this listing's VietQR from the payload the server built: account,
+ * amount and the "SEVQR VONG-..." note, so the bank app fills all three in.
+ * Plain square modules on white, which every banking app scans reliably.
+ */
+function PaymentQr({ payload, alt }) {
+  const [src, setSrc] = useState('');
+  useEffect(() => {
+    let live = true;
+    QRCode.toDataURL(payload, { errorCorrectionLevel: 'M', margin: 2, width: 560, color: { dark: '#000000', light: '#ffffff' } })
+      .then((url) => live && setSrc(url))
+      .catch(() => live && setSrc(''));
+    return () => { live = false; };
+  }, [payload]);
+  return src ? <img src={src} alt={alt} /> : <div className="qr-frame__placeholder" aria-hidden="true" />;
+}
 
 function CopyButton({ value }) {
   const { t } = useI18n();
@@ -182,7 +199,7 @@ export function Payment() {
 
       <div className="payment-grid">
         <div className="qr-frame">
-          <img src={PAYMENT_QR} alt={t('payment.qrAlt')} />
+          <PaymentQr payload={payment.qr_payload} alt={t('payment.qrAlt')} />
           <div className="row" style={{ gap: 8, justifyContent: 'center' }}>
             <span style={{ color: '#38604A' }}><LogoMark size={22} /></span>
             <span className="qr-frame__brand">VietQR · {payment.bank_name}</span>

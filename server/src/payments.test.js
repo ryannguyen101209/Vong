@@ -24,7 +24,7 @@ delete process.env.SEPAY_API_KEY;
 delete process.env.PAYMENT_AUTO_PUBLISH;
 delete process.env.SEPAY_ACCOUNT_NUMBER;
 
-const { db } = await import('./db.js');
+const { db, saveSettings } = await import('./db.js');
 const { createAuthRouter, sessionUser, protectWrites } = await import('./accounts.js');
 const { router: listings } = await import('./routes/listings.js');
 const { router: payments } = await import('./routes/payments.js');
@@ -127,8 +127,21 @@ try {
   assert.ok(row(b.id).payment_verified_at);
   assert.equal(row(b.id).status, 'awaiting_approval');
 
-  // The payment page shows the note with the SEVQR keyword, and the QR code carries it.
+  // On the live site, the built-in example bank account is never put in a QR.
+  const savedEnv = process.env.NODE_ENV;
+  process.env.NODE_ENV = 'production';
+  const example = await api(`/api/listings/${c.id}/payment`, { cookie: login });
+  assert.equal(example.status, 503);
+  assert.equal(example.body.error, 'payment_not_configured');
+  saveSettings({ bank_bin: '970415', bank_name: 'VietinBank', account_number: '108812345678', account_holder: 'NGUYEN VAN A' });
+  assert.equal((await api(`/api/listings/${c.id}/payment`, { cookie: login })).status, 200);
+  if (savedEnv === undefined) delete process.env.NODE_ENV; else process.env.NODE_ENV = savedEnv;
+
+  // The payment page shows the note with the SEVQR keyword, and the QR code carries
+  // the real account, the 10,000 VND fee and that note, so the bank app fills them in.
   const pay = (await api(`/api/listings/${c.id}/payment`, { cookie: login })).body.payment;
+  assert.ok(pay.qr_payload.includes('0006970415' + '0112108812345678'), 'QR carries the VietinBank account');
+  assert.ok(pay.qr_payload.includes('540510000'), 'QR carries the 10,000 VND amount');
   assert.equal(pay.reference, `SEVQR ${c.ref}`);
   assert.ok(pay.qr_payload.includes(`08${String(`SEVQR ${c.ref}`.length).padStart(2, '0')}SEVQR ${c.ref}`), 'QR note starts with SEVQR');
 
