@@ -3,7 +3,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
 import { db, getSettings, isFirstListing, UPLOADS_DIR } from '../db.js';
-import { newId, newRef } from '../ids.js';
+import { newId, newRef, transferNote } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
@@ -266,7 +266,7 @@ router.get('/:id/payment', requireUser, (req, res) => {
       bankBin: settings.bank_bin,
       accountNumber: settings.account_number,
       amount: row.fee_vnd,
-      note: row.ref,
+      note: transferNote(row.ref),
     });
   } catch (err) {
     // Bad bank details are an admin misconfiguration, not the seller's fault.
@@ -278,7 +278,7 @@ router.get('/:id/payment', requireUser, (req, res) => {
     payment: {
       qr_payload: payload,
       amount_vnd: row.fee_vnd,
-      reference: row.ref,
+      reference: transferNote(row.ref),
       bank_bin: settings.bank_bin,
       bank_name: bank ? bank.name : settings.bank_name,
       account_number: settings.account_number,

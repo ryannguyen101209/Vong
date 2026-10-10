@@ -10,6 +10,7 @@
  * Everything resets when the visitor clears the page's storage.
  */
 import { buildVietQrPayload, findBank, BANKS } from '../../../server/src/vietqr.js';
+import { transferNote } from './format.js';
 
 const STORAGE_KEY = 'vong.demo.state';
 const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'sports', 'hobby'];
@@ -176,7 +177,7 @@ export const api = {
       bankBin: state.settings.bank_bin,
       accountNumber: state.settings.account_number,
       amount: listing.fee_vnd,
-      note: listing.ref,
+      note: transferNote(listing.ref),
     });
     const bank = findBank(state.settings.bank_bin);
 
@@ -192,7 +193,7 @@ export const api = {
       payment: {
         qr_payload: payload,
         amount_vnd: listing.fee_vnd,
-        reference: listing.ref,
+        reference: transferNote(listing.ref),
         bank_bin: state.settings.bank_bin,
         bank_name: bank ? bank.name : state.settings.bank_name,
         account_number: state.settings.account_number,

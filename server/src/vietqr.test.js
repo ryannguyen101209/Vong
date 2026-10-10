@@ -9,7 +9,7 @@ const payload = buildVietQrPayload({
   bankBin: '970436',
   accountNumber: '1234567890',
   amount: 10000,
-  note: 'VONG-A1B2C3',
+  note: 'SEVQR VONG-A1B2C3',
 });
 
 // Walk the TLV structure back out and check every field we claim to emit.
@@ -38,7 +38,7 @@ assert.equal(merchant['02'], 'QRIBFTTA', 'transfer-to-account service code');
 const beneficiary = parse(merchant['01']);
 assert.equal(beneficiary['00'], '970436', 'bank BIN');
 assert.equal(beneficiary['01'], '1234567890', 'account number');
-assert.equal(parse(fields['62'])['08'], 'VONG-A1B2C3', 'transfer note');
+assert.equal(parse(fields['62'])['08'], 'SEVQR VONG-A1B2C3', 'transfer note keeps the SEVQR keyword');
 
 // The CRC must validate over everything up to and including "6304".
 const body = payload.slice(0, -4);

@@ -57,6 +57,8 @@ try {
   assert.deepEqual(findRefs('VONGA2B3C4'), ['VONG-A2B3C4']);
   assert.deepEqual(findRefs('Thanh toán VONG-K7M2PQ cảm ơn'), ['VONG-K7M2PQ']);
   assert.deepEqual(findRefs('no reference here'), []);
+  // VietinBank via SePay: the note starts with the SEVQR keyword.
+  assert.deepEqual(findRefs('SEVQR VONG-A2B3C4'), ['VONG-A2B3C4']);
 
   const login = await (await fetch(`${base}/api/auth/google`, { method: 'POST', headers: { 'X-Vong-Request': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ credential: 'seller' }) })).headers.get('set-cookie');
   // The new seller was welcomed; the payment emails below count from zero.
@@ -125,10 +127,15 @@ try {
   assert.ok(row(b.id).payment_verified_at);
   assert.equal(row(b.id).status, 'awaiting_approval');
 
-  // auto-publish switch: money in, listing live, "approved" email
+  // The payment page shows the note with the SEVQR keyword, and the QR code carries it.
+  const pay = (await api(`/api/listings/${c.id}/payment`, { cookie: login })).body.payment;
+  assert.equal(pay.reference, `SEVQR ${c.ref}`);
+  assert.ok(pay.qr_payload.includes(`08${String(`SEVQR ${c.ref}`.length).padStart(2, '0')}SEVQR ${c.ref}`), 'QR note starts with SEVQR');
+
+  // auto-publish switch: money in (note exactly as the bank sends it), listing live, "approved" email
   process.env.PAYMENT_AUTO_PUBLISH = 'true';
   sent.length = 0;
-  await hook({ content: c.ref });
+  await hook({ content: `SEVQR ${c.ref}` });
   await wait(300);
   assert.equal(row(c.id).status, 'published');
   assert.ok(row(c.id).published_at);

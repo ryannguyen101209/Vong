@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { formatPrice, formatDateTime, digitsOnly } from '../lib/format.js';
+import { formatPrice, formatDateTime, digitsOnly, transferNote } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { EmptyState } from '../components/States.jsx';
 import { ListingImage } from '../components/ListingCard.jsx';
@@ -262,7 +262,7 @@ function Queue({ token, onAuthError }) {
                   ) : listing.status === 'pending_payment' ? (
                     <>
                       <div>
-                        {t('admin.expectedAmount', { amount: formatPrice(listing.fee_vnd, lang), ref: listing.ref })}
+                        {t('admin.expectedAmount', { amount: formatPrice(listing.fee_vnd, lang), ref: transferNote(listing.ref) })}
                       </div>
                       <div className="muted">{t('admin.notMarkedPaid')}</div>
                     </>
@@ -271,7 +271,7 @@ function Queue({ token, onAuthError }) {
                       <div>
                         {t('admin.expectedAmount', {
                           amount: formatPrice(listing.fee_vnd, lang),
-                          ref: listing.ref,
+                          ref: transferNote(listing.ref),
                         })}
                       </div>
                       <div className="muted">

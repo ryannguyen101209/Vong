@@ -32,3 +32,8 @@ export function formatDateTime(iso, lang = 'en') {
 export function digitsOnly(value) {
   return String(value ?? '').replace(/[^\d]/g, '');
 }
+
+/** The bank transfer note for a listing. Must match transferNote() in server/src/ids.js. */
+export function transferNote(ref) {
+  return `SEVQR ${ref}`;
+}
