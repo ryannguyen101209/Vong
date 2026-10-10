@@ -502,6 +502,7 @@ export default {
     queueEmptyTitle: 'Queue is empty',
     queueEmptyBody: 'Nothing is waiting for approval right now.',
     sellerClaims: 'Seller marked as paid {{when}}',
+    paymentArrived: 'Money arrived at {{when}}',
     expectedAmount: 'Expect {{amount}} with note {{ref}}',
     firstListing: 'First listing',
     paymentVerified: 'Payment confirmed automatically',
