@@ -275,7 +275,10 @@ function Queue({ token, onAuthError }) {
                         })}
                       </div>
                       <div className="muted">
-                        {t('admin.sellerClaims', { when: formatDateTime(listing.paid_marked_at, lang) })}
+                        {/* Confirmed by the bank webhook: the seller may never have pressed "I paid". */}
+                        {listing.payment_verified_at
+                          ? t('admin.paymentArrived', { when: formatDateTime(listing.payment_verified_at, lang) })
+                          : t('admin.sellerClaims', { when: formatDateTime(listing.paid_marked_at, lang) })}
                       </div>
                     </>
                   )}

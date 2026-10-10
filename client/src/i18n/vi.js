@@ -491,6 +491,7 @@ export default {
     queueEmptyTitle: 'Hàng chờ trống',
     queueEmptyBody: 'Hiện không có tin nào đang chờ duyệt.',
     sellerClaims: 'Người bán báo đã chuyển lúc {{when}}',
+    paymentArrived: 'Tiền về lúc {{when}}',
     expectedAmount: 'Cần thấy {{amount}} với nội dung {{ref}}',
     firstListing: 'Món đầu tiên',
     paymentVerified: 'Đã tự động xác nhận tiền',
