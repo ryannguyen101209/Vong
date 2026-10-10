@@ -15,7 +15,16 @@ export function newId() {
   return crypto.randomUUID();
 }
 
-/** The reference the seller puts in their bank transfer, e.g. VONG-A1B2C3. */
+/** A listing's reference code, e.g. VONG-A1B2C3. */
 export function newRef() {
   return `VONG-${randomCode(6)}`;
+}
+
+// SePay only reports a VietinBank transfer to the webhook when the note starts
+// with this keyword. Payment matching still looks for VONG-XXXXXX anywhere in the note.
+export const TRANSFER_KEYWORD = 'SEVQR';
+
+/** What the seller types in the bank transfer note, e.g. "SEVQR VONG-A1B2C3". */
+export function transferNote(ref) {
+  return `${TRANSFER_KEYWORD} ${ref}`;
 }

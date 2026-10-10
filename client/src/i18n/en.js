@@ -95,8 +95,7 @@ export default {
     step1Body:
       'Photo, price, district, and an honest description of the scratches. It takes about two minutes and costs nothing.',
     step2Title: 'Pay the listing fee',
-    step2Body:
-      'Scan the VietQR code with your banking app. Enter the amount and paste your reference as the transfer note, so we can match your payment. Your first listing is free and skips this step.',
+    step2Body: 'Scan the VietQR code with your banking app. The amount and the transfer note (SEVQR followed by your listing code) are filled in for you. Your first listing is free and skips this step.',
     step3Title: 'We publish it',
     step3Body:
       'A real person checks the transfer arrived, usually within a few hours. Then your listing is live and buyers contact you directly.',
@@ -324,16 +323,15 @@ export default {
     accountNumber: 'Account number',
     accountHolder: 'Account holder',
     reference: 'Transfer note',
-    referenceHint:
-      'Keep this note exactly as it is — it is how we match your transfer to your listing.',
+    referenceHint: 'Copy this note exactly, including SEVQR at the start. Our bank only tells us about transfers whose note begins with SEVQR, and the code after it shows which listing you paid for.',
     qrAlt: 'VietQR code for the listing fee',
-    qrHint: 'Open your banking app → scan QR → enter the amount above → paste the reference as the note → confirm.',
+    qrHint: 'Open your banking app → scan QR → check the amount → check the note starts with SEVQR → confirm.',
     autoTitle: 'We spot your payment automatically',
     autoBody: 'Once your transfer arrives, usually within a minute, this page updates by itself. You do not need to press anything.',
     verifiedTitle: 'Payment received',
     verifiedBody: 'Your transfer arrived and your listing is in review. It goes live as soon as it is approved.',
     manualTitle: 'Or transfer manually',
-    manualBody: 'If scanning fails, transfer with these details and the note above.',
+    manualBody: 'If scanning fails, transfer with these details. Type the note above exactly, starting with SEVQR.',
     markPaid: 'I’ve sent the payment',
     marking: 'Saving…',
     markedTitle: 'Thanks — we’re checking for it',
@@ -445,7 +443,7 @@ export default {
       },
       {
         q: 'I paid but my listing is still not up.',
-        a: 'Check that the transfer note matched your reference code exactly. If it did and several hours have passed, contact us with the reference and the time you transferred, and we will find it.',
+        a: 'Check that the transfer note started with SEVQR followed by your listing code, for example SEVQR VONG-A2B3C4. If it did and several hours have passed, contact us with the reference and the time you transferred, and we will find it.',
       },
       {
         q: 'Which areas does Vòng cover?',

@@ -95,8 +95,7 @@ export default {
     step1Body:
       'Một tấm hình, giá, quận, và mô tả thật lòng cả những vết xước. Mất chừng hai phút và không tốn đồng nào.',
     step2Title: 'Trả phí đăng tin',
-    step2Body:
-      'Quét mã VietQR bằng app ngân hàng. Bạn nhập số tiền và dán mã tham chiếu vào nội dung chuyển khoản để tụi mình đối chiếu đúng tin của bạn. Tin đầu tiên của bạn miễn phí và bỏ qua bước này.',
+    step2Body: 'Quét mã VietQR bằng app ngân hàng. Số tiền và nội dung chuyển khoản (SEVQR kèm mã tin của bạn) đã được điền sẵn. Tin đầu tiên của bạn miễn phí và bỏ qua bước này.',
     step3Title: 'Tụi mình duyệt và đăng',
     step3Body:
       'Một người thật kiểm tra tiền đã về chưa, thường trong vài tiếng. Sau đó tin lên sóng và người mua liên hệ thẳng với bạn.',
@@ -318,15 +317,15 @@ export default {
     accountNumber: 'Số tài khoản',
     accountHolder: 'Chủ tài khoản',
     reference: 'Nội dung chuyển khoản',
-    referenceHint: 'Giữ nguyên nội dung này nhé, tụi mình dựa vào đó để biết tiền của tin nào.',
+    referenceHint: 'Ghi đúng y nội dung này, kể cả chữ SEVQR ở đầu. Ngân hàng chỉ báo cho tụi mình những khoản có nội dung bắt đầu bằng SEVQR, còn mã phía sau cho biết bạn trả tiền cho tin nào.',
     qrAlt: 'Mã VietQR cho phí đăng tin',
-    qrHint: 'Mở app ngân hàng → quét mã QR → nhập số tiền ở trên → dán mã tham chiếu vào nội dung → xác nhận.',
+    qrHint: 'Mở app ngân hàng → quét mã QR → kiểm tra số tiền → kiểm tra nội dung bắt đầu bằng SEVQR → xác nhận.',
     autoTitle: 'Tiền về là Vòng biết ngay',
     autoBody: 'Chuyển xong thường chưa tới một phút là Vòng nhận được. Trang này tự cập nhật, bạn không cần bấm gì thêm.',
     verifiedTitle: 'Đã nhận được tiền',
     verifiedBody: 'Vòng đã nhận được tiền. Tin đang chờ duyệt, duyệt xong là được đăng.',
     manualTitle: 'Hoặc chuyển khoản thủ công',
-    manualBody: 'Không quét được thì bạn chuyển theo thông tin bên dưới, nhớ ghi đúng nội dung ở trên.',
+    manualBody: 'Không quét được thì bạn chuyển theo thông tin bên dưới, ghi đúng nội dung ở trên, bắt đầu bằng SEVQR.',
     markPaid: 'Mình đã chuyển khoản',
     marking: 'Đang lưu…',
     markedTitle: 'Cảm ơn bạn, tụi mình đang kiểm tra',
@@ -433,7 +432,7 @@ export default {
       },
       {
         q: 'Mình chuyển khoản rồi mà tin vẫn chưa lên.',
-        a: 'Bạn kiểm tra lại xem nội dung chuyển khoản có đúng y mã tin không. Nếu đúng rồi mà đã qua vài tiếng, bạn nhắn tụi mình kèm mã tin và giờ chuyển khoản để tụi mình dò lại.',
+        a: 'Bạn kiểm tra lại xem nội dung chuyển khoản có bắt đầu bằng SEVQR rồi tới mã tin không, ví dụ SEVQR VONG-A2B3C4. Nếu đúng rồi mà đã qua vài tiếng, bạn nhắn tụi mình kèm mã tin và giờ chuyển khoản để tụi mình dò lại.',
       },
       {
         q: 'Vòng hoạt động ở khu vực nào?',
