@@ -493,6 +493,66 @@ function Reports({ token, onAuthError, onCount }) {
   );
 }
 
+function PromoCodes({ token, onAuthError }) {
+  const { t, lang } = useI18n();
+  const [codes, setCodes] = useState(null);
+  const [form, setForm] = useState({ code: '', note: '', max_uses: '', expires_at: '' });
+  const [error, setError] = useState('');
+
+  const load = useCallback(() => {
+    api.admin.promoCodes(token).then((data) => setCodes(data.codes)).catch((e) => (e.status === 401 ? onAuthError() : setCodes([])));
+  }, [token, onAuthError]);
+  useEffect(load, [load]);
+
+  const create = async (event) => {
+    event.preventDefault();
+    setError('');
+    try {
+      await api.admin.createPromo(token, form);
+      setForm({ code: '', note: '', max_uses: '', expires_at: '' });
+      load();
+    } catch (e) {
+      if (e.status === 401) onAuthError();
+      else setError(t(e.payload?.error === 'exists' ? 'admin.codeExists' : 'admin.codeBad'));
+    }
+  };
+  const toggle = async (code, active) => {
+    try { await api.admin.setPromoActive(token, code, active); load(); } catch (e) { if (e.status === 401) onAuthError(); }
+  };
+  const set = (key) => (event) => setForm((current) => ({ ...current, [key]: event.target.value }));
+
+  if (!codes) return <p className="muted">{t('common.loading')}</p>;
+  return (
+    <div className="stack" style={{ gap: 24 }}>
+      <p className="muted">{t('admin.codesIntro')}</p>
+      <form className="card panel" onSubmit={create} style={{ display: 'grid', gap: 12, maxWidth: 520 }}>
+        <label>{t('admin.codeName')}<input className="input" value={form.code} onChange={set('code')} placeholder="OWNERSFRIEND101" style={{ textTransform: 'uppercase' }} required /></label>
+        <label>{t('admin.codeNote')}<input className="input" value={form.note} onChange={set('note')} /></label>
+        <label>{t('admin.codeMax')}<input className="input" inputMode="numeric" value={form.max_uses} onChange={set('max_uses')} placeholder={t('admin.codeUnlimited')} /></label>
+        <label>{t('admin.codeExpires')}<input className="input" type="date" value={form.expires_at} onChange={set('expires_at')} /></label>
+        {error && <p className="small" role="alert" style={{ margin: 0, color: 'var(--danger, #a33)' }}>{error}</p>}
+        <button type="submit" className="btn btn--accent">{t('admin.codeCreate')}</button>
+      </form>
+      {codes.length === 0 ? <p className="muted">{t('admin.codesNone')}</p> : (
+        <table className="admin-table">
+          <thead><tr><th>{t('admin.codeName')}</th><th>{t('admin.codeNote')}</th><th>{t('admin.codeUses')}</th><th>{t('admin.codeExpires')}</th><th /></tr></thead>
+          <tbody>
+            {codes.map((c) => (
+              <tr key={c.code} style={{ opacity: c.active ? 1 : 0.5 }}>
+                <td><code>{c.code}</code></td>
+                <td>{c.note || '—'}</td>
+                <td>{c.uses}{c.max_uses != null ? ` / ${c.max_uses}` : ''}</td>
+                <td>{c.expires_at ? new Date(c.expires_at).toLocaleDateString(lang === 'vi' ? 'vi-VN' : 'en-GB') : '—'}</td>
+                <td><button type="button" className="btn btn--ghost btn--small" onClick={() => toggle(c.code, !c.active)}>{c.active ? t('admin.codeTurnOff') : t('admin.codeTurnOn')}</button></td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      )}
+    </div>
+  );
+}
+
 function Settings({ token, onAuthError }) {
   const { t } = useI18n();
   const [banks, setBanks] = useState([]);
@@ -724,6 +784,7 @@ export function Admin() {
           ['queue', 'admin.tabQueue'],
           ['all', 'admin.tabAll'],
           ['reports', 'admin.tabReports'],
+          ['codes', 'admin.tabCodes'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
           <button
@@ -743,6 +804,7 @@ export function Admin() {
       {tab === 'queue' && <Queue token={token} onAuthError={signOut} />}
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
       {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
+      {tab === 'codes' && <PromoCodes token={token} onAuthError={signOut} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>
   );

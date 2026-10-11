@@ -182,6 +182,32 @@ router.put('/settings', (req, res) => {
   res.json({ settings: saveSettings(patch) });
 });
 
+/** GET /api/admin/promo-codes — every code with how often it has been used. */
+router.get('/promo-codes', (req, res) => {
+  res.json({ codes: db.prepare('SELECT code, note, max_uses, uses, expires_at, active, created_at FROM promo_codes ORDER BY created_at DESC').all() });
+});
+
+/** POST /api/admin/promo-codes — create a code. Codes are stored in capitals and matched without regard to case. */
+router.post('/promo-codes', (req, res) => {
+  const code = String(req.body?.code ?? '').trim().toUpperCase();
+  if (!/^[A-Z0-9_-]{3,40}$/.test(code)) return res.status(400).json({ error: 'bad_code' });
+  const maxUses = req.body?.max_uses === '' || req.body?.max_uses == null ? null : Number(req.body.max_uses);
+  if (maxUses !== null && (!Number.isInteger(maxUses) || maxUses < 1 || maxUses > 100000)) return res.status(400).json({ error: 'bad_max_uses' });
+  const expires = req.body?.expires_at ? new Date(`${req.body.expires_at}T23:59:59+07:00`) : null;
+  if (expires && Number.isNaN(expires.getTime())) return res.status(400).json({ error: 'bad_expiry' });
+  if (db.prepare('SELECT 1 FROM promo_codes WHERE code = ?').get(code)) return res.status(409).json({ error: 'exists' });
+  db.prepare('INSERT INTO promo_codes (code, note, max_uses, expires_at, created_at) VALUES (?, ?, ?, ?, ?)')
+    .run(code, String(req.body?.note ?? '').trim().slice(0, 120) || null, maxUses, expires ? expires.toISOString() : null, new Date().toISOString());
+  res.status(201).json({ ok: true, code });
+});
+
+/** PATCH /api/admin/promo-codes/:code — switch a code on or off. */
+router.patch('/promo-codes/:code', (req, res) => {
+  const result = db.prepare('UPDATE promo_codes SET active = ? WHERE code = ?').run(req.body?.active ? 1 : 0, String(req.params.code).toUpperCase());
+  if (!result.changes) return res.status(404).json({ error: 'not_found' });
+  res.json({ ok: true });
+});
+
 /** GET /api/admin/messages — contact form submissions, newest first. */
 router.get('/messages', (req, res) => {
   res.json({ messages: db.prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 100').all() });

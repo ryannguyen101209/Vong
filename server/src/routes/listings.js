@@ -302,6 +302,45 @@ router.get('/:id/payment', requireUser, (req, res) => {
   });
 });
 
+// Wrong guesses only: 10 per 15 minutes per account, so codes cannot be guessed by brute force.
+const promoLimit = rateLimit({ windowMs: 15 * 60_000, limit: 10, skipSuccessfulRequests: true, keyGenerator: (req) => req.user.id, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_attempts' } });
+
+/**
+ * POST /api/listings/:id/promo — a seller enters a code instead of paying the fee. A valid code
+ * makes this listing free and sends it to the owner's review queue, the same as a first listing.
+ * Unknown, switched-off, expired and used-up codes all answer the same, so codes cannot be probed.
+ */
+router.post('/:id/promo', requireUser, promoLimit, (req, res) => {
+  const row = db.prepare('SELECT id, ref, status, fee_vnd, title_en, title_vi FROM listings WHERE id = ? AND seller_id = ? AND is_seed = 0').get(req.params.id, req.user.id);
+  if (!row) return res.status(404).json({ error: 'not_found' });
+  if (row.status !== 'pending_payment' || row.fee_vnd === 0) return res.status(409).json({ error: 'wrong_status', status: row.status });
+
+  const code = String(req.body?.code ?? '').trim().toUpperCase().slice(0, 40);
+  if (!code) return res.status(400).json({ error: 'invalid_code' });
+
+  const now = new Date().toISOString();
+  const redeem = db.transaction(() => {
+    const promo = db.prepare('SELECT * FROM promo_codes WHERE code = ?').get(code);
+    if (!promo || !promo.active) return 'invalid_code';
+    if (promo.expires_at && promo.expires_at < now) return 'invalid_code';
+    if (promo.max_uses != null && promo.uses >= promo.max_uses) return 'invalid_code';
+    if (db.prepare('SELECT 1 FROM promo_redemptions WHERE code = ? AND user_id = ?').get(code, req.user.id)) return 'already_used';
+    db.prepare('INSERT INTO promo_redemptions (code, listing_id, user_id, created_at) VALUES (?, ?, ?, ?)').run(code, row.id, req.user.id, now);
+    db.prepare('UPDATE promo_codes SET uses = uses + 1 WHERE code = ?').run(code);
+    db.prepare("UPDATE listings SET fee_vnd = 0, status = 'awaiting_approval', paid_marked_at = ?, reject_reason = NULL WHERE id = ?").run(now, row.id);
+    return null;
+  });
+  const failure = redeem();
+  if (failure) return res.status(failure === 'already_used' ? 409 : 400).json({ error: failure });
+
+  notifyOwner({
+    title: 'New listing to review (promo code)',
+    message: `${row.title_en ?? row.title_vi} · code ${code}`,
+    tags: ['bell'],
+  });
+  res.json({ id: row.id, status: 'awaiting_approval', free: true });
+});
+
 /**
  * POST /api/listings/:id/mark-paid — the seller says they sent the transfer.
  * This claim is not verified anywhere: a human checks the bank app and approves.
