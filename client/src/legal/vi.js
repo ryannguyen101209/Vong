@@ -14,7 +14,7 @@ export default {
       {
         h: '1. Vòng là gì',
         p: [
-          'Vòng (usevong.com) là nơi đăng tin mua bán đồ cũ ở TP. Hồ Chí Minh. Vòng chỉ cung cấp chỗ đăng tin và công cụ nhắn tin.',
+          'Vòng (usevong.com) là nơi đăng tin mua bán đồ cũ ở Việt Nam. Vòng chỉ cung cấp chỗ đăng tin và công cụ nhắn tin.',
           '- Vòng không phải người bán hay người mua, và không phải một bên trong giao dịch giữa các bạn.',
           '- Vòng không giữ tiền, không thu hộ, không làm trung gian thanh toán giữa người mua và người bán.',
           '- Vòng không kiểm định, bảo hành hay giao nhận món đồ. Tụi mình duyệt tin đăng, nhưng không thể đảm bảo mọi thông tin trong tin là đúng.',

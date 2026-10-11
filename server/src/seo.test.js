@@ -47,7 +47,10 @@ assert.equal((html.match(/<script/g) || []).length, 1, 'only the one script tag'
 // Category and district pages.
 assert.equal(browseMeta('sports', 'binh_thanh').title, 'Đồ thể thao cũ ở Bình Thạnh | Vòng');
 assert.equal(browseMeta('', 'district_7').title, 'Đồ cũ ở Quận 7 | Vòng');
-assert.equal(browseMeta('books', '').ogTitle, 'Sách cũ ở Sài Gòn');
+assert.equal(browseMeta('books', '').ogTitle, 'Sách cũ ở Việt Nam');
+assert.equal(browseMeta('books', '', 'ha_noi').ogTitle, 'Sách cũ ở Hà Nội');
+assert.equal(browseMeta('', 'hn_hoan_kiem').title, 'Đồ cũ ở Hoàn Kiếm, Hà Nội | Vòng');
+assert.equal(browseMeta('', '', 'da_nang').title, 'Đồ cũ ở Đà Nẵng | Vòng');
 assert.equal(browseMeta('', ''), null);
 assert.equal(browseMeta('weapons', 'mars'), null);
 
@@ -62,7 +65,7 @@ const server = await new Promise((resolve) => { const s = app.listen(0, '127.0.0
 const base = `http://127.0.0.1:${server.address().port}`;
 try {
   const page = await (await fetch(`${base}/browse?category=sports`)).text();
-  assert.ok(page.includes('<title>Đồ thể thao cũ ở Sài Gòn | Vòng</title>'));
+  assert.ok(page.includes('<title>Đồ thể thao cũ ở Việt Nam | Vòng</title>'));
   assert.ok(page.includes('<link rel="canonical" href="https://usevong.com/browse?category=sports" />'));
   assert.ok(page.includes('<meta property="og:type" content="website" />'));
   assert.equal(await (await fetch(`${base}/browse?q=xe`)).text(), 'fallthrough', 'plain searches use the normal page');

@@ -5,14 +5,53 @@
  */
 
 export const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'sports', 'hobby'];
-// Every district as people in Saigon still name them (the pre-2021 / pre-2025 map).
+// Cities Vòng is open in, and the areas a seller can pick inside each. Area keys are
+// unique across cities (Saigon's keep their original names; the rest are prefixed), so
+// the listing's `district` column alone says exactly which area it is.
+// Saigon uses the districts as people still name them (the pre-2021 / pre-2025 map).
 // 'thao_dien' is no longer offered but stays labelled in the UI for older listings.
-export const DISTRICTS = [
-  'district_1', 'district_2', 'district_3', 'district_4', 'district_5', 'district_6',
-  'district_7', 'district_8', 'district_9', 'district_10', 'district_11', 'district_12',
-  'binh_tan', 'binh_thanh', 'go_vap', 'phu_nhuan', 'tan_binh', 'tan_phu', 'thu_duc',
-  'binh_chanh', 'can_gio', 'cu_chi', 'hoc_mon', 'nha_be',
-];
+export const DEFAULT_CITY = 'ho_chi_minh';
+export const CITY_DISTRICTS = {
+  ho_chi_minh: [
+    'district_1', 'district_2', 'district_3', 'district_4', 'district_5', 'district_6',
+    'district_7', 'district_8', 'district_9', 'district_10', 'district_11', 'district_12',
+    'binh_tan', 'binh_thanh', 'go_vap', 'phu_nhuan', 'tan_binh', 'tan_phu', 'thu_duc',
+    'binh_chanh', 'can_gio', 'cu_chi', 'hoc_mon', 'nha_be',
+  ],
+  ha_noi: [
+    'hn_ba_dinh', 'hn_hoan_kiem', 'hn_hai_ba_trung', 'hn_dong_da', 'hn_tay_ho', 'hn_cau_giay',
+    'hn_thanh_xuan', 'hn_hoang_mai', 'hn_long_bien', 'hn_nam_tu_liem', 'hn_bac_tu_liem', 'hn_ha_dong',
+  ],
+  da_nang: ['dn_hai_chau', 'dn_thanh_khe', 'dn_son_tra', 'dn_ngu_hanh_son', 'dn_lien_chieu', 'dn_cam_le'],
+  hai_phong: ['hp_hong_bang', 'hp_ngo_quyen', 'hp_le_chan', 'hp_hai_an', 'hp_kien_an', 'hp_duong_kinh'],
+  can_tho: ['ct_ninh_kieu', 'ct_binh_thuy', 'ct_cai_rang', 'ct_o_mon', 'ct_thot_not'],
+  hue: ['hue_center', 'hue_other'],
+  nha_trang: ['nt_center', 'nt_other'],
+  da_lat: ['dl_center', 'dl_other'],
+  vung_tau: ['vt_center', 'vt_other'],
+  bien_hoa: ['bh_center', 'bh_other'],
+};
+export const CITIES = Object.keys(CITY_DISTRICTS);
+export const DISTRICTS = CITIES.flatMap((city) => CITY_DISTRICTS[city]);
+/** The city an area key belongs to, or null if it is not a known area. */
+export const cityOfDistrict = (district) => CITIES.find((city) => CITY_DISTRICTS[city].includes(district)) ?? null;
+
+// Vietnamese names for the places that are not simply "Quận N", used for link previews and Google.
+export const CITY_NAMES_VI = {
+  ho_chi_minh: 'TP. Hồ Chí Minh', ha_noi: 'Hà Nội', da_nang: 'Đà Nẵng', hai_phong: 'Hải Phòng',
+  can_tho: 'Cần Thơ', hue: 'Huế', nha_trang: 'Nha Trang', da_lat: 'Đà Lạt', vung_tau: 'Vũng Tàu',
+  bien_hoa: 'Biên Hòa',
+};
+export const AREA_NAMES_VI = {
+  hn_ba_dinh: 'Ba Đình', hn_hoan_kiem: 'Hoàn Kiếm', hn_hai_ba_trung: 'Hai Bà Trưng', hn_dong_da: 'Đống Đa',
+  hn_tay_ho: 'Tây Hồ', hn_cau_giay: 'Cầu Giấy', hn_thanh_xuan: 'Thanh Xuân', hn_hoang_mai: 'Hoàng Mai',
+  hn_long_bien: 'Long Biên', hn_nam_tu_liem: 'Nam Từ Liêm', hn_bac_tu_liem: 'Bắc Từ Liêm', hn_ha_dong: 'Hà Đông',
+  dn_hai_chau: 'Hải Châu', dn_thanh_khe: 'Thanh Khê', dn_son_tra: 'Sơn Trà', dn_ngu_hanh_son: 'Ngũ Hành Sơn',
+  dn_lien_chieu: 'Liên Chiểu', dn_cam_le: 'Cẩm Lệ',
+  hp_hong_bang: 'Hồng Bàng', hp_ngo_quyen: 'Ngô Quyền', hp_le_chan: 'Lê Chân', hp_hai_an: 'Hải An',
+  hp_kien_an: 'Kiến An', hp_duong_kinh: 'Dương Kinh',
+  ct_ninh_kieu: 'Ninh Kiều', ct_binh_thuy: 'Bình Thủy', ct_cai_rang: 'Cái Răng', ct_o_mon: 'Ô Môn', ct_thot_not: 'Thốt Nốt',
+};
 export const CONDITIONS = ['like_new', 'good', 'fair', 'well_used'];
 
 export const SEED_LISTINGS = [

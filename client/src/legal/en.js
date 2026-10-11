@@ -15,7 +15,7 @@ export default {
       {
         h: '1. What Vòng is',
         p: [
-          'Vòng (usevong.com) is a place to list secondhand items for sale in Ho Chi Minh City. Vòng provides the listings and a way to message each other, nothing more.',
+          'Vòng (usevong.com) is a place to list secondhand items for sale in Vietnam. Vòng provides the listings and a way to message each other, nothing more.',
           '- Vòng is not the seller or the buyer, and is not a party to any sale between you.',
           '- Vòng never holds, collects or passes on payment between buyers and sellers.',
           '- Vòng does not inspect, guarantee or deliver items. We review listings, but we cannot promise that everything in a listing is accurate.',
