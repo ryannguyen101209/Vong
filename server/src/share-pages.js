@@ -72,7 +72,9 @@ export function listingMeta(row) {
   // Vietnamese first, like the site itself; English only when there is no Vietnamese title.
   const lang = row.title_vi ? 'vi' : 'en';
   const title = row.title_vi || row.title_en;
-  const district = DISTRICTS[lang][row.district] || DISTRICTS.shared[row.district] || '';
+  const area = DISTRICTS[lang][row.district] || DISTRICTS.shared[row.district] || '';
+  // Outside Saigon the city goes in the preview too, since 'Trung tâm' or 'Hoàn Kiếm' alone is ambiguous.
+  const district = area && row.city && row.city !== 'ho_chi_minh' ? `${area}, ${cityName(row.city)}` : area;
   const description = lang === 'vi' ? row.description_vi || row.description_en : row.description_en || row.description_vi;
   const headline = `${title} · ${formatVnd(row.price_vnd)}${district ? ` · ${district}` : ''}`;
   const url = `${SITE}/listing/${encodeURIComponent(row.id)}`;
@@ -99,7 +101,7 @@ export function listingMeta(row) {
         priceCurrency: 'VND',
         itemCondition: CONDITION_SCHEMA[row.condition] || 'https://schema.org/UsedCondition',
         availability: row.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        ...(district ? { availableAtOrFrom: { '@type': 'Place', name: `${district}, ${cityName(row.city)}` } } : {}),
+        ...(area ? { availableAtOrFrom: { '@type': 'Place', name: `${area}, ${cityName(row.city)}` } } : {}),
       },
     },
   };
