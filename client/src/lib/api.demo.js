@@ -78,6 +78,9 @@ export const api = {
     reply({
       categories: CATEGORIES,
       districts: DISTRICTS,
+      // The offline demo only has Saigon listings.
+      cities: [{ key: 'ho_chi_minh', districts: DISTRICTS }],
+      default_city: 'ho_chi_minh',
       conditions: CONDITIONS,
       fee_vnd: state.settings.fee_vnd,
     }),
@@ -149,6 +152,7 @@ export const api = {
       description_vi: lang === 'vi' ? get('description') : null,
       category: get('category'),
       price_vnd: price,
+      city: 'ho_chi_minh',
       district: get('district'),
       condition: get('condition'),
       seller_name: get('seller_name'),

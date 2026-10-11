@@ -183,6 +183,8 @@ if (!columns.includes('sold_at')) db.exec('ALTER TABLE listings ADD COLUMN sold_
 if (!columns.includes('payment_verified_at')) db.exec('ALTER TABLE listings ADD COLUMN payment_verified_at TEXT');
 // When a seller last changed a listing that was already approved, so the owner can recheck it.
 if (!columns.includes('edited_at')) db.exec('ALTER TABLE listings ADD COLUMN edited_at TEXT');
+// Which city a listing is in. Everything listed before multi-city support was in Ho Chi Minh City.
+if (!columns.includes('city')) db.exec("ALTER TABLE listings ADD COLUMN city TEXT NOT NULL DEFAULT 'ho_chi_minh'");
 db.exec(`
   CREATE TABLE IF NOT EXISTS bank_transactions (
     provider TEXT NOT NULL, txn_id TEXT NOT NULL, listing_id TEXT, amount_vnd INTEGER NOT NULL,

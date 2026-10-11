@@ -18,6 +18,7 @@ const EMPTY = {
   title: '',
   category: '',
   price_vnd: '',
+  city: 'ho_chi_minh',
   district: '',
   condition: '',
   description: '',
@@ -32,7 +33,7 @@ export function Sell() {
   const navigate = useNavigate();
   const fileInput = useRef(null);
 
-  const [meta, setMeta] = useState({ categories: [], districts: [], conditions: [], fee_vnd: null, first_listing_free: false });
+  const [meta, setMeta] = useState({ categories: [], districts: [], cities: [], conditions: [], fee_vnd: null, first_listing_free: false });
   const [values, setValues] = useState(EMPTY);
   // Each photo keeps its File, a stable key for React, and an object URL for the preview.
   const [photos, setPhotos] = useState([]);
@@ -54,6 +55,8 @@ export function Sell() {
       if (!active) return;
       setMeta(data);
       setMetaStatus('ready');
+      // Start on the server's default city (Saigon) unless the seller has already picked one.
+      setValues((current) => (current.district ? current : { ...current, city: data.default_city || current.city }));
     }).catch(() => active && setMetaStatus('error'));
     return () => { active = false; };
   }, [metaAttempt]);
@@ -309,11 +312,25 @@ export function Sell() {
             )}
           </Field>
 
+          <Field label={t('sell.cityLabel')} error={errorFor('city')} required>
+            {(props) => (
+              <select
+                {...props}
+                value={values.city}
+                onChange={(event) => setValues((current) => ({ ...current, city: event.target.value, district: '' }))}
+              >
+                {meta.cities.map((item) => (
+                  <option key={item.key} value={item.key}>{t(`cities.${item.key}`)}</option>
+                ))}
+              </select>
+            )}
+          </Field>
+
           <Field label={t('sell.districtLabel')} error={errorFor('district')} required>
             {(props) => (
               <select {...props} value={values.district} onChange={set('district')}>
                 <option value="">{t('sell.districtPlaceholder')}</option>
-                {meta.districts.map((value) => (
+                {(meta.cities.find((item) => item.key === values.city)?.districts ?? []).map((value) => (
                   <option key={value} value={value}>{t(`districts.${value}`)}</option>
                 ))}
               </select>

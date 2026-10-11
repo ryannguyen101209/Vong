@@ -16,7 +16,7 @@ import { mountSharePages } from './share-pages.js';
 import { startBackupSchedule } from './backup.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
-import { CATEGORIES, DISTRICTS, CONDITIONS } from './seed-data.js';
+import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from './seed-data.js';
 import { translationEnabled } from './translate.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
@@ -55,6 +55,8 @@ app.get('/api/meta', (req, res) => {
   res.json({
     categories: CATEGORIES,
     districts: DISTRICTS,
+    cities: CITIES.map((key) => ({ key, districts: CITY_DISTRICTS[key] })),
+    default_city: DEFAULT_CITY,
     conditions: CONDITIONS,
     fee_vnd: settings.fee_vnd,
     first_listing_free: isFirstListing(req.user?.id),

@@ -30,13 +30,14 @@ export function Browse() {
   const search = params.get('q') ?? '';
   const category = params.get('category') ?? '';
   const sort = params.get('sort') ?? 'newest';
+  const city = params.get('city') ?? '';
   const district = params.get('district') ?? '';
   const price = params.get('price') ?? '';
   const band = PRICE_BANDS.find((item) => item.value === price);
 
   const [searchInput, setSearchInput] = useState(search);
   const [categories, setCategories] = useState([]);
-  const [districts, setDistricts] = useState([]);
+  const [cities, setCities] = useState([]);
   const [listings, setListings] = useState([]);
   const [status, setStatus] = useState('loading');
   const requestId = useRef(0);
@@ -45,7 +46,7 @@ export function Browse() {
     api.meta()
       .then((meta) => {
         setCategories(meta.categories);
-        setDistricts(meta.districts);
+        setCities(meta.cities ?? []);
       })
       .catch(() => setCategories([]));
   }, []);
@@ -69,7 +70,7 @@ export function Browse() {
     const currentRequest = ++requestId.current;
     setStatus('loading');
     api
-      .listings({ search, category, district, minPrice: band?.min, maxPrice: band?.max, sort })
+      .listings({ search, category, city, district, minPrice: band?.min, maxPrice: band?.max, sort })
       .then((data) => {
         if (currentRequest !== requestId.current) return;
         setListings(data.listings);
@@ -78,7 +79,7 @@ export function Browse() {
       .catch(() => {
         if (currentRequest === requestId.current) setStatus('error');
       });
-  }, [search, category, district, band, sort]);
+  }, [search, category, city, district, band, sort]);
 
   useEffect(() => {
     load();
@@ -92,7 +93,7 @@ export function Browse() {
     setParams(next);
   };
 
-  const hasFilters = Boolean(search || category || district || band || sort !== 'newest');
+  const hasFilters = Boolean(search || category || city || district || band || sort !== 'newest');
 
   const resultLabel = useMemo(
     () => (listings.length === 1 ? t('browse.resultsOne') : t('browse.resultsMany', { count: listings.length })),
@@ -120,14 +121,36 @@ export function Browse() {
           </label>
 
           <label>
-            <span className="sr-only">{t('browse.districtLabel')}</span>
-            <select className="select" value={district} onChange={(event) => update('district', event.target.value)}>
-              <option value="">{t('browse.allDistricts')}</option>
-              {districts.map((value) => (
-                <option key={value} value={value}>{t(`districts.${value}`)}</option>
+            <span className="sr-only">{t('browse.cityLabel')}</span>
+            <select
+              className="select"
+              value={city}
+              onChange={(event) => {
+                // A district only makes sense inside its own city, so changing city clears it.
+                const next = new URLSearchParams(params);
+                if (event.target.value) next.set('city', event.target.value); else next.delete('city');
+                next.delete('district');
+                setParams(next, { replace: true });
+              }}
+            >
+              <option value="">{t('browse.allCities')}</option>
+              {cities.map((item) => (
+                <option key={item.key} value={item.key}>{t(`cities.${item.key}`)}</option>
               ))}
             </select>
           </label>
+
+          {city && (
+            <label>
+              <span className="sr-only">{t('browse.districtLabel')}</span>
+              <select className="select" value={district} onChange={(event) => update('district', event.target.value)}>
+                <option value="">{t('browse.allDistricts')}</option>
+                {(cities.find((item) => item.key === city)?.districts ?? []).map((value) => (
+                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
+                ))}
+              </select>
+            </label>
+          )}
 
           <label>
             <span className="sr-only">{t('browse.priceLabel')}</span>

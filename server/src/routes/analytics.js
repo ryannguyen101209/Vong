@@ -117,6 +117,7 @@ function buildReport() {
       contact_messages: count('SELECT COUNT(*) AS n FROM messages'),
     },
     by_category: group('category'),
+    by_city: group('city'),
     by_district: group('district'),
     top_listings: top,
     daily: days,

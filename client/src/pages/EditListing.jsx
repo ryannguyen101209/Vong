@@ -12,7 +12,7 @@ export function EditListing() {
   const { t, localized } = useI18n();
   const { profile, loading, openSignIn } = useAuth();
   const navigate = useNavigate();
-  const [meta, setMeta] = useState({ categories: [], districts: [], conditions: [] });
+  const [meta, setMeta] = useState({ categories: [], districts: [], cities: [], conditions: [] });
   const [values, setValues] = useState(null);
   const [status, setStatus] = useState('loading');
   const [errors, setErrors] = useState({});
@@ -34,6 +34,7 @@ export function EditListing() {
           description: localized(listing, 'description') || '',
           category: listing.category,
           price_vnd: String(listing.price_vnd),
+          city: listing.city || 'ho_chi_minh',
           district: listing.district,
           condition: listing.condition,
           seller_name: listing.seller_name,
@@ -121,10 +122,30 @@ export function EditListing() {
           <Field label={t('sell.priceLabel')} hint={t('sell.priceHint')} error={errorFor('price_vnd')} required>
             {(props) => <input {...props} className="input" inputMode="numeric" value={values.price_vnd} onChange={set('price_vnd')} />}
           </Field>
+          <Field label={t('sell.cityLabel')} error={errorFor('city')} required>
+            {(props) => (
+              <select
+                {...props}
+                value={values.city}
+                onChange={(event) => {
+                  const city = event.target.value;
+                  const first = meta.cities.find((item) => item.key === city)?.districts[0] ?? '';
+                  setValues((current) => ({ ...current, city, district: first }));
+                }}
+              >
+                {meta.cities.map((item) => (
+                  <option key={item.key} value={item.key}>{t(`cities.${item.key}`)}</option>
+                ))}
+              </select>
+            )}
+          </Field>
+
           <Field label={t('sell.districtLabel')} error={errorFor('district')} required>
             {(props) => (
               <select {...props} value={values.district} onChange={set('district')}>
-                {meta.districts.map((value) => <option key={value} value={value}>{t(`districts.${value}`)}</option>)}
+                {(meta.cities.find((item) => item.key === values.city)?.districts ?? []).map((value) => (
+                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
+                ))}
               </select>
             )}
           </Field>

@@ -5,7 +5,7 @@ import multer from 'multer';
 import { db, getSettings, isFirstListing, UPLOADS_DIR, DEFAULT_SETTINGS } from '../db.js';
 import { newId, newRef, transferNote } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
-import { CATEGORIES, DISTRICTS, CONDITIONS } from '../seed-data.js';
+import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
 import { rateLimit } from 'express-rate-limit';
@@ -38,7 +38,7 @@ const upload = multer({
 /** Columns safe to send to anybody. Seller phone is deliberately not here. */
 const PUBLIC_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category,
-  price_vnd, district, condition, seller_name, image_path, images, status,
+  price_vnd, city, district, condition, seller_name, image_path, images, status,
   reject_reason, fee_vnd, views, created_at, published_at, seller_id
 `;
 
@@ -71,7 +71,7 @@ function priceParam(value) {
 
 /** GET /api/listings — published listings, with search / category / district / price / sort. */
 router.get('/', (req, res) => {
-  const { search = '', category = '', district = '', sort = 'newest', ids = '' } = req.query;
+  const { search = '', category = '', city = '', district = '', sort = 'newest', ids = '' } = req.query;
 
   const where = [];
   const params = {};
@@ -90,6 +90,11 @@ router.get('/', (req, res) => {
   if (category && CATEGORIES.includes(String(category))) {
     where.push('category = @category');
     params.category = category;
+  }
+
+  if (city && CITIES.includes(String(city))) {
+    where.push('city = @city');
+    params.city = city;
   }
 
   if (district && DISTRICTS.includes(String(district))) {
@@ -161,7 +166,10 @@ function validateListing(body) {
   if (title.length < 4 || title.length > 120) errors.title = 'length';
   if (description.length < 20 || description.length > 6000) errors.description = 'length';
   if (!CATEGORIES.includes(String(body.category))) errors.category = 'invalid';
-  if (!DISTRICTS.includes(String(body.district))) errors.district = 'invalid';
+  // Sellers who send no city (older clients, the API) are in Saigon, where Vòng started.
+  const city = String(body.city || DEFAULT_CITY);
+  if (!CITIES.includes(city)) errors.city = 'invalid';
+  else if (!CITY_DISTRICTS[city].includes(String(body.district))) errors.district = 'invalid';
   if (!CONDITIONS.includes(String(body.condition))) errors.condition = 'invalid';
   if (!Number.isFinite(price) || price < 1000 || price > 2_000_000_000) errors.price_vnd = 'invalid';
   if (sellerName.length < 2 || sellerName.length > 80) errors.seller_name = 'length';
@@ -170,7 +178,7 @@ function validateListing(body) {
     errors.seller_email = 'invalid';
   }
 
-  return { errors, values: { title, description, sellerName, sellerPhone, sellerEmail, price } };
+  return { errors, values: { title, description, sellerName, sellerPhone, sellerEmail, price, city } };
 }
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
@@ -198,11 +206,11 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
   db.prepare(`
     INSERT INTO listings (
       id, ref, title_en, title_vi, description_en, description_vi, category,
-      price_vnd, district, condition, seller_name, seller_phone, seller_email,
+      price_vnd, city, district, condition, seller_name, seller_phone, seller_email,
       image_path, images, status, fee_vnd, created_at, paid_marked_at, seller_id
     ) VALUES (
       @id, @ref, @title_en, @title_vi, @description_en, @description_vi, @category,
-      @price_vnd, @district, @condition, @seller_name, @seller_phone, @seller_email,
+      @price_vnd, @city, @district, @condition, @seller_name, @seller_phone, @seller_email,
       @image_path, @images, @status, @fee_vnd, @created_at, @paid_marked_at, @seller_id
     )
   `).run({
@@ -214,6 +222,7 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     description_vi: lang === 'vi' ? values.description : null,
     category: req.body.category,
     price_vnd: values.price,
+    city: values.city,
     district: req.body.district,
     condition: req.body.condition,
     seller_name: values.sellerName,
@@ -335,6 +344,7 @@ router.patch('/:id', requireUser, (req, res) => {
     description: body.description ?? row.description_en ?? row.description_vi,
     category: body.category ?? row.category,
     price_vnd: body.price_vnd ?? row.price_vnd,
+    city: body.city ?? row.city,
     district: body.district ?? row.district,
     condition: body.condition ?? row.condition,
     seller_name: body.seller_name ?? row.seller_name,
@@ -348,11 +358,11 @@ router.patch('/:id', requireUser, (req, res) => {
   // harmless listing cannot be quietly turned into a scam once it is live.
   const before = {
     title: row.title_en ?? row.title_vi, description: row.description_en ?? row.description_vi,
-    category: row.category, price: row.price_vnd, district: row.district, condition: row.condition,
+    category: row.category, price: row.price_vnd, city: row.city, district: row.district, condition: row.condition,
   };
   const after = {
     title: values.title, description: values.description,
-    category: merged.category, price: values.price, district: merged.district, condition: merged.condition,
+    category: merged.category, price: values.price, city: values.city, district: merged.district, condition: merged.condition,
   };
   const recheck = ['published', 'sold'].includes(row.status) && Object.keys(before).some((key) => String(before[key]) !== String(after[key]));
 
@@ -360,7 +370,7 @@ router.patch('/:id', requireUser, (req, res) => {
     UPDATE listings SET
       title_en = @title_en, title_vi = @title_vi,
       description_en = @description_en, description_vi = @description_vi,
-      category = @category, price_vnd = @price_vnd, district = @district, condition = @condition,
+      category = @category, price_vnd = @price_vnd, city = @city, district = @district, condition = @condition,
       seller_name = @seller_name, seller_phone = @seller_phone,
       edited_at = CASE WHEN @recheck THEN @now ELSE edited_at END
     WHERE id = @id
@@ -374,6 +384,7 @@ router.patch('/:id', requireUser, (req, res) => {
     description_vi: lang === 'vi' ? values.description : row.description_vi,
     category: merged.category,
     price_vnd: values.price,
+    city: values.city,
     district: merged.district,
     condition: merged.condition,
     seller_name: values.sellerName,

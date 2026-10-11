@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { db } from './db.js';
-import { CATEGORIES, DISTRICTS as DISTRICT_KEYS } from './seed-data.js';
+import { CATEGORIES, CITIES, CITY_NAMES_VI, cityOfDistrict, AREA_NAMES_VI, DISTRICTS as DISTRICT_KEYS } from './seed-data.js';
 
 /**
  * Link previews and search indexing.
@@ -29,6 +29,10 @@ const DISTRICTS = {
     binh_tan: 'Bình Tân', binh_thanh: 'Bình Thạnh', go_vap: 'Gò Vấp', phu_nhuan: 'Phú Nhuận',
     tan_binh: 'Tân Bình', tan_phu: 'Tân Phú', thu_duc: 'Thủ Đức', binh_chanh: 'Bình Chánh',
     can_gio: 'Cần Giờ', cu_chi: 'Củ Chi', hoc_mon: 'Hóc Môn', nha_be: 'Nhà Bè', thao_dien: 'Thảo Điền',
+    ...AREA_NAMES_VI,
+    hue_center: 'Trung tâm', hue_other: 'Khu vực khác', nt_center: 'Trung tâm', nt_other: 'Khu vực khác',
+    dl_center: 'Trung tâm', dl_other: 'Khu vực khác', vt_center: 'Trung tâm', vt_other: 'Khu vực khác',
+    bh_center: 'Trung tâm', bh_other: 'Khu vực khác',
   },
 };
 
@@ -42,6 +46,7 @@ const CONDITION_SCHEMA = {
   fair: 'https://schema.org/UsedCondition', well_used: 'https://schema.org/UsedCondition',
 };
 const districtName = (key) => DISTRICTS.vi[key] || DISTRICTS.shared[key] || '';
+const cityName = (key) => CITY_NAMES_VI[key] || CITY_NAMES_VI.ho_chi_minh;
 
 const escapeHtml = (value) => String(value ?? '')
   .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -94,27 +99,36 @@ export function listingMeta(row) {
         priceCurrency: 'VND',
         itemCondition: CONDITION_SCHEMA[row.condition] || 'https://schema.org/UsedCondition',
         availability: row.status === 'sold' ? 'https://schema.org/SoldOut' : 'https://schema.org/InStock',
-        ...(district ? { availableAtOrFrom: { '@type': 'Place', name: `${district}, TP. Hồ Chí Minh` } } : {}),
+        ...(district ? { availableAtOrFrom: { '@type': 'Place', name: `${district}, ${cityName(row.city)}` } } : {}),
       },
     },
   };
 }
 
 /** Title and description for a category and/or district page, or null if neither is known. */
-export function browseMeta(category, district) {
+export function browseMeta(category, district, city = '') {
   const cat = CATEGORY_NAMES[category] ? category : '';
   const dist = DISTRICT_KEYS.includes(district) ? district : '';
-  if (!cat && !dist) return null;
+  const town = CITIES.includes(city) ? city : '';
+  if (!cat && !dist && !town) return null;
   const what = cat ? CATEGORY_NAMES[cat] : 'Đồ cũ';
-  const where = dist ? districtName(dist) : 'Sài Gòn';
+  // A district page is named after its city too, since 'Trung tâm' or 'Quận 1' alone is ambiguous.
+  const cityOfArea = dist ? (cityOfDistrict(dist) ?? 'ho_chi_minh') : '';
+  const place = town || cityOfArea;
+  // Saigon's districts are known by name alone; elsewhere the city is added, since
+  // 'Trung tâm' or 'Hoàn Kiếm' alone is ambiguous.
+  const where = dist
+    ? (place === 'ho_chi_minh' ? districtName(dist) : `${districtName(dist)}, ${cityName(place)}`)
+    : (place ? cityName(place) : 'Việt Nam');
   const params = new URLSearchParams();
   if (cat) params.set('category', cat);
+  if (town) params.set('city', town);
   if (dist) params.set('district', dist);
   const lowerWhat = cat ? `${what.charAt(0).toLowerCase()}${what.slice(1)} cũ` : 'đồ cũ';
   return {
     title: `${what}${cat ? ' cũ' : ''} ở ${where} | Vòng`,
     ogTitle: `${what}${cat ? ' cũ' : ''} ở ${where}`,
-    description: `Mua bán ${lowerWhat} ở ${where}, TP. Hồ Chí Minh. Xem ảnh thật, giá rõ ràng, nhắn người bán trực tiếp trên Vòng. Không hoa hồng.`,
+    description: `Mua bán ${lowerWhat} ở ${where}. Xem ảnh thật, giá rõ ràng, nhắn người bán trực tiếp trên Vòng. Không hoa hồng.`,
     url: `${SITE}/browse?${params.toString()}`,
     image: `${SITE}/og-image.png`,
     imageAlt: 'Vòng',
@@ -159,7 +173,7 @@ export function mountSharePages(app, clientDist) {
   };
 
   const findListing = db.prepare(`
-    SELECT id, title_en, title_vi, description_en, description_vi, price_vnd, district, category, condition, status, image_path, images
+    SELECT id, title_en, title_vi, description_en, description_vi, price_vnd, city, district, category, condition, status, image_path, images
     FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0
   `);
 
@@ -172,7 +186,7 @@ export function mountSharePages(app, clientDist) {
 
   // Category and district pages get their own title, so each can be found on Google.
   app.get('/browse', (req, res, next) => {
-    const meta = browseMeta(String(req.query.category ?? ''), String(req.query.district ?? ''));
+    const meta = browseMeta(String(req.query.category ?? ''), String(req.query.district ?? ''), String(req.query.city ?? ''));
     if (!meta) return next();
     res.set('Cache-Control', 'public, max-age=300');
     res.type('html').send(renderListingHead(readTemplate(), meta).replace('<meta property="og:type" content="product" />', '<meta property="og:type" content="website" />'));
@@ -188,9 +202,10 @@ export function mountSharePages(app, clientDist) {
     const pages = ['/', '/browse', '/about', '/faq', '/contact', '/rules', '/terms', '/privacy']
       .map((p) => `  <url><loc>${SITE}${p}</loc></url>`);
     // Only categories and districts that have something for sale, so no empty pages are listed.
-    const live = db.prepare("SELECT DISTINCT category, district FROM listings WHERE status = 'published' AND is_seed = 0").all();
+    const live = db.prepare("SELECT DISTINCT category, city, district FROM listings WHERE status = 'published' AND is_seed = 0").all();
     const browse = [
       ...new Set(live.map((r) => r.category).filter((c) => CATEGORY_NAMES[c]).map((c) => `category=${c}`)),
+      ...new Set(live.map((r) => r.city).filter((c) => CITIES.includes(c)).map((c) => `city=${c}`)),
       ...new Set(live.map((r) => r.district).filter((d) => DISTRICT_KEYS.includes(d)).map((d) => `district=${d}`)),
     ].map((q) => `  <url><loc>${SITE}/browse?${q.replace('&', '&amp;')}</loc></url>`);
     const listings = liveListings.all().map((r) =>
