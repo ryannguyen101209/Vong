@@ -66,6 +66,9 @@ export function Payment() {
   const [data, setData] = useState(null);
   const [status, setStatus] = useState('loading');
   const [marking, setMarking] = useState(false);
+  const [promo, setPromo] = useState('');
+  const [promoError, setPromoError] = useState('');
+  const [promoBusy, setPromoBusy] = useState(false);
 
   const load = useCallback(() => {
     if (!profile) return;
@@ -105,6 +108,23 @@ export function Payment() {
       load();
     } finally {
       setMarking(false);
+    }
+  };
+
+  const applyPromo = async (event) => {
+    event.preventDefault();
+    if (!promo.trim()) return;
+    setPromoBusy(true);
+    setPromoError('');
+    try {
+      await api.applyPromo(id, promo);
+      setPromo('');
+      load();
+    } catch (error) {
+      const code = error.payload?.error;
+      setPromoError(t(code === 'already_used' ? 'payment.promoUsed' : code === 'too_many_attempts' ? 'payment.promoTooMany' : 'payment.promoInvalid'));
+    } finally {
+      setPromoBusy(false);
     }
   };
 
@@ -227,6 +247,25 @@ export function Payment() {
             <p className="notice__title">{t('payment.manualTitle')}</p>
             <p className="small" style={{ margin: 0 }}>{t('payment.manualBody')}</p>
           </div>
+
+          <form className="card panel" onSubmit={applyPromo}>
+            <label htmlFor="promo-code" className="notice__title" style={{ display: 'block', marginBottom: 8 }}>{t('payment.promoTitle')}</label>
+            <div className="row" style={{ gap: 8 }}>
+              <input
+                id="promo-code"
+                className="input"
+                value={promo}
+                onChange={(event) => { setPromo(event.target.value); setPromoError(''); }}
+                placeholder={t('payment.promoPlaceholder')}
+                autoCapitalize="characters"
+                autoComplete="off"
+                spellCheck={false}
+                style={{ flex: 1, textTransform: 'uppercase' }}
+              />
+              <button type="submit" className="btn btn--ghost" disabled={promoBusy || !promo.trim()}>{t('payment.promoApply')}</button>
+            </div>
+            {promoError && <p className="small" role="alert" style={{ margin: '8px 0 0', color: 'var(--danger, #a33)' }}>{promoError}</p>}
+          </form>
 
           <div>
             <button type="button" className="btn btn--accent btn--block" onClick={markPaid} disabled={marking}>

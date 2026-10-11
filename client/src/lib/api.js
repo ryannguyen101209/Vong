@@ -44,6 +44,14 @@ export const api = {
 
   payment: (id) => request(`/api/listings/${id}/payment`),
 
+  /** Redeems a promo code on a listing that still owes the fee. */
+  applyPromo: (id, code) =>
+    request(`/api/listings/${id}/promo`, {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ code }),
+    }),
+
   markPaid: (id) => request(`/api/listings/${id}/mark-paid`, { method: 'POST' }),
 
   // Seller tools: the signed-in seller's own listings.
@@ -157,6 +165,23 @@ export const api = {
         method: 'PUT',
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify(patch),
+      }),
+
+    promoCodes: (token) =>
+      request('/api/admin/promo-codes', { headers: { authorization: `Bearer ${token}` } }),
+
+    createPromo: (token, body) =>
+      request('/api/admin/promo-codes', {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify(body),
+      }),
+
+    setPromoActive: (token, code, active) =>
+      request(`/api/admin/promo-codes/${encodeURIComponent(code)}`, {
+        method: 'PATCH',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ active }),
       }),
 
     messages: (token) =>
