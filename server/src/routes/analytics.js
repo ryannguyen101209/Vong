@@ -125,6 +125,10 @@ function buildReport() {
 }
 
 router.get('/', (req, res) => {
+  // The owner's dashboard page lives on another origin, so let browsers read this
+  // route cross-origin. Safe: it is a plain GET with no cookies, and the response is
+  // counts only and still needs the secret key in the query string.
+  res.set('Access-Control-Allow-Origin', '*');
   if (!process.env.ANALYTICS_KEY) return res.status(404).json({ error: 'not_found' });
   res.set('Cache-Control', 'no-store');
   res.set('X-Robots-Tag', 'noindex');
