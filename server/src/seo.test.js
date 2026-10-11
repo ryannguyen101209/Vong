@@ -37,11 +37,13 @@ assert.equal(meta.jsonLd.offers.priceCurrency, 'VND');
 assert.equal(meta.jsonLd.offers.itemCondition, 'https://schema.org/UsedCondition');
 assert.equal(meta.jsonLd.offers.availableAtOrFrom.name, 'Bình Thạnh, TP. Hồ Chí Minh');
 
-// A listing outside Saigon names its city in the preview and in Google's data.
+// The preview caption names the city, not the district.
+assert.ok(meta.ogTitle.endsWith('· TP. Hồ Chí Minh'), meta.ogTitle);
 const hanoiMeta = listingMeta({ ...row, city: 'ha_noi', district: 'hn_hoan_kiem' });
-assert.ok(hanoiMeta.ogTitle.endsWith('· Hoàn Kiếm, Hà Nội'), hanoiMeta.ogTitle);
+assert.ok(hanoiMeta.ogTitle.endsWith('· Hà Nội'), hanoiMeta.ogTitle);
+assert.ok(!hanoiMeta.ogTitle.includes('Hoàn Kiếm'), 'no district in the caption');
 assert.equal(hanoiMeta.jsonLd.offers.availableAtOrFrom.name, 'Hoàn Kiếm, Hà Nội');
-assert.ok(!listingMeta({ ...row, city: 'ho_chi_minh' }).ogTitle.includes('TP.'), 'Saigon previews stay short');
+assert.ok(listingMeta({ ...row, title_vi: null, title_en: 'Bike', city: 'da_nang', district: 'dn_hai_chau' }).ogTitle.endsWith('· Đà Nẵng'));
 
 // Seller text can never break out of the JSON block.
 const html = renderListingHead(template, meta);

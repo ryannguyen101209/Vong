@@ -36,7 +36,7 @@ export function ListingCard({ listing }) {
           <h3 className="listing-card__title">{title}</h3>
         </Link>
         <p className="listing-card__meta">
-          {t(`districts.${listing.district}`)} · {t(`conditions.${listing.condition}`)}
+          {t(`cities.${listing.city || 'ho_chi_minh'}`)} · {t(`conditions.${listing.condition}`)}
         </p>
       </div>
     </article>

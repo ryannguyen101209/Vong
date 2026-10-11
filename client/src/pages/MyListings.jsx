@@ -95,7 +95,7 @@ function Manager() {
                     <span className={`badge ${BADGE[listing.status] ?? ''}`}>{t(`status.${listing.status}`)}</span>
                   </div>
                   <p className="small muted" style={{ margin: '4px 0 0' }}>
-                    {formatPrice(listing.price_vnd, lang)} · {t(`districts.${listing.district}`)} · {formatDate(listing.created_at, lang)}
+                    {formatPrice(listing.price_vnd, lang)} · {t(`cities.${listing.city || 'ho_chi_minh'}`)} · {formatDate(listing.created_at, lang)}
                     {listing.status === 'published' && ` · ${t('myListings.views', { count: listing.views })}`}
                   </p>
                   <p className="small" style={{ margin: '8px 0 0' }}>{t(`myListings.hint.${listing.status}`, { reason: listing.reject_reason || '—' })}</p>

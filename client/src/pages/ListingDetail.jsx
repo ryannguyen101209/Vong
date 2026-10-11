@@ -171,6 +171,10 @@ export function ListingDetail() {
                   <td>{t(`conditions.${listing.condition}`)}</td>
                 </tr>
                 <tr>
+                  <th scope="row">{t('sell.cityLabel')}</th>
+                  <td>{t(`cities.${listing.city || 'ho_chi_minh'}`)}</td>
+                </tr>
+                <tr>
                   <th scope="row">{t('listing.district')}</th>
                   <td>{t(`districts.${listing.district}`)}</td>
                 </tr>

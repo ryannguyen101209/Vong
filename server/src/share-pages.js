@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { db } from './db.js';
-import { CATEGORIES, CITIES, CITY_NAMES_VI, cityOfDistrict, AREA_NAMES_VI, DISTRICTS as DISTRICT_KEYS } from './seed-data.js';
+import { CATEGORIES, CITIES, CITY_NAMES_VI, CITY_NAMES_EN, cityOfDistrict, AREA_NAMES_VI, DISTRICTS as DISTRICT_KEYS } from './seed-data.js';
 
 /**
  * Link previews and search indexing.
@@ -73,10 +73,11 @@ export function listingMeta(row) {
   const lang = row.title_vi ? 'vi' : 'en';
   const title = row.title_vi || row.title_en;
   const area = DISTRICTS[lang][row.district] || DISTRICTS.shared[row.district] || '';
-  // Outside Saigon the city goes in the preview too, since 'Trung tâm' or 'Hoàn Kiếm' alone is ambiguous.
-  const district = area && row.city && row.city !== 'ho_chi_minh' ? `${area}, ${cityName(row.city)}` : area;
+  // The preview names the city (not the district), e.g. "Hà Nội" or "TP. Hồ Chí Minh".
+  const city = row.city || 'ho_chi_minh';
+  const place = (lang === 'vi' ? CITY_NAMES_VI : CITY_NAMES_EN)[city] || '';
   const description = lang === 'vi' ? row.description_vi || row.description_en : row.description_en || row.description_vi;
-  const headline = `${title} · ${formatVnd(row.price_vnd)}${district ? ` · ${district}` : ''}`;
+  const headline = `${title} · ${formatVnd(row.price_vnd)}${place ? ` · ${place}` : ''}`;
   const url = `${SITE}/listing/${encodeURIComponent(row.id)}`;
   const image = coverImage(row);
   return {
