@@ -42,6 +42,9 @@ export const CITY_NAMES_VI = {
   can_tho: 'Cần Thơ', hue: 'Huế', nha_trang: 'Nha Trang', da_lat: 'Đà Lạt', vung_tau: 'Vũng Tàu',
   bien_hoa: 'Biên Hòa',
 };
+export const CITY_NAMES_EN = {
+  ...CITY_NAMES_VI, ho_chi_minh: 'Ho Chi Minh City',
+};
 export const AREA_NAMES_VI = {
   hn_ba_dinh: 'Ba Đình', hn_hoan_kiem: 'Hoàn Kiếm', hn_hai_ba_trung: 'Hai Bà Trưng', hn_dong_da: 'Đống Đa',
   hn_tay_ho: 'Tây Hồ', hn_cau_giay: 'Cầu Giấy', hn_thanh_xuan: 'Thanh Xuân', hn_hoang_mai: 'Hoàng Mai',
