@@ -285,32 +285,22 @@ const insertSetting = db.prepare(
 );
 for (const [key, value] of Object.entries(DEFAULT_SETTINGS)) insertSetting.run(key, value);
 
+/**
+ * The listing fee in VND, the same for every listing. Set by LISTING_FEE_VND;
+ * unset means 0 (listing is free). Set it to 10000 to bring the fee back.
+ * The old fee_vnd row in settings is kept but no longer read.
+ */
+export function listingFee() {
+  const raw = String(process.env.LISTING_FEE_VND ?? '').trim();
+  const fee = raw === '' ? 0 : Number(raw);
+  return Number.isFinite(fee) && fee > 0 ? Math.round(fee) : 0;
+}
+
 export function getSettings() {
   const rows = db.prepare('SELECT key, value FROM settings').all();
   const out = { ...DEFAULT_SETTINGS };
   for (const row of rows) out[row.key] = row.value;
-  return { ...out, fee_vnd: Number(out.fee_vnd) || 0 };
-}
-
-/**
- * Every account's first real listing is free of the publishing fee. "First"
- * means the account has never created a listing (in any status), so deleting or
- * abandoning one does not hand out a second free listing.
- */
-export function isFirstListing(userId) {
-  if (!userId) return false;
-  return !db.prepare('SELECT 1 FROM listings WHERE seller_id = ? AND is_seed = 0 LIMIT 1').get(userId);
-}
-
-/** The emails in the "always free" setting, lower-cased. */
-export function freeEmails(settings = getSettings()) {
-  return String(settings.free_emails || '').split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean);
-}
-
-/** True when this account's listings are always free (admin setting, matched on the sign-in email). */
-export function hasFreeListings(email) {
-  if (!email) return false;
-  return freeEmails().includes(String(email).trim().toLowerCase());
+  return { ...out, fee_vnd: listingFee() };
 }
 
 export function saveSettings(patch) {
