@@ -270,6 +270,34 @@ db.exec(`
   CREATE INDEX IF NOT EXISTS idx_reports_open ON listing_reports(resolved_at, created_at);
 `);
 
+// Seller profiles: a "trusted seller" badge the owner gives by hand, and reviews.
+const userColumns = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
+if (!userColumns.includes('trusted_at')) db.exec('ALTER TABLE users ADD COLUMN trusted_at TEXT');
+db.exec(`
+  -- A buyer who talked to a seller about a listing can review them once for it.
+  CREATE TABLE IF NOT EXISTS seller_reviews (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    seller_id   TEXT NOT NULL REFERENCES users(id),
+    reviewer_id TEXT NOT NULL REFERENCES users(id),
+    listing_id  TEXT NOT NULL REFERENCES listings(id),
+    rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    body        TEXT NOT NULL,
+    created_at  TEXT NOT NULL,
+    UNIQUE (reviewer_id, listing_id)
+  );
+  CREATE INDEX IF NOT EXISTS idx_seller_reviews ON seller_reviews(seller_id, created_at);
+  -- Reviews of Vòng itself, one per account, shown only once the owner approves them.
+  CREATE TABLE IF NOT EXISTS site_reviews (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     TEXT NOT NULL UNIQUE REFERENCES users(id),
+    rating      INTEGER NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    body        TEXT NOT NULL,
+    status      TEXT NOT NULL DEFAULT 'pending',
+    created_at  TEXT NOT NULL,
+    reviewed_at TEXT
+  );
+`);
+
 export const DEFAULT_SETTINGS = {
   bank_bin: '970436',
   bank_name: 'Vietcombank',

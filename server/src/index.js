@@ -12,6 +12,8 @@ import { createAuthRouter, protectWrites, sessionUser } from './accounts.js';
 import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
+import { router as sellersRouter } from './routes/sellers.js';
+import { router as siteReviewsRouter } from './routes/site-reviews.js';
 import { mountSharePages } from './share-pages.js';
 import { notifyOwner } from './notify.js';
 import { startBackupSchedule } from './backup.js';
@@ -108,6 +110,8 @@ app.post('/api/contact', (req, res) => {
 });
 
 app.use('/api/listings', listingsRouter);
+app.use('/api/sellers', sellersRouter);
+app.use('/api/site-reviews', siteReviewsRouter);
 app.use('/api/admin', adminRouter);
 
 // Serve the built frontend if it exists, so `npm run build && npm start` gives

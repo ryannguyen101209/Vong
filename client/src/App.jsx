@@ -13,6 +13,7 @@ import { About } from './pages/About.jsx';
 import { Faq } from './pages/Faq.jsx';
 import { Contact } from './pages/Contact.jsx';
 import { Legal } from './pages/Legal.jsx';
+import { SellerProfile } from './pages/SellerProfile.jsx';
 import { Admin } from './pages/Admin.jsx';
 import { NotFound } from './pages/NotFound.jsx';
 import { Messages } from './pages/Messages.jsx';
@@ -61,6 +62,7 @@ export function App() {
           <Route path="/" element={<Home />} />
           <Route path="/browse" element={<Browse />} />
           <Route path="/listing/:id" element={<ListingDetail />} />
+          <Route path="/seller/:id" element={<SellerProfile />} />
           <Route path="/listing/:id/edit" element={<EditListing />} />
           <Route path="/my-listings" element={<MyListings />} />
           <Route path="/sell" element={<Sell />} />

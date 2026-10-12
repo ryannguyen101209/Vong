@@ -35,7 +35,8 @@ router.use(requireAdmin);
 const ADMIN_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd,
   city, district, condition, seller_name, seller_phone, seller_email, image_path, status, reject_reason,
-  fee_vnd, views, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at, edited_at,
+  fee_vnd, views, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at, edited_at, seller_id,
+  (SELECT trusted_at IS NOT NULL FROM users WHERE users.id = listings.seller_id) AS seller_trusted,
   (SELECT COUNT(*) FROM listings o
      WHERE o.seller_id = listings.seller_id AND o.is_seed = 0 AND o.id <> listings.id
        AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))
@@ -257,6 +258,47 @@ router.get('/reports', (req, res) => {
 router.post('/reports/:id/dismiss', (req, res) => {
   const result = db.prepare('UPDATE listing_reports SET resolved_at = ? WHERE id = ? AND resolved_at IS NULL')
     .run(new Date().toISOString(), Number(req.params.id));
+  if (result.changes === 0) return res.status(404).json({ error: 'not_found' });
+  res.json({ ok: true });
+});
+
+/** POST /api/admin/sellers/:id/trust { trusted } — give or take away the "trusted seller" badge. */
+router.post('/sellers/:id/trust', (req, res) => {
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
+  if (!user) return res.status(404).json({ error: 'not_found' });
+  const trustedAt = req.body?.trusted ? new Date().toISOString() : null;
+  db.prepare('UPDATE users SET trusted_at = ? WHERE id = ?').run(trustedAt, user.id);
+  res.json({ id: user.id, trusted: Boolean(trustedAt) });
+});
+
+/** GET /api/admin/reviews — reviews of Vòng (waiting ones first) and the latest seller reviews. */
+router.get('/reviews', (req, res) => {
+  const site = db.prepare(`
+    SELECT r.id, r.rating, r.body, r.status, r.created_at, u.name AS reviewer, u.email AS reviewer_email
+    FROM site_reviews r JOIN users u ON u.id = r.user_id
+    ORDER BY (r.status = 'pending') DESC, r.created_at DESC LIMIT 200
+  `).all();
+  const seller = db.prepare(`
+    SELECT r.id, r.rating, r.body, r.created_at, r.seller_id, u.name AS reviewer, l.title_en, l.title_vi,
+           (SELECT seller_name FROM listings WHERE listings.id = r.listing_id) AS seller_name
+    FROM seller_reviews r JOIN users u ON u.id = r.reviewer_id JOIN listings l ON l.id = r.listing_id
+    ORDER BY r.created_at DESC LIMIT 200
+  `).all();
+  res.json({ site, seller, pending: site.filter((r) => r.status === 'pending').length });
+});
+
+/** POST /api/admin/site-reviews/:id/(approve|hide) — show a review of Vòng on the home page, or hide it. */
+router.post('/site-reviews/:id/:action(approve|hide)', (req, res) => {
+  const status = req.params.action === 'approve' ? 'approved' : 'hidden';
+  const result = db.prepare('UPDATE site_reviews SET status = ?, reviewed_at = ? WHERE id = ?')
+    .run(status, new Date().toISOString(), Number(req.params.id));
+  if (result.changes === 0) return res.status(404).json({ error: 'not_found' });
+  res.json({ ok: true, status });
+});
+
+/** DELETE /api/admin/seller-reviews/:id — remove a seller review (fake, abusive or off-topic). */
+router.delete('/seller-reviews/:id', (req, res) => {
+  const result = db.prepare('DELETE FROM seller_reviews WHERE id = ?').run(Number(req.params.id));
   if (result.changes === 0) return res.status(404).json({ error: 'not_found' });
   res.json({ ok: true });
 });

@@ -10,6 +10,7 @@ import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { ReportListing } from '../components/ReportListing.jsx';
+import { Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { ShareYourListing } from '../components/ShareYourListing.jsx';
 
 export function ListingDetail() {
@@ -17,6 +18,7 @@ export function ListingDetail() {
   const { t, lang, localized } = useI18n();
   const { profile, openSignIn } = useAuth();
   const [listing, setListing] = useState(null);
+  const [seller, setSeller] = useState(null);
   const [status, setStatus] = useState('loading');
   const [contact, setContact] = useState(null);
   const [requesting, setRequesting] = useState(false);
@@ -41,6 +43,7 @@ export function ListingDetail() {
       .listing(id)
       .then((data) => {
         setListing(data.listing);
+        setSeller(data.seller ?? null);
         setStatus('ready');
       })
       .catch((error) => setStatus(error.status === 404 ? 'missing' : 'error'));
@@ -205,7 +208,19 @@ export function ListingDetail() {
               </span>
               <div>
                 <p className="small muted" style={{ margin: 0 }}>{t('listing.sellerTitle')}</p>
-                <strong>{listing.seller_name}</strong>
+                {seller ? (
+                  <Link to={`/seller/${seller.id}`} className="seller-card__name">{listing.seller_name}</Link>
+                ) : (
+                  <strong>{listing.seller_name}</strong>
+                )}
+                {seller && (seller.trusted || seller.rating_count > 0) && (
+                  <div className="seller-card__meta">
+                    {seller.trusted && <TrustedBadge small />}
+                    {seller.rating_count > 0 && (
+                      <span className="small"><Stars value={seller.rating_avg} size={13} /> {seller.rating_avg} ({seller.rating_count})</span>
+                    )}
+                  </div>
+                )}
               </div>
             </div>
 

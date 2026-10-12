@@ -128,6 +128,7 @@ export default {
         h: '3. Ai thấy được gì',
         p: [
           '- Công khai: ảnh, tiêu đề, mô tả, giá, quận và tên người bán trên tin đã được duyệt.',
+          '- Đánh giá bạn viết (về người bán hoặc về Vòng) hiện công khai kèm tên rút gọn, ví dụ “Nguyễn L.”. Trang người bán hiện tên bạn dùng khi đăng tin, ngày tham gia và các tin đang bán.',
           '- Số điện thoại người bán chỉ hiện cho người đã đăng nhập và bấm yêu cầu mua.',
           '- Tin nhắn chỉ người mua và người bán trong cuộc trò chuyện đó đọc được. Chủ Vòng chỉ xem khi cần xử lý báo cáo vi phạm hoặc khi pháp luật yêu cầu.',
           '- Chủ Vòng thấy thông tin tin đăng và phí đăng để duyệt tin.',

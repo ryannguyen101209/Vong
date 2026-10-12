@@ -8,6 +8,7 @@ import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
+import { sellerSummary } from './sellers.js';
 import { rateLimit } from 'express-rate-limit';
 import { translateListing, TranslationError } from '../translate.js';
 
@@ -151,7 +152,7 @@ router.get('/:id', (req, res) => {
     db.prepare('UPDATE listings SET views = views + 1 WHERE id = ?').run(row.id);
     row.views += 1;
   }
-  res.json({ listing: withImages(row) });
+  res.json({ listing: withImages(row), seller: sellerSummary(row.seller_id) });
 });
 
 function validateListing(body) {

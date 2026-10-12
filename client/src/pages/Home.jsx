@@ -5,6 +5,7 @@ import { api } from '../lib/api.js';
 import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
 import { ArrowUpRightIcon, SearchIcon } from '../components/Icons.jsx';
+import { SiteReviews } from '../components/SiteReviews.jsx';
 
 // Product photos for the categories that have one; the rest get a text tile.
 const CATEGORY_PHOTOS = {
@@ -125,6 +126,8 @@ export function Home() {
         {status === 'error' && <ErrorState onRetry={() => setAttempt((value) => value + 1)} />}
         {status === 'ready' && (listings.length ? <div className="grid-listings">{listings.map((listing) => <ListingCard listing={listing} key={listing.id} />)}</div> : <EmptyState title={t('market.firstTitle')} body={t('market.firstBody')}><Link className="btn btn--accent" to="/sell">{t('market.firstCta')}</Link></EmptyState>)}
       </section>
+
+      <SiteReviews />
 
       <section className="market-sell" aria-labelledby="sell-title">
         <div><h2 id="sell-title">{t('market.sellTitle')}</h2><p>{t('market.sellBody')}</p></div>
