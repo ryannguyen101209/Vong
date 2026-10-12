@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
-import { formatPrice, formatDateTime, digitsOnly, transferNote } from '../lib/format.js';
+import { formatPrice, formatDateTime, transferNote } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { EmptyState } from '../components/States.jsx';
 import { ListingImage } from '../components/ListingCard.jsx';
@@ -555,7 +555,7 @@ function PromoCodes({ token, onAuthError }) {
 }
 
 function Settings({ token, onAuthError }) {
-  const { t } = useI18n();
+  const { t, lang } = useI18n();
   const [banks, setBanks] = useState([]);
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
@@ -586,8 +586,6 @@ function Settings({ token, onAuthError }) {
         bank_bin: form.bank_bin,
         account_number: form.account_number,
         account_holder: form.account_holder,
-        fee_vnd: form.fee_vnd,
-        free_emails: form.free_emails ?? '',
       });
       setForm(data.settings);
       setMessage('saved');
@@ -640,24 +638,8 @@ function Settings({ token, onAuthError }) {
             <input
               {...props}
               className="input"
-              inputMode="numeric"
-              value={form.fee_vnd}
-              onChange={(event) =>
-                setForm((current) => ({ ...current, fee_vnd: digitsOnly(event.target.value) }))
-              }
-            />
-          )}
-        </Field>
-
-        <Field label={t('admin.freeEmailsLabel')} hint={t('admin.freeEmailsHint')}>
-          {(props) => (
-            <textarea
-              {...props}
-              className="input"
-              rows={3}
-              placeholder="ban@gmail.com, ban2@gmail.com"
-              value={form.free_emails ?? ''}
-              onChange={set('free_emails')}
+              value={formatPrice(form.fee_vnd, lang)}
+              readOnly
             />
           )}
         </Field>
@@ -855,7 +837,6 @@ export function Admin() {
           ['queue', 'admin.tabQueue'],
           ['all', 'admin.tabAll'],
           ['reports', 'admin.tabReports'],
-          ['codes', 'admin.tabCodes'],
           ['analytics', 'admin.tabAnalytics'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
@@ -876,7 +857,6 @@ export function Admin() {
       {tab === 'queue' && <Queue token={token} onAuthError={signOut} />}
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
       {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
-      {tab === 'codes' && <PromoCodes token={token} onAuthError={signOut} />}
       {tab === 'analytics' && <AdminAnalytics token={token} onAuthError={signOut} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>
