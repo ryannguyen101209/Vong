@@ -4,7 +4,7 @@
  * Mỗi đoạn là một chuỗi; chuỗi bắt đầu bằng "- " được hiện thành gạch đầu dòng.
  */
 export default {
-  updated: 'Cập nhật ngày 9/10/2026',
+  updated: 'Cập nhật ngày 12/10/2026',
   draftNote: 'Đây là bản đầu tiên. Nếu có chỗ nào chưa rõ, bạn cứ hỏi tụi mình qua trang Liên hệ.',
 
   terms: {
@@ -39,12 +39,12 @@ export default {
         ],
       },
       {
-        h: '4. Phí đăng tin',
+        h: '4. Phí',
         p: [
-          '- Tin đầu tiên của mỗi tài khoản được miễn phí. Từ tin thứ hai, mỗi tin có một khoản phí đăng cố định, hiện rõ trước khi bạn chuyển khoản.',
+          '- Hiện tại đăng bán trên Vòng miễn phí, không phí đăng tin.',
           '- Vòng không lấy hoa hồng trên giá bán. Bạn giữ toàn bộ số tiền bán được.',
-          '- Phí không được hoàn lại sau khi tin đã được duyệt và hiển thị, kể cả khi món đồ chưa bán được.',
-          '- Nếu tin bị từ chối mà không phải do vi phạm quy định, hoặc bạn chuyển khoản nhầm, hãy liên hệ tụi mình để được hoàn phí.',
+          '- Nếu sau này Vòng thu phí đăng tin, tụi mình sẽ báo trước trên trang, và mức phí sẽ hiện rõ trước khi bạn đăng tin.',
+          '- Nếu trước đây bạn đã trả phí cho một tin bị từ chối mà không phải do vi phạm quy định, hoặc bạn chuyển khoản nhầm, hãy liên hệ tụi mình để được hoàn phí.',
         ],
       },
       {
@@ -108,7 +108,7 @@ export default {
           '- Tài khoản: tên, email và ảnh đại diện từ tài khoản Google bạn dùng để đăng nhập.',
           '- Tin đăng: tên người bán, số điện thoại, email, ảnh, mô tả, giá và quận bạn nhập vào.',
           '- Tin nhắn giữa người mua và người bán trên Vòng.',
-          '- Phí đăng tin: số tiền, nội dung chuyển khoản và thời gian, do ngân hàng gửi qua dịch vụ SePay. Vòng không bao giờ thấy thẻ hay mật khẩu ngân hàng của bạn.',
+          '- Phí đăng tin, nếu có thu: số tiền, nội dung chuyển khoản và thời gian, do ngân hàng gửi qua dịch vụ SePay. Vòng không bao giờ thấy thẻ hay mật khẩu ngân hàng của bạn.',
           '- Báo cáo vi phạm và tin nhắn bạn gửi qua trang Liên hệ.',
           '- Dữ liệu kỹ thuật: cookie đăng nhập, lượt xem tin, và một mã ngẫu nhiên cho mỗi tab để đếm số người đang xem (mã này không được lưu lại).',
           'Ngôn ngữ, giao diện sáng/tối và tin bạn đã lưu nằm trong trình duyệt của bạn, không gửi lên máy chủ.',
@@ -140,7 +140,7 @@ export default {
           '- Google: đăng nhập. Khi bạn bấm link dịch bằng Google trên một tin, nội dung tin đó được mở trong Google Dịch.',
           '- Render: máy chủ và ổ lưu trữ của trang.',
           '- Resend: gửi email thông báo.',
-          '- SePay: báo cho Vòng khi có chuyển khoản phí đăng.',
+          '- SePay: báo cho Vòng khi có chuyển khoản phí đăng, nếu có thu phí.',
           '- ntfy: báo cho chủ Vòng khi có tin mới hoặc báo cáo mới. Thông báo này không chứa số điện thoại hay email.',
           'Một số dịch vụ này đặt máy chủ ở nước ngoài, ví dụ ở Hoa Kỳ, nên dữ liệu có thể được chuyển ra ngoài Việt Nam để xử lý.',
         ],
@@ -238,7 +238,7 @@ export default {
       {
         h: 'Xử lý vi phạm',
         p: [
-          'Tin vi phạm sẽ bị từ chối hoặc gỡ. Phí đăng của tin vi phạm không được hoàn lại. Tài khoản vi phạm nhiều lần, hoặc có dấu hiệu lừa đảo, sẽ bị khóa.',
+          'Tin vi phạm sẽ bị từ chối hoặc gỡ. Tài khoản vi phạm nhiều lần, hoặc có dấu hiệu lừa đảo, sẽ bị khóa.',
         ],
       },
     ],

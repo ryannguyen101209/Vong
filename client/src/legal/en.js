@@ -5,7 +5,7 @@
  * with "- " is shown as a bullet.
  */
 export default {
-  updated: 'Updated 9 October 2026',
+  updated: 'Updated 12 October 2026',
   draftNote: 'This is our first version. If anything is unclear, ask us through the Contact page. If this English text and the Vietnamese text differ, the Vietnamese text applies.',
 
   terms: {
@@ -40,12 +40,12 @@ export default {
         ],
       },
       {
-        h: '4. Listing fees',
+        h: '4. Fees',
         p: [
-          '- Each account’s first listing is free. After that, each listing has a flat fee, shown before you transfer anything.',
+          '- Listing on Vòng is currently free, with no listing fees.',
           '- Vòng takes no commission on the sale price. You keep everything the buyer pays you.',
-          '- Fees are not refunded once a listing has been approved and published, even if the item does not sell.',
-          '- If a listing is rejected for a reason other than breaking the rules, or you transferred by mistake, contact us for a refund.',
+          '- If Vòng ever charges a listing fee, we will announce it on the site first, and the fee will be shown clearly before you post.',
+          '- If you paid a fee in the past for a listing that was rejected for a reason other than breaking the rules, or you transferred by mistake, contact us for a refund.',
         ],
       },
       {
@@ -109,7 +109,7 @@ export default {
           '- Account: your name, email and profile photo from the Google account you sign in with.',
           '- Listings: the seller name, phone number, email, photos, description, price and district you enter.',
           '- Messages between buyers and sellers on Vòng.',
-          '- Listing fees: the amount, transfer note and time, sent by your bank through SePay. Vòng never sees your card or banking password.',
+          '- Listing fees, when one is charged: the amount, transfer note and time, sent by your bank through SePay. Vòng never sees your card or banking password.',
           '- Reports and messages you send through the Contact page.',
           '- Technical data: a sign-in cookie, listing view counts, and a random code per browser tab used to count how many people are online (it is not stored).',
           'Your language, light or dark mode and saved listings are kept in your own browser, not on our server.',
@@ -141,7 +141,7 @@ export default {
           '- Google: sign-in. When you tap the Google translate link on a listing, that listing’s text opens in Google Translate.',
           '- Render: the server and storage the site runs on.',
           '- Resend: sends notification emails.',
-          '- SePay: tells Vòng when a listing fee transfer arrives.',
+          '- SePay: tells Vòng when a listing fee transfer arrives, when a fee is charged.',
           '- ntfy: alerts Vòng’s owner about new listings and reports. These alerts carry no phone numbers or emails.',
           'Some of these services run servers outside Vietnam, for example in the United States, so your data may be processed abroad.',
         ],
@@ -239,7 +239,7 @@ export default {
       {
         h: 'When rules are broken',
         p: [
-          'Listings that break the rules are rejected or removed, and their fees are not refunded. Accounts that break the rules repeatedly, or show signs of scamming, are blocked.',
+          'Listings that break the rules are rejected or removed. Accounts that break the rules repeatedly, or show signs of scamming, are blocked.',
         ],
       },
     ],

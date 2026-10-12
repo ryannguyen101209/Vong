@@ -14,6 +14,8 @@ const fake = http.createServer((req, res) => {
 await new Promise((r) => fake.listen(0, '127.0.0.1', r));
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'vong-pay-'));
+// These tests cover the paid flow, so they turn the listing fee back on.
+process.env.LISTING_FEE_VND = '10000';
 process.env.DATABASE_FILE = path.join(directory, 'test.db');
 process.env.UPLOADS_DIR = path.join(directory, 'uploads');
 process.env.GOOGLE_CLIENT_ID = 'test-client';
@@ -68,7 +70,6 @@ try {
   sent.length = 0;
   const listing = { title: 'Payment test chair', description: 'A test listing used to check automatic payment matching works properly.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (title) => (await api('/api/listings', { cookie: login, body: { ...listing, title } })).body;
-  await make('free first');                 // first listing is free: nothing to pay
   const a = await make('Payment test A');   // pending_payment, fee 10000
   const b = await make('Payment test B');
   const c = await make('Payment test C');

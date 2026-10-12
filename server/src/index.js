@@ -4,7 +4,7 @@ import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
 
-import { db, getSettings, isFirstListing, hasFreeListings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
+import { db, getSettings, SERVER_ROOT, UPLOADS_DIR } from './db.js';
 import { router as listingsRouter, MAX_PHOTOS } from './routes/listings.js';
 import { router as adminRouter } from './routes/admin.js';
 import { usingDefaultPassword } from './auth.js';
@@ -60,8 +60,8 @@ app.get('/api/meta', (req, res) => {
     default_city: DEFAULT_CITY,
     conditions: CONDITIONS,
     fee_vnd: settings.fee_vnd,
-    first_listing_free: isFirstListing(req.user?.id) || hasFreeListings(req.user?.email),
-    free_account: hasFreeListings(req.user?.email),
+    // True when there is no listing fee: the Sell page skips every payment notice.
+    listing_free: settings.fee_vnd === 0,
     max_photos: MAX_PHOTOS,
     translation: translationEnabled(),
   });

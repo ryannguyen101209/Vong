@@ -9,7 +9,7 @@ process.env.DATABASE_FILE = path.join(directory, 'test.db');
 process.env.UPLOADS_DIR = path.join(directory, 'uploads');
 process.env.GOOGLE_CLIENT_ID = 'test-client';
 process.env.CORS_ORIGIN = 'http://localhost:5174';
-const { db, isFirstListing } = await import('./db.js');
+const { db } = await import('./db.js');
 const { createAuthRouter, sessionUser, protectWrites } = await import('./accounts.js');
 const { router: conversations } = await import('./routes/conversations.js');
 const { router: listings } = await import('./routes/listings.js');
@@ -45,19 +45,16 @@ try {
   const created = await request('/api/listings', { cookie: seller.cookie, body: listingBody });
   assert.equal(created.status, 201);
   const listingId = created.body.id;
-  // First listing on an account is free and goes straight to the review queue.
+  // Listing is free: every listing goes straight to the review queue, with nothing to pay.
   assert.equal(created.body.free, true);
   assert.equal(created.body.fee_vnd, 0);
   assert.equal(created.body.status, 'awaiting_approval');
   const second = await request('/api/listings', { cookie: seller.cookie, body: listingBody });
-  assert.equal(second.body.free, false);
-  assert.equal(second.body.fee_vnd, 10000);
-  assert.equal(second.body.status, 'pending_payment');
+  assert.equal(second.body.free, true);
+  assert.equal(second.body.fee_vnd, 0);
+  assert.equal(second.body.status, 'awaiting_approval');
   assert.equal((await request(`/api/listings/${listingId}/payment`, { cookie: seller.cookie })).body.payment, null);
-  assert.equal((await request(`/api/listings/${second.body.id}/payment`, { cookie: seller.cookie })).body.payment.amount_vnd, 10000);
-  assert.equal(isFirstListing(seller.body.profile.id), false);
-  assert.equal(isFirstListing(buyer.body.profile.id), true);
-  assert.equal(isFirstListing(null), false);
+  assert.equal((await request(`/api/listings/${second.body.id}/payment`, { cookie: seller.cookie })).body.payment, null);
   // Seller tools: list, edit, mark sold / relist, remove. Only the owner may use them.
   const mine = await request('/api/listings/mine', { cookie: seller.cookie });
   assert.equal(mine.body.listings.length, 2);

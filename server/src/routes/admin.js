@@ -185,11 +185,7 @@ router.put('/settings', (req, res) => {
     if (emails.length > 50 || emails.some((e) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))) return res.status(400).json({ error: 'bad_free_emails' });
     patch.free_emails = emails.join(', ');
   }
-  if (body.fee_vnd !== undefined) {
-    const fee = Number(String(body.fee_vnd).replace(/[^\d]/g, ''));
-    if (!Number.isFinite(fee) || fee < 0 || fee > 10_000_000) return res.status(400).json({ error: 'bad_fee' });
-    patch.fee_vnd = fee;
-  }
+  // The listing fee is set by LISTING_FEE_VND on the host, not here.
 
   res.json({ settings: saveSettings(patch) });
 });

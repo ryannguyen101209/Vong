@@ -5,6 +5,8 @@ import path from 'node:path';
 import express from 'express';
 
 const directory = fs.mkdtempSync(path.join(os.tmpdir(), 'vong-promo-'));
+// Codes only matter while there is a listing fee, so turn it back on here.
+process.env.LISTING_FEE_VND = '10000';
 process.env.DATABASE_FILE = path.join(directory, 'test.db');
 process.env.UPLOADS_DIR = path.join(directory, 'uploads');
 process.env.GOOGLE_CLIENT_ID = 'test-client';
@@ -33,9 +35,9 @@ try {
   const listing = { title: 'Promo test lamp', description: 'A test listing used to check the promo code flow.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (cookie, title) => (await request('/api/listings', { cookie, body: { ...listing, title } })).body;
 
-  // The first listing is free already, so codes are for the second one onwards.
+  // With a fee set, every listing waits for payment, including the first.
   const first = await make(seller.cookie, 'Promo test first');
-  assert.equal(first.free, true);
+  assert.equal(first.free, false);
   const second = await make(seller.cookie, 'Promo test second');
   assert.equal(second.status, 'pending_payment');
   assert.ok(second.fee_vnd > 0);

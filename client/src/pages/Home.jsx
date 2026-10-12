@@ -81,6 +81,7 @@ export function Home() {
             {t('market.title').split(/(?<=[.!?])\s+/).map((sentence) => <span key={sentence} className="market-hero__line">{sentence}</span>)}
           </h2>
           <p className="lead">{t('market.lead')}</p>
+          <p className="market-hero__free">{t('market.freeLine')}</p>
           <form className="market-search" role="search" onSubmit={onSearch}>
             <SearchIcon />
             <label className="sr-only" htmlFor="market-search">{t('browse.searchLabel')}</label>
