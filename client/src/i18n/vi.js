@@ -838,4 +838,15 @@ export default {
     noReviews: 'Chưa có đánh giá nào.',
     howReviews: 'Chỉ người đã nhắn tin với người bán về một món, và được trả lời, mới đánh giá được, mỗi món một lần.',
   },
+
+  ticker: {
+    label: 'Thông báo của Vòng',
+    items: [
+      { text: 'Đăng bán miễn phí, không phí đăng tin', to: '/sell' },
+      { text: 'Bán đồ cũ trên Vòng', to: '/sell' },
+      { text: 'Đồ cũ còn xịn, giá lại mềm', to: '/browse' },
+      { text: 'Nhắn người bán ngay trên web', to: '/browse' },
+      { text: 'Dọn nhà nhẹ tênh, pass đồ không xài', to: '/sell' },
+    ],
+  },
 };

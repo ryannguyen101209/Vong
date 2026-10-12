@@ -846,4 +846,15 @@ export default {
     noReviews: 'No reviews yet.',
     howReviews: 'Only people who messaged the seller about an item, and got a reply, can review them, once per item.',
   },
+
+  ticker: {
+    label: 'Vòng announcements',
+    items: [
+      { text: 'Free to list, no listing fees', to: '/sell' },
+      { text: 'Sell on Vòng', to: '/sell' },
+      { text: 'Good finds, gentle prices', to: '/browse' },
+      { text: 'Message sellers right on the site', to: '/browse' },
+      { text: 'Clear out the clutter, pass it on', to: '/sell' },
+    ],
+  },
 };
