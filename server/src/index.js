@@ -13,6 +13,7 @@ import { router as conversationsRouter } from './routes/conversations.js';
 import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
 import { mountSharePages } from './share-pages.js';
+import { notifyOwner } from './notify.js';
 import { startBackupSchedule } from './backup.js';
 import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
@@ -102,6 +103,7 @@ app.post('/api/contact', (req, res) => {
     .run(name, email, body, new Date().toISOString());
 
   console.log(`[contact] ${name} <${email}>: ${body.slice(0, 120)}`);
+  notifyOwner({ title: `New message from ${name}`, message: body.slice(0, 200), tags: ['envelope'], path: '/admin' });
   res.status(201).json({ ok: true });
 });
 

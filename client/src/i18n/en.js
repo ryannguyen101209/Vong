@@ -589,6 +589,16 @@ export default {
     backup_downloadFailed: 'Download failed. Try again in a moment.',
     messagesTitle: 'Contact messages',
     noMessages: 'No messages yet.',
+    reply: 'Reply',
+    replyAgain: 'Reply again',
+    replyLabel: 'Your reply',
+    replyGreeting: 'Hi {{name}},\n\n',
+    replyHint: 'Sent to {{to}} from hello@usevong.com. Their answer goes to vong-inquiries@outlook.com, which also gets a copy.',
+    replySend: 'Send email',
+    replySending: 'Sending…',
+    repliedAt: 'Replied {{when}}',
+    replyMailOff: 'Email is not set up. RESEND_API_KEY and MAIL_FROM need to be set on Render.',
+    replyFailed: 'Could not send the email. Try again in a moment.',
   },
 
   status: {

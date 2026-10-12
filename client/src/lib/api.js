@@ -186,5 +186,12 @@ export const api = {
 
     messages: (token) =>
       request('/api/admin/messages', { headers: { authorization: `Bearer ${token}` } }),
+
+    replyMessage: (token, id, body) =>
+      request(`/api/admin/messages/${id}/reply`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ body }),
+      }),
   },
 };
