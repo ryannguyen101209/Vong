@@ -173,6 +173,11 @@ router.put('/settings', (req, res) => {
     if (holder.length < 2 || holder.length > 60) return res.status(400).json({ error: 'bad_account_holder' });
     patch.account_holder = holder;
   }
+  if (body.free_emails !== undefined) {
+    const emails = [...new Set(String(body.free_emails).split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean))];
+    if (emails.length > 50 || emails.some((e) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))) return res.status(400).json({ error: 'bad_free_emails' });
+    patch.free_emails = emails.join(', ');
+  }
   if (body.fee_vnd !== undefined) {
     const fee = Number(String(body.fee_vnd).replace(/[^\d]/g, ''));
     if (!Number.isFinite(fee) || fee < 0 || fee > 10_000_000) return res.status(400).json({ error: 'bad_fee' });

@@ -272,6 +272,8 @@ export const DEFAULT_SETTINGS = {
   account_number: '1234567890',
   account_holder: 'NGUYEN VAN A',
   fee_vnd: '10000',
+  // Accounts (by Google email) that never pay the listing fee, e.g. the team.
+  free_emails: '',
 };
 
 const insertSetting = db.prepare(
@@ -294,6 +296,17 @@ export function getSettings() {
 export function isFirstListing(userId) {
   if (!userId) return false;
   return !db.prepare('SELECT 1 FROM listings WHERE seller_id = ? AND is_seed = 0 LIMIT 1').get(userId);
+}
+
+/** The emails in the "always free" setting, lower-cased. */
+export function freeEmails(settings = getSettings()) {
+  return String(settings.free_emails || '').split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean);
+}
+
+/** True when this account's listings are always free (admin setting, matched on the sign-in email). */
+export function hasFreeListings(email) {
+  if (!email) return false;
+  return freeEmails().includes(String(email).trim().toLowerCase());
 }
 
 export function saveSettings(patch) {

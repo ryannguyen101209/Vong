@@ -586,6 +586,7 @@ function Settings({ token, onAuthError }) {
         account_number: form.account_number,
         account_holder: form.account_holder,
         fee_vnd: form.fee_vnd,
+        free_emails: form.free_emails ?? '',
       });
       setForm(data.settings);
       setMessage('saved');
@@ -643,6 +644,19 @@ function Settings({ token, onAuthError }) {
               onChange={(event) =>
                 setForm((current) => ({ ...current, fee_vnd: digitsOnly(event.target.value) }))
               }
+            />
+          )}
+        </Field>
+
+        <Field label={t('admin.freeEmailsLabel')} hint={t('admin.freeEmailsHint')}>
+          {(props) => (
+            <textarea
+              {...props}
+              className="input"
+              rows={3}
+              placeholder="ban@gmail.com, ban2@gmail.com"
+              value={form.free_emails ?? ''}
+              onChange={set('free_emails')}
             />
           )}
         </Field>
