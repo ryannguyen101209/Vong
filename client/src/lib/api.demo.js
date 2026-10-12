@@ -234,6 +234,24 @@ export const api = {
         ? reply({ token: 'demo-token', expiresIn: 3600000, default_password: true })
         : Promise.reject(new DemoError(401, { error: 'bad_password' })),
 
+    analytics: () => {
+      const by_status = {};
+      for (const listing of state.listings) by_status[listing.status] = (by_status[listing.status] || 0) + 1;
+      return reply({
+        generated_at: new Date().toISOString(),
+        live_visitors: 0,
+        monthly: [],
+        listings: { by_status, total: state.listings.length, new_7d: 0, published_7d: 0, total_views: 0 },
+        fees_vnd: { collected: 0, awaiting_approval: 0 },
+        users: { total: 0, new_7d: 0 },
+        engagement: { buy_requests: 0, buy_requests_7d: 0, conversations: 0, chat_messages: 0, chat_messages_7d: 0, contact_messages: 0 },
+        by_category: [],
+        by_district: [],
+        top_listings: [],
+        daily: [],
+      });
+    },
+
     listings: (token, status) => {
       const counts = { pending_payment: 0, awaiting_approval: 0, published: 0, rejected: 0 };
       for (const listing of state.listings) counts[listing.status] += 1;

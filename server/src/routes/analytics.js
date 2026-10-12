@@ -6,7 +6,8 @@ import { liveVisitors } from '../presence.js';
 /**
  * GET /api/analytics?key=...
  *
- * Private, read-only totals for the owner's dashboard. Counts and sums only:
+ * Private, read-only totals. The admin panel's Analytics tab reads the same report from
+ * GET /api/admin/analytics (admin login); this key route is kept for scripts. Counts and sums only:
  * no names, emails, phone numbers or message text ever leave this route.
  * Disabled (404) unless ANALYTICS_KEY is set; the key is compared in constant time.
  */
@@ -35,7 +36,7 @@ function dailySeries(table, where = '1=1') {
   return Object.fromEntries(rows.map((r) => [r.day, r.n]));
 }
 
-function buildReport() {
+export function buildReport() {
   const weekAgo = new Date(Date.now() - 7 * 86_400_000).toISOString();
   const real = 'is_seed = 0';
 
@@ -125,10 +126,6 @@ function buildReport() {
 }
 
 router.get('/', (req, res) => {
-  // The owner's dashboard page lives on another origin, so let browsers read this
-  // route cross-origin. Safe: it is a plain GET with no cookies, and the response is
-  // counts only and still needs the secret key in the query string.
-  res.set('Access-Control-Allow-Origin', '*');
   if (!process.env.ANALYTICS_KEY) return res.status(404).json({ error: 'not_found' });
   res.set('Cache-Control', 'no-store');
   res.set('X-Robots-Tag', 'noindex');
