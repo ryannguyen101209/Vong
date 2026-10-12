@@ -129,6 +129,7 @@ export default {
         h: '3. Who sees what',
         p: [
           '- Public: photos, title, description, price, district and seller name on approved listings.',
+          '- Reviews you write (of a seller or of Vòng) are public, with a shortened name such as “Nguyễn L.”. A seller page shows the name you list under, when you joined, and your listings.',
           '- A seller’s phone number is shown only to signed-in people who tap request to buy.',
           '- Messages can be read only by the buyer and seller in that conversation. Vòng’s owner looks at them only to handle a report or when the law requires it.',
           '- Vòng’s owner sees listing and fee details in order to review listings.',

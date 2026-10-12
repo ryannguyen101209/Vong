@@ -1399,3 +1399,38 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 
 /* Home hero: the one-line note that listing is free. */
 .market-hero__free { margin: -4px 0 0; font-weight: 600; color: var(--accent-ink); }
+
+/* Reviews, stars and the trusted seller badge. */
+.stars { display: inline-flex; gap: 1px; line-height: 1; vertical-align: -1px; }
+.stars__on { color: #c9922e; }
+.stars__off { color: var(--line-strong); }
+.star-input { display: flex; gap: 4px; }
+.star-input button { border: 0; background: none; padding: 2px; font-size: 1.7rem; line-height: 1; color: var(--line-strong); cursor: pointer; }
+.star-input button.is-on { color: #c9922e; }
+.star-input button:focus-visible { outline: 2px solid var(--accent); border-radius: 6px; }
+.trusted-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--accent-soft); color: var(--accent-ink); font-size: 0.8rem; font-weight: 700; white-space: nowrap; }
+.trusted-badge--small { padding: 2px 8px; font-size: 0.72rem; }
+.review-list { list-style: none; padding: 0; margin: 0; display: grid; gap: 12px; }
+.review-list--grid { grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); }
+.review { padding: 16px 18px; border: 1px solid var(--line); border-radius: 16px; background: var(--surface); }
+.review__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.review__body { margin: 8px 0 0; white-space: pre-wrap; }
+.review__context { margin: 6px 0 0; }
+.review-box { margin-bottom: 18px; }
+.review-list + .small { margin-top: 12px; }
+.review-form { display: grid; gap: 10px; }
+.review-form .btn { justify-self: start; }
+.seller-card__name { font-weight: 700; color: var(--ink); text-decoration: underline; text-underline-offset: 3px; text-decoration-color: var(--line-strong); }
+.seller-card__name:hover { text-decoration-color: currentColor; }
+.seller-card__meta { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 4px; }
+.seller-head { display: flex; gap: 20px; align-items: center; margin-bottom: 36px; }
+.seller-head__name { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; }
+.seller-head__name h1 { margin: 0; }
+.seller-head__rating { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 8px 0 0; }
+.avatar--large { width: 72px; height: 72px; font-size: 1.8rem; flex: none; }
+.seller-section { margin-bottom: 44px; }
+.seller-subhead { margin: 28px 0 14px; font-size: 1.05rem; }
+.grid-listings--muted { opacity: 0.75; }
+.site-reviews { margin-block: 48px; }
+.site-reviews__score { display: flex; align-items: center; gap: 8px; margin: 0; }
+@media (max-width: 720px) { .seller-head { align-items: flex-start; } .avatar--large { width: 56px; height: 56px; font-size: 1.4rem; } }

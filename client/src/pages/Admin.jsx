@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
+import { Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, formatDateTime, transferNote } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
@@ -357,6 +358,81 @@ function DeleteButton({ token, id, onDeleted, onAuthError }) {
   );
 }
 
+/** Give or take away a seller's "trusted seller" badge, from any of their listings. */
+function TrustToggle({ token, listing, onChanged, onAuthError }) {
+  const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const trusted = Boolean(listing.seller_trusted);
+  const toggle = async () => {
+    setBusy(true);
+    try {
+      await api.admin.trustSeller(token, listing.seller_id, !trusted);
+      onChanged();
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <div className="row" style={{ gap: 6, marginTop: 6, flexWrap: 'wrap', alignItems: 'center' }}>
+      {trusted && <TrustedBadge small />}
+      <button type="button" className="btn btn--ghost btn--small" disabled={busy} onClick={toggle}>
+        {trusted ? t('admin.untrust') : t('admin.trust')}
+      </button>
+    </div>
+  );
+}
+
+/** Reviews of Vòng waiting for approval, and seller reviews the owner may remove. */
+function ReviewsAdmin({ token, onAuthError, onCount }) {
+  const { t, lang, localized } = useI18n();
+  const [data, setData] = useState(null);
+  const load = useCallback(() => {
+    api.admin.reviews(token)
+      .then((result) => { setData(result); onCount(result.pending); })
+      .catch((error) => error.status === 401 && onAuthError());
+  }, [token, onAuthError, onCount]);
+  useEffect(load, [load]);
+  const act = (promise) => promise.then(load).catch((error) => error.status === 401 && onAuthError());
+
+  if (!data) return <p className="muted">{t('common.loading')}</p>;
+  return (
+    <>
+      <h3 style={{ fontSize: '1.1rem' }}>{t('admin.siteReviewsTitle')}</h3>
+      <p className="muted small" style={{ maxWidth: '62ch' }}>{t('admin.siteReviewsLead')}</p>
+      {data.site.length === 0 && <div className="card panel"><p className="muted small" style={{ margin: 0 }}>{t('admin.noSiteReviews')}</p></div>}
+      <div className="stack" style={{ gap: 12, marginBottom: 32 }}>
+        {data.site.map((review) => (
+          <div key={review.id} className="card panel">
+            <div className="spread" style={{ gap: 12, flexWrap: 'wrap' }}>
+              <span><Stars value={review.rating} size={14} /> <strong className="small">{review.reviewer}</strong> <span className="small muted">· {review.reviewer_email} · {formatDateTime(review.created_at, lang)}</span></span>
+              <span className={`badge${review.status === 'approved' ? ' badge--positive' : review.status === 'pending' ? ' badge--warning' : ''}`}>{t(`admin.reviewStatus.${review.status}`)}</span>
+            </div>
+            <p className="small" style={{ margin: '8px 0 12px', whiteSpace: 'pre-wrap' }}>{review.body}</p>
+            <div className="row" style={{ gap: 8 }}>
+              {review.status !== 'approved' && <button type="button" className="btn btn--accent btn--small" onClick={() => act(api.admin.siteReviewAction(token, review.id, 'approve'))}>{t('admin.reviewApprove')}</button>}
+              {review.status !== 'hidden' && <button type="button" className="btn btn--ghost btn--small" onClick={() => act(api.admin.siteReviewAction(token, review.id, 'hide'))}>{t('admin.reviewHide')}</button>}
+            </div>
+          </div>
+        ))}
+      </div>
+
+      <h3 style={{ fontSize: '1.1rem' }}>{t('admin.sellerReviewsTitle')}</h3>
+      {data.seller.length === 0 && <div className="card panel"><p className="muted small" style={{ margin: 0 }}>{t('admin.noSellerReviews')}</p></div>}
+      <div className="stack" style={{ gap: 12 }}>
+        {data.seller.map((review) => (
+          <div key={review.id} className="card panel">
+            <span><Stars value={review.rating} size={14} /> <strong className="small">{review.reviewer}</strong> <span className="small muted">→ <a href={`/seller/${review.seller_id}`} target="_blank" rel="noopener">{review.seller_name}</a> · {localized(review, 'title')} · {formatDateTime(review.created_at, lang)}</span></span>
+            <p className="small" style={{ margin: '8px 0 12px', whiteSpace: 'pre-wrap' }}>{review.body}</p>
+            <button type="button" className="btn btn--ghost btn--small" onClick={() => act(api.admin.deleteSellerReview(token, review.id))}>{t('admin.reviewDelete')}</button>
+          </div>
+        ))}
+      </div>
+    </>
+  );
+}
+
 /** "Listing #3 of 7 from this seller", or nothing for listings with no account. */
 function SellerCount({ listing }) {
   const { t } = useI18n();
@@ -423,6 +499,7 @@ function AllListings({ token, onAuthError }) {
                     {listing.is_first_listing && <span className="badge badge--positive">{t('admin.firstListing')}</span>}
                     <SellerCount listing={listing} />
                   </div>
+                  {listing.seller_id && <TrustToggle token={token} listing={listing} onChanged={load} onAuthError={onAuthError} />}
                 </td>
                 <td style={{ fontFamily: 'ui-monospace, monospace' }}>{listing.ref}</td>
                 <td>{formatPrice(listing.price_vnd, lang)}</td>
@@ -795,6 +872,7 @@ export function Admin() {
   const [token, setToken] = useState(readToken);
   const [tab, setTab] = useState('queue');
   const [openReports, setOpenReports] = useState(0);
+  const [pendingReviews, setPendingReviews] = useState(0);
   const [defaultPassword, setDefaultPassword] = useState(false);
 
   const signOut = useCallback(() => {
@@ -813,6 +891,7 @@ export function Admin() {
       .then((data) => setDefaultPassword(data.default_password))
       .catch((error) => error.status === 401 && signOut());
     api.admin.reports(token).then((data) => setOpenReports(data.reports.length)).catch(() => {});
+    api.admin.reviews(token).then((data) => setPendingReviews(data.pending)).catch(() => {});
   }, [token, signOut]);
 
   if (!token) return <LoginForm onSuccess={setToken} />;
@@ -837,6 +916,7 @@ export function Admin() {
           ['queue', 'admin.tabQueue'],
           ['all', 'admin.tabAll'],
           ['reports', 'admin.tabReports'],
+          ['reviews', 'admin.tabReviews'],
           ['analytics', 'admin.tabAnalytics'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
@@ -850,6 +930,7 @@ export function Admin() {
           >
             {t(label)}
             {key === 'reports' && openReports > 0 && <span className="tab__count">{openReports}</span>}
+            {key === 'reviews' && pendingReviews > 0 && <span className="tab__count">{pendingReviews}</span>}
           </button>
         ))}
       </div>
@@ -857,6 +938,7 @@ export function Admin() {
       {tab === 'queue' && <Queue token={token} onAuthError={signOut} />}
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
       {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
+      {tab === 'reviews' && <ReviewsAdmin token={token} onAuthError={signOut} onCount={setPendingReviews} />}
       {tab === 'analytics' && <AdminAnalytics token={token} onAuthError={signOut} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>

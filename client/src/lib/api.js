@@ -82,6 +82,16 @@ export const api = {
 
   buyRequest: (id) => request(`/api/listings/${id}/buy-request`, { method: 'POST' }),
 
+  seller: (id) => request(`/api/sellers/${id}`),
+
+  reviewSeller: (id, body) =>
+    request(`/api/sellers/${id}/reviews`, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
+
+  siteReviews: () => request('/api/site-reviews'),
+
+  postSiteReview: (body) =>
+    request('/api/site-reviews', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }),
+
   translate: (id, to) =>
     request(`/api/listings/${id}/translate`, {
       method: 'POST',
@@ -124,6 +134,21 @@ export const api = {
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify({ reason }),
       }),
+
+    trustSeller: (token, id, trusted) =>
+      request(`/api/admin/sellers/${id}/trust`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ trusted }),
+      }),
+
+    reviews: (token) => request('/api/admin/reviews', { headers: { authorization: `Bearer ${token}` } }),
+
+    siteReviewAction: (token, id, action) =>
+      request(`/api/admin/site-reviews/${id}/${action}`, { method: 'POST', headers: { authorization: `Bearer ${token}` } }),
+
+    deleteSellerReview: (token, id) =>
+      request(`/api/admin/seller-reviews/${id}`, { method: 'DELETE', headers: { authorization: `Bearer ${token}` } }),
 
     reports: (token) =>
       request('/api/admin/reports', { headers: { authorization: `Bearer ${token}` } }),
