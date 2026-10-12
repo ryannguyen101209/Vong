@@ -4,6 +4,7 @@ import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
 import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
+import { buildReport } from './analytics.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
 
 /** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
@@ -45,6 +46,12 @@ const ADMIN_COLUMNS = `
        AND (o.created_at < listings.created_at OR (o.created_at = listings.created_at AND o.id < listings.id))
   ) END AS seller_index
 `;
+
+/** GET /api/admin/analytics — counts and sums for the Analytics tab. No personal data. */
+router.get('/analytics', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  res.json(buildReport());
+});
 
 /** GET /api/admin/listings?status=... — the review queue. */
 router.get('/listings', (req, res) => {

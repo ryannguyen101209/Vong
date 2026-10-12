@@ -5,6 +5,7 @@ import { formatPrice, formatDateTime, digitsOnly, transferNote } from '../lib/fo
 import { Field } from '../components/Field.jsx';
 import { EmptyState } from '../components/States.jsx';
 import { ListingImage } from '../components/ListingCard.jsx';
+import { AdminAnalytics } from './AdminAnalytics.jsx';
 
 // sessionStorage, not localStorage: closing the tab should end the admin session.
 const TOKEN_KEY = 'vong.admin.token';
@@ -855,6 +856,7 @@ export function Admin() {
           ['all', 'admin.tabAll'],
           ['reports', 'admin.tabReports'],
           ['codes', 'admin.tabCodes'],
+          ['analytics', 'admin.tabAnalytics'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
           <button
@@ -875,6 +877,7 @@ export function Admin() {
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
       {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
       {tab === 'codes' && <PromoCodes token={token} onAuthError={signOut} />}
+      {tab === 'analytics' && <AdminAnalytics token={token} onAuthError={signOut} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>
   );

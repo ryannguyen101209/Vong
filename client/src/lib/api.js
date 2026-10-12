@@ -104,6 +104,9 @@ export const api = {
         body: JSON.stringify({ password }),
       }),
 
+    analytics: (token) =>
+      request('/api/admin/analytics', { headers: { authorization: `Bearer ${token}` } }),
+
     listings: (token, status) =>
       request(`/api/admin/listings?status=${encodeURIComponent(status)}`, {
         headers: { authorization: `Bearer ${token}` },

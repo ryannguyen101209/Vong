@@ -1352,3 +1352,33 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 /* Admin: contact messages with replies. */
 .contact-message__reply { margin-top: 12px; padding: 10px 12px; border-left: 3px solid var(--accent); background: var(--surface); border-radius: 0 8px 8px 0; }
 .contact-message__compose { margin-top: 12px; }
+
+/* ---------------------------------------------------------- analytics --- */
+
+.an-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap; margin-bottom: 20px; }
+.an-stats { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; margin-bottom: 28px; }
+.an-stat { padding: 16px 18px; }
+.an-stat__label { font-size: 0.78rem; color: var(--ink-faint); }
+.an-stat__value { font-size: 1.6rem; font-weight: 600; letter-spacing: -0.02em; line-height: 1.15; font-variant-numeric: tabular-nums; }
+.an-stat__sub { font-size: 0.8rem; color: var(--ink-soft); }
+.an-grid { display: grid; grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr); gap: 24px; margin-bottom: 28px; }
+.an-section { margin-bottom: 28px; }
+.an-section > h2 { font-size: 1.05rem; margin: 0 0 12px; }
+.an-chart { width: 100%; height: auto; display: block; overflow: visible; }
+.an-chart text { fill: var(--ink-faint); font-size: 11px; font-variant-numeric: tabular-nums; }
+.an-chart .grid { stroke: var(--line); stroke-width: 1; }
+.an-chart .bar { fill: var(--accent); }
+.an-chart .bar--zero { fill: var(--line); }
+.an-chart .bar--today { fill: var(--accent-ink); }
+.an-pipe { display: flex; height: 14px; border-radius: 7px; overflow: hidden; background: var(--surface-sunk); }
+.an-pipe span { display: block; height: 100%; }
+.an-legend { display: grid; gap: 8px; margin-top: 14px; font-size: 0.9rem; }
+.an-legend > div { display: grid; grid-template-columns: 12px 1fr auto; gap: 10px; align-items: center; }
+.an-legend i { width: 10px; height: 10px; border-radius: 3px; display: block; }
+.an-bars { display: grid; gap: 9px; }
+.an-bars > div { display: grid; grid-template-columns: minmax(90px, 140px) 1fr 28px; gap: 10px; align-items: center; font-size: 0.88rem; }
+.an-track { height: 8px; border-radius: 4px; background: var(--surface-sunk); overflow: hidden; }
+.an-fill { height: 100%; background: var(--accent); border-radius: 4px; display: block; }
+.an-num { text-align: right; font-variant-numeric: tabular-nums; }
+.admin-table th.an-num { text-align: right; }
+@media (max-width: 900px) { .an-grid { grid-template-columns: minmax(0, 1fr); } .an-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
