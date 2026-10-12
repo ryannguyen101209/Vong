@@ -177,15 +177,15 @@ export function Sell() {
         </div>
         <div className="sell-fee-lockup">
           <span>{meta.first_listing_free ? t('sell.freeLockup') : feeLabel}</span>
-          <small>{meta.first_listing_free ? t('sell.freeLockupNote') : t('common.perListing')}</small>
+          <small>{meta.free_account ? t('sell.freeAccountNote') : meta.first_listing_free ? t('sell.freeLockupNote') : t('common.perListing')}</small>
         </div>
       </header>
 
       <div className="notice notice--accent fee-notice">
         {meta.first_listing_free ? (
           <>
-            <p className="notice__title">{t('sell.freeNoticeTitle')}</p>
-            <p style={{ margin: 0 }}>{t('sell.freeNoticeBody', { fee: feeLabel })}</p>
+            <p className="notice__title">{t(meta.free_account ? 'sell.freeAccountTitle' : 'sell.freeNoticeTitle')}</p>
+            <p style={{ margin: 0 }}>{meta.free_account ? t('sell.freeAccountBody') : t('sell.freeNoticeBody', { fee: feeLabel })}</p>
           </>
         ) : (
           <>
@@ -423,7 +423,7 @@ export function Sell() {
 
         <div className="sell-submit">
           <div>
-            <strong>{meta.first_listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
+            <strong>{meta.free_account ? t('sell.freeAccountTitle') : meta.first_listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
             <span>{meta.first_listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
             <span className="sell-submit__agree">
               {t('sell.agreePrefix')}

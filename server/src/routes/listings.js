@@ -2,7 +2,7 @@ import express from 'express';
 import fs from 'node:fs';
 import path from 'node:path';
 import multer from 'multer';
-import { db, getSettings, isFirstListing, UPLOADS_DIR, DEFAULT_SETTINGS } from '../db.js';
+import { db, getSettings, isFirstListing, hasFreeListings, UPLOADS_DIR, DEFAULT_SETTINGS } from '../db.js';
 import { newId, newRef, transferNote } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
 import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from '../seed-data.js';
@@ -191,9 +191,10 @@ router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHO
     return res.status(400).json({ error: 'validation_failed', fields: errors });
   }
 
-  // First listing per account is free: no fee, no payment step, straight to the
+  // First listing per account is free, and so is every listing from an account
+  // the owner marked as always free: no fee, no payment step, straight to the
   // admin queue (it is still reviewed by hand before it goes live).
-  const free = isFirstListing(req.user.id);
+  const free = isFirstListing(req.user.id) || hasFreeListings(req.user.email);
   const fee = free ? 0 : getSettings().fee_vnd;
   const now = new Date().toISOString();
   const id = newId();
