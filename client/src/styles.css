@@ -1382,3 +1382,17 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 .an-num { text-align: right; font-variant-numeric: tabular-nums; }
 .admin-table th.an-num { text-align: right; }
 @media (max-width: 900px) { .an-grid { grid-template-columns: minmax(0, 1fr); } .an-stats { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+.an-chart-wrap { position: relative; }
+.an-chart:focus-visible { outline: 2px solid var(--accent); outline-offset: 4px; border-radius: 6px; }
+.an-chart .line { fill: none; stroke: var(--accent); stroke-width: 2; stroke-linejoin: round; stroke-linecap: round; }
+.an-chart .dot { fill: var(--accent); stroke: var(--surface); stroke-width: 2; }
+.an-chart .cross { stroke: var(--line-strong); stroke-width: 1; }
+.an-chart .an-chart__value { fill: var(--ink); font-size: 12px; font-weight: 600; }
+.an-tip { position: absolute; top: 6px; transform: translateX(14px); z-index: 2; pointer-events: none; white-space: nowrap; padding: 8px 10px; border: 1px solid var(--line-strong); border-radius: var(--radius-sm); background: var(--surface); box-shadow: var(--shadow-sm); font-size: 0.8rem; }
+.an-tip__label { color: var(--ink-soft); }
+.an-tip__row { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.an-tip__key { display: block; width: 12px; height: 2px; border-radius: 1px; background: var(--accent); }
+.an-tip__value { color: var(--ink); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
+.an-tip--left { transform: translateX(calc(-100% - 14px)); }
+.an-section .admin-table th, .an-section .admin-table .an-num, .an-nowrap { white-space: nowrap; }

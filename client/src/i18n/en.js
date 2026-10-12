@@ -543,6 +543,8 @@ export default {
       approvedCol: 'Approved listings',
       freeCol: 'Free first listings',
       noApproved: 'No approved listings yet.',
+      freeShort: 'free',
+      oneMonth: 'Only one month so far. The line draws once there is a second month.',
       engagement: 'Buyer activity',
       conversations: 'Conversations',
       chatMessages: 'Chat messages',

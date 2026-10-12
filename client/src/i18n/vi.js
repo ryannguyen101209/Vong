@@ -533,6 +533,8 @@ export default {
       approvedCol: 'Tin đã duyệt',
       freeCol: 'Tin đầu tiên miễn phí',
       noApproved: 'Chưa có tin nào được duyệt.',
+      freeShort: 'miễn phí',
+      oneMonth: 'Mới có một tháng. Đường biểu đồ sẽ xuất hiện khi có tháng thứ hai.',
       engagement: 'Hoạt động của người mua',
       conversations: 'Cuộc trò chuyện',
       chatMessages: 'Tin nhắn',
