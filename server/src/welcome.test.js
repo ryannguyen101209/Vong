@@ -53,7 +53,7 @@ try {
   assert.equal(sent.length, 1);
   assert.deepEqual(sent[0].to, ['linh@example.test']);
   assert.match(sent[0].subject, /Chào mừng bạn đến với Vòng/);
-  assert.match(sent[0].text, /Món đầu tiên bạn đăng bán là miễn phí/);
+  assert.match(sent[0].text, /Đăng bán miễn phí, không phí đăng tin/);
   assert.match(sent[0].text, /https:\/\/example\.test\/sell/);
   assert.match(sent[0].html, /Linh &lt;b&gt;Nguyễn&lt;\/b&gt;/, 'name is escaped');
   assert.doesNotMatch(sent[0].html, /<b>Nguyễn<\/b>/);

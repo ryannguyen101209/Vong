@@ -22,7 +22,7 @@ const DEFAULT_SETTINGS = {
   bank_name: 'Vietcombank',
   account_number: '1234567890',
   account_holder: 'NGUYEN VAN A',
-  fee_vnd: 10000,
+  fee_vnd: 0,
 };
 
 function load() {
@@ -83,6 +83,7 @@ export const api = {
       default_city: 'ho_chi_minh',
       conditions: CONDITIONS,
       fee_vnd: state.settings.fee_vnd,
+      listing_free: !state.settings.fee_vnd,
     }),
 
   listings: ({ search = '', category = '', sort = 'newest', ids } = {}) => {
@@ -160,7 +161,7 @@ export const api = {
       seller_email: get('seller_email'),
       // Object URLs do not survive a reload; the card falls back to the empty state.
       image_path: image && image.size ? URL.createObjectURL(image) : null,
-      status: 'pending_payment',
+      status: state.settings.fee_vnd ? 'pending_payment' : 'awaiting_approval',
       reject_reason: null,
       fee_vnd: state.settings.fee_vnd,
       views: 0,
@@ -170,7 +171,8 @@ export const api = {
     });
     persist();
 
-    return reply({ id, ref, status: 'pending_payment', fee_vnd: state.settings.fee_vnd });
+    const free = !state.settings.fee_vnd;
+    return reply({ id, ref, status: free ? 'awaiting_approval' : 'pending_payment', fee_vnd: state.settings.fee_vnd, free });
   },
 
   payment: (id) => {

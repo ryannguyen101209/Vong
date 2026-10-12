@@ -1396,3 +1396,6 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 .an-tip__value { color: var(--ink); font-size: 1rem; font-weight: 600; font-variant-numeric: tabular-nums; }
 .an-tip--left { transform: translateX(calc(-100% - 14px)); }
 .an-section .admin-table th, .an-section .admin-table .an-num, .an-nowrap { white-space: nowrap; }
+
+/* Home hero: the one-line note that listing is free. */
+.market-hero__free { margin: -4px 0 0; font-weight: 600; color: var(--accent-ink); }

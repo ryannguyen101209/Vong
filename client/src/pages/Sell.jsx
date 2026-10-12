@@ -33,7 +33,7 @@ export function Sell() {
   const navigate = useNavigate();
   const fileInput = useRef(null);
 
-  const [meta, setMeta] = useState({ categories: [], districts: [], cities: [], conditions: [], fee_vnd: null, first_listing_free: false });
+  const [meta, setMeta] = useState({ categories: [], districts: [], cities: [], conditions: [], fee_vnd: null, listing_free: true });
   const [values, setValues] = useState(EMPTY);
   // Each photo keeps its File, a stable key for React, and an object URL for the preview.
   const [photos, setPhotos] = useState([]);
@@ -93,7 +93,7 @@ export function Sell() {
 
     try {
       const created = await api.createListing(body);
-      // To the payment page (a free first listing just shows its review status there).
+      // To the payment page (a free listing just shows its review status there).
       navigate(`/payment/${created.id}`, { replace: true });
     } catch (error) {
       if (error.payload?.fields) setErrors(error.payload.fields);
@@ -176,16 +176,16 @@ export function Sell() {
           <p className="lead">{t('sell.lead')}</p>
         </div>
         <div className="sell-fee-lockup">
-          <span>{meta.first_listing_free ? t('sell.freeLockup') : feeLabel}</span>
-          <small>{meta.free_account ? t('sell.freeAccountNote') : meta.first_listing_free ? t('sell.freeLockupNote') : t('common.perListing')}</small>
+          <span>{meta.listing_free ? t('sell.freeLockup') : feeLabel}</span>
+          <small>{meta.listing_free ? t('sell.freeLockupNote') : t('common.perListing')}</small>
         </div>
       </header>
 
       <div className="notice notice--accent fee-notice">
-        {meta.first_listing_free ? (
+        {meta.listing_free ? (
           <>
-            <p className="notice__title">{t(meta.free_account ? 'sell.freeAccountTitle' : 'sell.freeNoticeTitle')}</p>
-            <p style={{ margin: 0 }}>{meta.free_account ? t('sell.freeAccountBody') : t('sell.freeNoticeBody', { fee: feeLabel })}</p>
+            <p className="notice__title">{t('sell.freeNoticeTitle')}</p>
+            <p style={{ margin: 0 }}>{t('sell.freeNoticeBody')}</p>
           </>
         ) : (
           <>
@@ -423,8 +423,8 @@ export function Sell() {
 
         <div className="sell-submit">
           <div>
-            <strong>{meta.free_account ? t('sell.freeAccountTitle') : meta.first_listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
-            <span>{meta.first_listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
+            <strong>{meta.listing_free ? t('sell.freeSubmitSummary') : t('sell.submitSummary', { fee: feeLabel })}</strong>
+            <span>{meta.listing_free ? t('sell.freeSubmitSummaryBody') : t('sell.submitSummaryBody')}</span>
             <span className="sell-submit__agree">
               {t('sell.agreePrefix')}
               <Link to="/rules" target="_blank">{legalTitle(lang, 'rules')}</Link>
@@ -434,7 +434,7 @@ export function Sell() {
             </span>
           </div>
           <button type="submit" className="btn btn--accent" disabled={submitting}>
-          {submitting ? t('sell.submitting') : t(meta.first_listing_free ? 'sell.freeSubmit' : 'sell.submit')}
+          {submitting ? t('sell.submitting') : t(meta.listing_free ? 'sell.freeSubmit' : 'sell.submit')}
           </button>
         </div>
       </form>
