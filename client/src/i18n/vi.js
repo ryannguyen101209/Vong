@@ -579,6 +579,16 @@ export default {
     backup_downloadFailed: 'Tải không được. Thử lại sau giây lát.',
     messagesTitle: 'Tin nhắn liên hệ',
     noMessages: 'Chưa có tin nhắn nào.',
+    reply: 'Trả lời',
+    replyAgain: 'Trả lời tiếp',
+    replyLabel: 'Nội dung trả lời',
+    replyGreeting: 'Chào {{name}},\n\n',
+    replyHint: 'Gửi tới {{to}} từ hello@usevong.com. Khi họ trả lời, thư về vong-inquiries@outlook.com (hộp thư đó cũng nhận một bản sao).',
+    replySend: 'Gửi email',
+    replySending: 'Đang gửi…',
+    repliedAt: 'Đã trả lời lúc {{when}}',
+    replyMailOff: 'Chưa bật gửi email. Cần đặt RESEND_API_KEY và MAIL_FROM trên Render.',
+    replyFailed: 'Chưa gửi được email. Thử lại sau giây lát.',
   },
 
   status: {

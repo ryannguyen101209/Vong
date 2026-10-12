@@ -686,10 +686,7 @@ function Settings({ token, onAuthError }) {
         ) : (
           <div className="stack" style={{ gap: 14 }}>
             {messages.map((item) => (
-              <div key={item.id} className="notice">
-                <p className="notice__title">{item.name} · {item.email}</p>
-                <p className="small" style={{ margin: 0 }}>{item.body}</p>
-              </div>
+              <ContactMessage key={item.id} item={item} token={token} onAuthError={onAuthError} />
             ))}
           </div>
         )}
@@ -699,6 +696,65 @@ function Settings({ token, onAuthError }) {
 }
 
 /** Download the database, and see / test the daily backup email. */
+/** One contact form message: when it came in, and a reply sent by email from hello@usevong.com. */
+function ContactMessage({ item, token, onAuthError }) {
+  const { t, lang } = useI18n();
+  const [open, setOpen] = useState(false);
+  const [draft, setDraft] = useState(() => t('admin.replyGreeting', { name: item.name }));
+  const [state, setState] = useState('idle'); // idle | sending | error codes
+  const [reply, setReply] = useState(item.replied_at ? { body: item.reply_body, at: item.replied_at } : null);
+
+  const send = async () => {
+    setState('sending');
+    try {
+      const result = await api.admin.replyMessage(token, item.id, draft.trim());
+      setReply({ body: draft.trim(), at: result.replied_at });
+      setOpen(false);
+      setState('idle');
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      setState(error.payload?.error || 'send_failed');
+    }
+  };
+
+  return (
+    <div className="notice contact-message">
+      <div className="spread" style={{ gap: 12, alignItems: 'baseline', flexWrap: 'wrap' }}>
+        <p className="notice__title" style={{ margin: 0 }}>{item.name} · {item.email}</p>
+        <span className="small muted">{formatDateTime(item.created_at, lang)}</span>
+      </div>
+      <p className="small" style={{ margin: '6px 0 0', whiteSpace: 'pre-wrap' }}>{item.body}</p>
+
+      {reply && (
+        <div className="contact-message__reply">
+          <p className="small muted" style={{ margin: '0 0 4px' }}>{t('admin.repliedAt', { when: formatDateTime(reply.at, lang) })}</p>
+          <p className="small" style={{ margin: 0, whiteSpace: 'pre-wrap' }}>{reply.body}</p>
+        </div>
+      )}
+
+      {open ? (
+        <div className="contact-message__compose">
+          <textarea className="input" rows={5} maxLength={5000} value={draft} onChange={(event) => setDraft(event.target.value)} aria-label={t('admin.replyLabel')} />
+          <p className="small muted" style={{ margin: '6px 0 0' }}>{t('admin.replyHint', { to: item.email })}</p>
+          {!['idle', 'sending'].includes(state) && (
+            <p role="alert" className="field__error">{t(state === 'mail_off' ? 'admin.replyMailOff' : 'admin.replyFailed')}</p>
+          )}
+          <div className="row" style={{ gap: 8, marginTop: 10 }}>
+            <button type="button" className="btn btn--accent btn--small" disabled={state === 'sending' || draft.trim().length < 2} onClick={send}>
+              {state === 'sending' ? t('admin.replySending') : t('admin.replySend')}
+            </button>
+            <button type="button" className="btn btn--ghost btn--small" disabled={state === 'sending'} onClick={() => setOpen(false)}>{t('common.cancel')}</button>
+          </div>
+        </div>
+      ) : (
+        <button type="button" className="btn btn--ghost btn--small" style={{ marginTop: 12 }} onClick={() => { setOpen(true); setState('idle'); }}>
+          {reply ? t('admin.replyAgain') : t('admin.reply')}
+        </button>
+      )}
+    </div>
+  );
+}
+
 function BackupPanel({ token, backup, onBackup, onAuthError }) {
   const { t, lang } = useI18n();
   const [busy, setBusy] = useState(null);

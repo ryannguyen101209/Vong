@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
-import { emailUser, mailEnabled } from '../mailer.js';
+import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
 
 /** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
@@ -215,7 +215,27 @@ router.patch('/promo-codes/:code', (req, res) => {
 
 /** GET /api/admin/messages — contact form submissions, newest first. */
 router.get('/messages', (req, res) => {
-  res.json({ messages: db.prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 100').all() });
+  res.json({ messages: db.prepare('SELECT * FROM messages ORDER BY created_at DESC LIMIT 100').all(), mail: mailEnabled() });
+});
+
+/**
+ * POST /api/admin/messages/:id/reply { body } — emails the sender from MAIL_FROM
+ * (hello@usevong.com). Their answer goes to the shared inbox, which also gets a copy.
+ */
+router.post('/messages/:id/reply', async (req, res) => {
+  const message = db.prepare('SELECT * FROM messages WHERE id = ?').get(Number(req.params.id));
+  if (!message) return res.status(404).json({ error: 'not_found' });
+  const body = String(req.body?.body ?? '').trim();
+  if (body.length < 2 || body.length > 5000) return res.status(400).json({ error: 'bad_body' });
+  if (!mailEnabled()) return res.status(503).json({ error: 'mail_off' });
+
+  const email = buildContactReply({ name: message.name, originalBody: message.body, originalAt: message.created_at, replyBody: body });
+  const sent = await sendMail({ to: message.email, ...email, replyTo: inboxAddress(), bcc: inboxAddress() });
+  if (!sent) return res.status(502).json({ error: 'send_failed' });
+
+  const repliedAt = new Date().toISOString();
+  db.prepare('UPDATE messages SET reply_body = ?, replied_at = ? WHERE id = ?').run(body, repliedAt, message.id);
+  res.json({ ok: true, replied_at: repliedAt });
 });
 
 /** GET /api/admin/reports — open reports, newest first, with the listing they are about. */

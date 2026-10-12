@@ -183,6 +183,10 @@ if (!columns.includes('sold_at')) db.exec('ALTER TABLE listings ADD COLUMN sold_
 if (!columns.includes('payment_verified_at')) db.exec('ALTER TABLE listings ADD COLUMN payment_verified_at TEXT');
 // When a seller last changed a listing that was already approved, so the owner can recheck it.
 if (!columns.includes('edited_at')) db.exec('ALTER TABLE listings ADD COLUMN edited_at TEXT');
+// The owner's reply to a contact form message, sent by email from the admin page.
+const messageColumns = db.prepare('PRAGMA table_info(messages)').all().map((c) => c.name);
+if (!messageColumns.includes('reply_body')) db.exec('ALTER TABLE messages ADD COLUMN reply_body TEXT');
+if (!messageColumns.includes('replied_at')) db.exec('ALTER TABLE messages ADD COLUMN replied_at TEXT');
 // Which city a listing is in. Everything listed before multi-city support was in Ho Chi Minh City.
 if (!columns.includes('city')) db.exec("ALTER TABLE listings ADD COLUMN city TEXT NOT NULL DEFAULT 'ho_chi_minh'");
 // Promo codes for the listing fee. A code makes one listing free; each account can use a given code once.

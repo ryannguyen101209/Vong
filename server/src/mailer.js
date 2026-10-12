@@ -127,6 +127,29 @@ export function buildEmail(kind, data) {
   throw new Error(`unknown email kind: ${kind}`);
 }
 
+/** Where people's answers to the owner's replies go (and where a copy of each reply is kept). */
+export const inboxAddress = () => process.env.CONTACT_INBOX?.trim() || 'vong-inquiries@outlook.com';
+
+const vnDate = (iso) => new Date(iso).toLocaleString('vi-VN', { timeZone: 'Asia/Ho_Chi_Minh', dateStyle: 'medium', timeStyle: 'short' });
+
+/** The owner's answer to a contact form message, with the original quoted under it. */
+export function buildContactReply({ name, originalBody, originalAt, replyBody }) {
+  const quoteText = String(originalBody).split('\n').map((line) => `> ${line}`).join('\n');
+  return {
+    subject: 'Vòng trả lời tin nhắn của bạn · Reply from Vòng',
+    text: `${replyBody}\n\n---\n${name} viết lúc ${vnDate(originalAt)}:\n${quoteText}`,
+    html: `<!doctype html><html><body style="margin:0;background:${PAGE};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:${INK}">
+<div style="max-width:560px;margin:0 auto;padding:28px 20px">
+<p style="margin:0 0 18px;font-size:22px;font-weight:700;color:${GREEN}">Vòng</p>
+<div style="line-height:1.6;white-space:pre-wrap">${esc(replyBody)}</div>
+<hr style="border:0;border-top:1px solid #dfe5da;margin:28px 0 16px">
+<p style="margin:0 0 8px;font-size:13px;color:#7b8a80">${esc(name)} · ${esc(vnDate(originalAt))}</p>
+<blockquote style="margin:0;padding:12px 14px;background:${SOFT};border-radius:8px;color:#4b5a51;white-space:pre-wrap">${esc(originalBody)}</blockquote>
+<p style="margin:28px 0 0;font-size:12px;color:#7b8a80">usevong.com · Trả lời email này để nhắn tiếp cho tụi mình / Reply to this email to write back</p>
+</div></body></html>`,
+  };
+}
+
 /** True when email is configured. Callers check this before doing throttle bookkeeping. */
 export const mailEnabled = () => Boolean(process.env.RESEND_API_KEY?.trim());
 
@@ -134,13 +157,15 @@ export const mailEnabled = () => Boolean(process.env.RESEND_API_KEY?.trim());
  * Send one email. No-op without RESEND_API_KEY or a recipient. Never throws.
  * Resolves to true when the provider accepted it; most callers ignore that.
  */
-export function sendMail({ to, subject, html, text, attachments, timeoutMs = TIMEOUT_MS }) {
+export function sendMail({ to, subject, html, text, attachments, replyTo, bcc, timeoutMs = TIMEOUT_MS }) {
   const key = process.env.RESEND_API_KEY?.trim();
   if (!key || !to) return Promise.resolve(false);
   const api = (process.env.RESEND_API_URL || 'https://api.resend.com').replace(/\/+$/, '');
   const from = process.env.MAIL_FROM?.trim() || 'Vòng <onboarding@resend.dev>';
   const payload = { from, to: [to], subject, html, text };
-  if (process.env.MAIL_REPLY_TO?.trim()) payload.reply_to = process.env.MAIL_REPLY_TO.trim();
+  const replyAddress = replyTo || process.env.MAIL_REPLY_TO?.trim();
+  if (replyAddress) payload.reply_to = replyAddress;
+  if (bcc) payload.bcc = [bcc];
   if (attachments?.length) payload.attachments = attachments;
 
   return fetch(`${api}/emails`, {
