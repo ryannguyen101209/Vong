@@ -796,4 +796,15 @@ export default {
     privacy: 'Privacy',
     rules: 'Listing rules',
   },
+
+  ticker: {
+    label: 'Vòng announcements',
+    items: [
+      { text: 'Free to list, no listing fees', to: '/sell' },
+      { text: 'Sell on Vòng', to: '/sell' },
+      { text: 'Good finds, gentle prices', to: '/browse' },
+      { text: 'Message sellers right on the site', to: '/browse' },
+      { text: 'Clear out the clutter, pass it on', to: '/sell' },
+    ],
+  },
 };
