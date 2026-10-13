@@ -85,20 +85,46 @@ try {
   assert.deepEqual(onlySaigon.map((l) => l.id).sort(), [ward.body.id, 'legacy'].sort());
   assert.equal((await request('/api/admin/listings?status=published&city=atlantis', { token })).body.listings.length, 3, 'unknown city: no filter');
 
-  // Admin stats: sold, seller reply rate, and each city.
+  // Admin stats: sold, sellers, buyers who messaged, and each city.
   const convo = (await request('/api/conversations', { cookie: buyer, body: { listingId: ward.body.id } })).body.conversation.id;
-  await request(`/api/conversations/${convo}/messages`, { cookie: buyer, body: { body: 'Còn không?', clientId: 'areas-buyer-0001' } });
+  for (let i = 0; i < 5; i += 1) {
+    await request(`/api/conversations/${convo}/messages`, { cookie: buyer, body: { body: `Tin ${i}`, clientId: `areas-buyer-000${i}` } });
+  }
   await request('/api/conversations', { cookie: buyer, body: { listingId: hanoi.body.id } });
-  let report = (await request('/api/admin/analytics', { token })).body;
-  assert.deepEqual(report.replies_30d, { chats: 2, answered: 0 });
-  await request(`/api/conversations/${convo}/messages`, { cookie: seller, body: { body: 'Còn nha', clientId: 'areas-seller-0001' } });
   assert.equal((await request(`/api/listings/${ward.body.id}/sold`, { cookie: seller, method: 'POST' })).status, 200);
-  report = (await request('/api/admin/analytics', { token })).body;
-  assert.deepEqual(report.replies_30d, { chats: 2, answered: 1 });
+  let report = (await request('/api/admin/analytics', { token })).body;
+  assert.equal(report.engagement.conversations, 2);
+  assert.equal(report.engagement.buyers, 1, 'one buyer, however many messages');
+  assert.equal(report.engagement.buyers_7d, 1);
+  assert.ok(!('chat_messages' in report.engagement), 'raw message counts are gone');
+  assert.deepEqual(report.sellers, { active: 1, new_7d: 1 });
   assert.deepEqual(report.sold, { total: 1, last_30d: 1 });
   const saigon = report.cities.find((c) => c.city === 'ho_chi_minh');
   assert.deepEqual({ live: saigon.live, sold: saigon.sold, new_30d: saigon.new_30d }, { live: 1, sold: 1, new_30d: 2 });
   assert.equal(report.cities.find((c) => c.city === 'ha_noi').live, 1);
+  assert.equal(report.daily.reduce((n, d) => n + d.conversations, 0), 2, 'the chart counts new chats');
+  assert.equal(report.users.total, 2);
+
+  // Accounts marked "not counted" (the team, test accounts) drop out of every number,
+  // but a listing with no account (from before sign-in existed) still counts.
+  db.prepare(`INSERT INTO listings (id, ref, title_vi, description_vi, category, price_vnd, city, district, condition,
+    seller_name, seller_phone, status, fee_vnd, created_at, published_at)
+    VALUES ('noaccount', 'VONG-NOACC01', 'Đèn cũ', 'Tin đăng từ trước khi có tài khoản.', 'household', 50000, 'ho_chi_minh', 'district_3', 'good',
+    'An', '0900000002', 'published', 0, ?, ?)`).run(new Date().toISOString(), new Date().toISOString());
+  assert.equal((await request('/api/admin/settings', { token, method: 'PUT', body: { stats_exclude_emails: "x'@bad" } })).status, 400);
+  const saved = await request('/api/admin/settings', { token, method: 'PUT', body: { stats_exclude_emails: 'Buyer@example.test, seller@example.test' } });
+  assert.equal(saved.body.settings.stats_exclude_emails, 'buyer@example.test, seller@example.test');
+  report = (await request('/api/admin/analytics', { token })).body;
+  assert.equal(report.excluded_accounts, 2);
+  assert.equal(report.users.total, 0);
+  assert.equal(report.engagement.conversations, 0);
+  assert.equal(report.engagement.buyers, 0);
+  assert.deepEqual(report.sellers, { active: 0, new_7d: 0 });
+  assert.equal(report.sold.total, 0);
+  assert.equal(report.listings.by_status.published, 1, 'only the listing with no account is left');
+  // Removing them from the list brings them back.
+  await request('/api/admin/settings', { token, method: 'PUT', body: { stats_exclude_emails: '' } });
+  assert.equal((await request('/api/admin/analytics', { token })).body.engagement.buyers, 1);
 
   console.log('area and admin stats tests passed');
 } finally {

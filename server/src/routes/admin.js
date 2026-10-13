@@ -197,6 +197,11 @@ router.put('/settings', (req, res) => {
     if (emails.length > 50 || emails.some((e) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))) return res.status(400).json({ error: 'bad_free_emails' });
     patch.free_emails = emails.join(', ');
   }
+  if (body.stats_exclude_emails !== undefined) {
+    const emails = [...new Set(String(body.stats_exclude_emails).split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean))];
+    if (emails.length > 50 || emails.some((e) => !/^[^@\s',;]+@[^@\s',;]+\.[^@\s',;]+$/.test(e))) return res.status(400).json({ error: 'bad_stats_emails' });
+    patch.stats_exclude_emails = emails.join(', ');
+  }
   // The listing fee is set by LISTING_FEE_VND on the host, not here.
 
   res.json({ settings: saveSettings(patch) });

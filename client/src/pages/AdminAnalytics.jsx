@@ -3,12 +3,12 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, formatDate } from '../lib/format.js';
 
-const METRICS = ['listings', 'users', 'buy_requests', 'chat_messages'];
+const METRICS = ['listings', 'users', 'buy_requests', 'conversations'];
 const METRIC_LABEL = {
   listings: 'metricListings',
   users: 'metricUsers',
   buy_requests: 'metricBuyRequests',
-  chat_messages: 'metricChats',
+  conversations: 'metricConversations',
 };
 const STATUSES = [
   ['pending_payment', 'var(--line-strong)'],
@@ -102,6 +102,57 @@ function BarList({ rows, label, empty }) {
 }
 
 /** The admin panel's Analytics tab: counts only, read from /api/admin/analytics. */
+/** The team's own and test accounts, left out of every number above. */
+function ExcludedAccounts({ token, onAuthError, onSaved, counted }) {
+  const { t } = useI18n();
+  const a = (key, vars) => t(`admin.analytics.${key}`, vars);
+  const [emails, setEmails] = useState(null);
+  const [state, setState] = useState('idle');
+
+  useEffect(() => {
+    api.admin.settings(token)
+      .then((data) => setEmails(data.settings.stats_exclude_emails || ''))
+      .catch((error) => error.status === 401 && onAuthError());
+  }, [token, onAuthError]);
+
+  if (emails === null) return null;
+  const save = async (event) => {
+    event.preventDefault();
+    setState('saving');
+    try {
+      const data = await api.admin.saveSettings(token, { stats_exclude_emails: emails });
+      setEmails(data.settings.stats_exclude_emails || '');
+      setState('saved');
+      onSaved();
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      setState('error');
+    }
+  };
+
+  return (
+    <section className="an-section">
+      <h2>{a('excludeTitle')}</h2>
+      <form className="card panel form" onSubmit={save} style={{ maxWidth: 620 }}>
+        <p className="small muted" style={{ margin: 0 }}>{a('excludeHint')}</p>
+        <textarea
+          className="textarea"
+          style={{ minHeight: 80 }}
+          value={emails}
+          onChange={(event) => { setEmails(event.target.value); setState('idle'); }}
+          placeholder="ban@gmail.com, test@gmail.com"
+          aria-label={a('excludeTitle')}
+        />
+        <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+          <button type="submit" className="btn btn--small" disabled={state === 'saving'}>{t('common.save')}</button>
+          {state === 'saved' && <span className="small muted" role="status">{a('excludeSaved', { n: counted ?? 0 })}</span>}
+          {state === 'error' && <span className="small" role="alert">{a('excludeError')}</span>}
+        </div>
+      </form>
+    </section>
+  );
+}
+
 export function AdminAnalytics({ token, onAuthError }) {
   const { t, lang } = useI18n();
   const [report, setReport] = useState(null);
@@ -134,7 +185,6 @@ export function AdminAnalytics({ token, onAuthError }) {
   }
 
   const status = report.listings?.by_status || {};
-  const replies = report.replies_30d || { chats: 0, answered: 0 };
   const cities = report.cities || [];
   const statusTotal = Object.values(status).reduce((s, v) => s + v, 0);
   const waiting = status.awaiting_approval || 0;
@@ -156,11 +206,7 @@ export function AdminAnalytics({ token, onAuthError }) {
       <div className="an-stats">
         <Stat label={a('liveNow')} value={num(report.live_visitors)} />
         <Stat label={a('sold')} value={num(report.sold?.total)} sub={`+${num(report.sold?.last_30d)} ${a('in30Days')}`} />
-        <Stat
-          label={a('replyRate')}
-          value={replies.chats ? `${Math.round((replies.answered / replies.chats) * 100)}%` : '–'}
-          sub={replies.chats ? a('replyRateSub', { answered: num(replies.answered), chats: num(replies.chats) }) : undefined}
-        />
+        <Stat label={a('sellers')} value={num(report.sellers?.active)} sub={`+${num(report.sellers?.new_7d)} ${a('newSellers')}`} />
         <Stat label={a('liveListings')} value={num(status.published)} sub={`+${num(report.listings?.published_7d)} ${a('thisWeek')}`} />
         <Stat label={a('waiting')} value={num(waiting)} sub={waiting ? a('needsYou') : a('queueClear')} />
         <Stat label={a('accounts')} value={num(report.users?.total)} sub={`+${num(report.users?.new_7d)} ${a('thisWeek')}`} />
@@ -245,11 +291,13 @@ export function AdminAnalytics({ token, onAuthError }) {
         <h2>{a('engagement')}</h2>
         <div className="an-stats" style={{ marginBottom: 0 }}>
           <Stat label={a('buyRequests')} value={num(report.engagement?.buy_requests)} sub={`+${num(report.engagement?.buy_requests_7d)} ${a('thisWeek')}`} />
-          <Stat label={a('conversations')} value={num(report.engagement?.conversations)} />
-          <Stat label={a('chatMessages')} value={num(report.engagement?.chat_messages)} sub={`+${num(report.engagement?.chat_messages_7d)} ${a('thisWeek')}`} />
+          <Stat label={a('conversations')} value={num(report.engagement?.conversations)} sub={`+${num(report.engagement?.conversations_7d)} ${a('thisWeek')}`} />
+          <Stat label={a('buyers')} value={num(report.engagement?.buyers)} sub={`+${num(report.engagement?.buyers_7d)} ${a('thisWeek')}`} />
           <Stat label={a('contactForm')} value={num(report.engagement?.contact_messages)} />
         </div>
       </section>
+
+      <ExcludedAccounts token={token} onAuthError={onAuthError} onSaved={load} counted={report.excluded_accounts} />
 
       <section className="an-section">
         <h2>{a('top')}</h2>

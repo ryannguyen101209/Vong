@@ -306,6 +306,8 @@ export const DEFAULT_SETTINGS = {
   fee_vnd: '10000',
   // Accounts (by Google email) that never pay the listing fee, e.g. the team.
   free_emails: '',
+  // Accounts (by Google email) left out of the admin stats: the team's own and test accounts.
+  stats_exclude_emails: '',
 };
 
 const insertSetting = db.prepare(
