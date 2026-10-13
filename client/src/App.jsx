@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useRef } from 'react';
 import { Routes, Route, useLocation } from 'react-router-dom';
 import { Header } from './components/Header.jsx';
 import { PromoTicker } from './components/PromoTicker.jsx';
@@ -32,6 +32,23 @@ function ScrollToTop() {
   return null;
 }
 
+const SITE_TITLE = 'Vòng — Mua bán đồ cũ ở Việt Nam';
+
+/**
+ * The server names the tab for a listing or category page when it is first
+ * opened. After that, each move to another page goes back to the site name,
+ * so a listing's name doesn't stay on the tab; a listing sets its own again.
+ */
+function PageTitle() {
+  const { pathname, search } = useLocation();
+  const first = useRef(true);
+  useEffect(() => {
+    if (first.current) { first.current = false; return; }
+    document.title = SITE_TITLE;
+  }, [pathname, search]);
+  return null;
+}
+
 /** Tells the server this tab is open, so the owner can see how many people are here now. */
 function VisitorPing() {
   useEffect(() => {
@@ -54,6 +71,7 @@ export function App() {
   return (
     <>
       <ScrollToTop />
+      <PageTitle />
       <VisitorPing />
       <PromoTicker />
       <Header />

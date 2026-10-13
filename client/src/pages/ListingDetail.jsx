@@ -49,6 +49,12 @@ export function ListingDetail() {
       .catch((error) => setStatus(error.status === 404 ? 'missing' : 'error'));
   }, [id]);
 
+  // Name the tab after the listing, like the server does when the page is opened directly.
+  const tabTitle = status === 'ready' && listing ? localized(listing, 'title') : '';
+  useEffect(() => {
+    if (tabTitle) document.title = `${tabTitle} | Vòng`;
+  }, [tabTitle]);
+
   if (status === 'loading') {
     return <div className="shell section editorial-page listing-page"><p className="muted">{t('common.loading')}</p></div>;
   }
