@@ -21,10 +21,26 @@
     <meta property="og:image:height" content="630" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:image" content="https://usevong.com/og-image.png" />
+    <script>
+      // Apply a dark theme the visitor chose before anything is drawn, so the first screen matches.
+      try { if (localStorage.getItem('vong.theme.choice') === 'dark') document.documentElement.dataset.theme = 'dark'; } catch (e) {}
+    </script>
+    <style>
+      /* First-load screen: the Vòng mark drawing itself until the app starts (React replaces it).
+         Same animation as .vong-loader in styles.css. Shown only if loading takes a moment. */
+      .vong-splash { position: fixed; inset: 0; display: grid; place-items: center; background: #fafbf8; --ink: #38604a; --track: #e1e5dc; opacity: 0; animation: vong-splash-in 0.3s ease 0.3s forwards; }
+      [data-theme='dark'] .vong-splash { background: #171e19; --ink: #bdd4aa; --track: #354236; }
+      .vong-splash svg { width: 104px; height: auto; overflow: visible; }
+      .vong-splash .t { stroke: var(--track); }
+      .vong-splash .i { stroke: var(--ink); stroke-dasharray: 1 1; animation: vong-splash-draw 2.2s cubic-bezier(0.65, 0, 0.35, 1) infinite; }
+      @keyframes vong-splash-in { to { opacity: 1; } }
+      @keyframes vong-splash-draw { 0% { stroke-dashoffset: 1; } 48%, 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
+      @media (prefers-reduced-motion: reduce) { .vong-splash .i { stroke-dasharray: none; animation: none; } }
+    </style>
     <title>Vòng — Mua bán đồ cũ ở Việt Nam</title>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root"><div class="vong-splash" role="status" aria-label="Vòng"><svg viewBox="0 0 200 170" fill="none" aria-hidden="true"><path class="t" pathLength="1" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" d="M 8 76 C 52 76 84 70 96 44 C 104 26 96 14 84 16 C 70 18 66 40 76 62 L 120 146 C 124 152 130 152 134 144 L 172 40 C 176 28 184 24 192 28"/><path class="i" pathLength="1" stroke-width="13" stroke-linecap="round" stroke-linejoin="round" d="M 8 76 C 52 76 84 70 96 44 C 104 26 96 14 84 16 C 70 18 66 40 76 62 L 120 146 C 124 152 130 152 134 144 L 172 40 C 176 28 184 24 192 28"/></svg></div></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>

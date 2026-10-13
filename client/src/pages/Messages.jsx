@@ -5,11 +5,12 @@ import { useI18n } from '../i18n/index.jsx';
 import { sessionApi } from '../lib/session-api.js';
 import { unreadChanged } from '../lib/unread.js';
 import { EmptyState, ErrorState } from '../components/States.jsx';
+import { PageLoader } from '../components/Loader.jsx';
 
 export function Messages() {
   const { t } = useI18n();
   const { profile, loading, openSignIn } = useAuth();
-  if (loading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (loading) return <PageLoader />;
   if (!profile) return (
     <div className="shell section messages-gate">
       <h1>{t('messages.signInTitle')}</h1><p className="lead">{t('messages.signInBody')}</p>

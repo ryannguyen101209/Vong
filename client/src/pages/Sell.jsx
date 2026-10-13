@@ -8,6 +8,7 @@ import { UploadIcon, CloseIcon, PlusIcon } from '../components/Icons.jsx';
 import { ErrorState } from '../components/States.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { legalTitle } from './Legal.jsx';
+import { Loader, PageLoader } from '../components/Loader.jsx';
 
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -160,11 +161,11 @@ export function Sell() {
   const feeLabel = meta.fee_vnd == null ? '…' : formatPrice(meta.fee_vnd, lang);
   const hasErrors = Object.keys(errors).length > 0;
 
-  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (authLoading) return <PageLoader />;
   if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.sellTitle')}</h1><p className="lead">{t('auth.sellBody')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
 
   if (metaStatus !== 'ready') {
-    return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <p role="status">{t('common.loading')}</p>}</div>;
+    return <div className="shell section sell-page"><h1>{t('sell.title')}</h1>{metaStatus === 'error' ? <ErrorState onRetry={() => setMetaAttempt((value) => value + 1)} /> : <Loader />}</div>;
   }
 
   return (

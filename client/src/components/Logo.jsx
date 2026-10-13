@@ -4,7 +4,7 @@
  * from CSS (currentColor), which is what makes it work in both themes.
  */
 
-const MARK_PATH =
+export const MARK_PATH =
   'M 8 76 C 52 76 84 70 96 44 C 104 26 96 14 84 16 C 70 18 66 40 76 62 L 120 146 ' +
   'C 124 152 130 152 134 144 L 172 40 C 176 28 184 24 192 28';
 

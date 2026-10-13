@@ -6,6 +6,7 @@ import { api } from '../lib/api.js';
 import { digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { ErrorState } from '../components/States.jsx';
+import { PageLoader } from '../components/Loader.jsx';
 
 export function EditListing() {
   const { id } = useParams();
@@ -46,7 +47,7 @@ export function EditListing() {
     return () => { active = false; };
   }, [id, profile]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  if (loading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (loading) return <PageLoader />;
   if (!profile) {
     return (
       <div className="shell section messages-gate">
@@ -56,7 +57,7 @@ export function EditListing() {
       </div>
     );
   }
-  if (status === 'loading') return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (status === 'loading') return <PageLoader />;
   if (status === 'missing') {
     return (
       <div className="shell section editorial-page">
