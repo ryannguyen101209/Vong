@@ -6,6 +6,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ReviewForm, ReviewItem, Stars, TrustedBadge } from '../components/Reviews.jsx';
+import { PageLoader } from '../components/Loader.jsx';
 
 /** A seller's public page: who they are, what they sell, and what buyers said. */
 export function SellerProfile() {
@@ -30,7 +31,7 @@ export function SellerProfile() {
   // Reload when the visitor signs in, so "can review" reflects them.
   useEffect(load, [load, profile?.id]);
 
-  if (status === 'loading') return <div className="shell section"><p className="muted">{t('common.loading')}</p></div>;
+  if (status === 'loading') return <PageLoader />;
   if (status === 'missing') {
     return (
       <div className="shell section">

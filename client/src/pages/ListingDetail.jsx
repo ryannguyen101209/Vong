@@ -12,6 +12,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { ReportListing } from '../components/ReportListing.jsx';
 import { Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { ShareYourListing } from '../components/ShareYourListing.jsx';
+import { PageLoader } from '../components/Loader.jsx';
 
 export function ListingDetail() {
   const { id } = useParams();
@@ -56,7 +57,7 @@ export function ListingDetail() {
   }, [tabTitle]);
 
   if (status === 'loading') {
-    return <div className="shell section editorial-page listing-page"><p className="muted">{t('common.loading')}</p></div>;
+    return <PageLoader />;
   }
   if (status === 'missing') {
     return (

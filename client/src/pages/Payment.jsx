@@ -8,6 +8,7 @@ import { ErrorState } from '../components/States.jsx';
 import { LogoMark } from '../components/Logo.jsx';
 import { CheckIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
+import { PageLoader } from '../components/Loader.jsx';
 
 /**
  * Draws this listing's VietQR from the payload the server built: account,
@@ -128,10 +129,10 @@ export function Payment() {
     }
   };
 
-  if (authLoading) return <div className="shell section"><p role="status">{t('common.loading')}</p></div>;
+  if (authLoading) return <PageLoader />;
   if (!profile) return <div className="shell section messages-gate"><h1>{t('auth.title')}</h1><p className="lead">{t('auth.lead')}</p><button className="btn btn--accent" onClick={openSignIn}>{t('auth.signIn')}</button></div>;
   if (status === 'loading') {
-    return <div className="shell section editorial-page payment-page"><p className="muted">{t('common.loading')}</p></div>;
+    return <PageLoader />;
   }
   if (status === 'unconfigured') {
     return (
