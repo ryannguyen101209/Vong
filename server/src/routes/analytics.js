@@ -148,6 +148,8 @@ export function buildReport() {
     users: {
       total: count(`SELECT COUNT(*) AS n FROM users WHERE ${realUser}`),
       new_7d: count(`SELECT COUNT(*) AS n FROM users WHERE ${realUser} AND created_at >= ?`, weekAgo),
+      // New accounts per day (Saigon time) since the first one, for the growth chart. Days with none are left out.
+      by_day: db.prepare(`SELECT date(created_at, '${TZ_SHIFT}') AS day, COUNT(*) AS n FROM users WHERE ${realUser} GROUP BY day ORDER BY day`).all(),
     },
     engagement: {
       buy_requests: count(`SELECT COUNT(*) AS n FROM buy_requests WHERE ${realRequest}`),
