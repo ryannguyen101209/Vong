@@ -4,20 +4,18 @@
  * sold, and how pickup works. Both language variants are hand-written.
  */
 
+import { HCM_WARDS } from './hcm-wards.js';
+
 export const CATEGORIES = ['furniture', 'clothing', 'electronics', 'books', 'household', 'sports', 'hobby'];
 // Cities Vòng is open in, and the areas a seller can pick inside each. Area keys are
 // unique across cities (Saigon's keep their original names; the rest are prefixed), so
 // the listing's `district` column alone says exactly which area it is.
-// Saigon uses the districts as people still name them (the pre-2021 / pre-2025 map).
-// 'thao_dien' is no longer offered but stays labelled in the UI for older listings.
+// Saigon has had no districts since 1 July 2025, so its areas are the new wards
+// (hcm-wards.js). The old district keys are no longer offered but stay valid,
+// labelled and filterable for listings written before (LEGACY_AREAS).
 export const DEFAULT_CITY = 'ho_chi_minh';
 export const CITY_DISTRICTS = {
-  ho_chi_minh: [
-    'district_1', 'district_2', 'district_3', 'district_4', 'district_5', 'district_6',
-    'district_7', 'district_8', 'district_9', 'district_10', 'district_11', 'district_12',
-    'binh_tan', 'binh_thanh', 'go_vap', 'phu_nhuan', 'tan_binh', 'tan_phu', 'thu_duc',
-    'binh_chanh', 'can_gio', 'cu_chi', 'hoc_mon', 'nha_be',
-  ],
+  ho_chi_minh: HCM_WARDS.map((ward) => ward.key),
   ha_noi: [
     'hn_ba_dinh', 'hn_hoan_kiem', 'hn_hai_ba_trung', 'hn_dong_da', 'hn_tay_ho', 'hn_cau_giay',
     'hn_thanh_xuan', 'hn_hoang_mai', 'hn_long_bien', 'hn_nam_tu_liem', 'hn_bac_tu_liem', 'hn_ha_dong',
@@ -31,10 +29,19 @@ export const CITY_DISTRICTS = {
   vung_tau: ['vt_center', 'vt_other'],
   bien_hoa: ['bh_center', 'bh_other'],
 };
+export const LEGACY_AREAS = {
+  ho_chi_minh: [
+    'district_1', 'district_2', 'district_3', 'district_4', 'district_5', 'district_6',
+    'district_7', 'district_8', 'district_9', 'district_10', 'district_11', 'district_12',
+    'binh_tan', 'binh_thanh', 'go_vap', 'phu_nhuan', 'tan_binh', 'tan_phu', 'thu_duc',
+    'binh_chanh', 'can_gio', 'cu_chi', 'hoc_mon', 'nha_be', 'thao_dien',
+  ],
+};
 export const CITIES = Object.keys(CITY_DISTRICTS);
-export const DISTRICTS = CITIES.flatMap((city) => CITY_DISTRICTS[city]);
+/** Every known area key, offered or legacy. */
+export const DISTRICTS = CITIES.flatMap((city) => [...CITY_DISTRICTS[city], ...(LEGACY_AREAS[city] ?? [])]);
 /** The city an area key belongs to, or null if it is not a known area. */
-export const cityOfDistrict = (district) => CITIES.find((city) => CITY_DISTRICTS[city].includes(district)) ?? null;
+export const cityOfDistrict = (district) => CITIES.find((city) => CITY_DISTRICTS[city].includes(district) || LEGACY_AREAS[city]?.includes(district)) ?? null;
 
 // Vietnamese names for the places that are not simply "Quận N", used for link previews and Google.
 export const CITY_NAMES_VI = {
@@ -46,6 +53,7 @@ export const CITY_NAMES_EN = {
   ...CITY_NAMES_VI, ho_chi_minh: 'Ho Chi Minh City',
 };
 export const AREA_NAMES_VI = {
+  ...Object.fromEntries(HCM_WARDS.map((ward) => [ward.key, ward.name])),
   hn_ba_dinh: 'Ba Đình', hn_hoan_kiem: 'Hoàn Kiếm', hn_hai_ba_trung: 'Hai Bà Trưng', hn_dong_da: 'Đống Đa',
   hn_tay_ho: 'Tây Hồ', hn_cau_giay: 'Cầu Giấy', hn_thanh_xuan: 'Thanh Xuân', hn_hoang_mai: 'Hoàng Mai',
   hn_long_bien: 'Long Biên', hn_nam_tu_liem: 'Nam Từ Liêm', hn_bac_tu_liem: 'Bắc Từ Liêm', hn_ha_dong: 'Hà Đông',

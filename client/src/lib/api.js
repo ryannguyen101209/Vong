@@ -117,8 +117,8 @@ export const api = {
     analytics: (token) =>
       request('/api/admin/analytics', { headers: { authorization: `Bearer ${token}` } }),
 
-    listings: (token, status) =>
-      request(`/api/admin/listings?status=${encodeURIComponent(status)}`, {
+    listings: (token, status, city = '') =>
+      request(`/api/admin/listings?status=${encodeURIComponent(status)}${city ? `&city=${encodeURIComponent(city)}` : ''}`, {
         headers: { authorization: `Bearer ${token}` },
       }),
 

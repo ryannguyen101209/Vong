@@ -6,6 +6,7 @@ import { api } from '../lib/api.js';
 import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState, LoadingGrid } from '../components/States.jsx';
 import { SearchIcon } from '../components/Icons.jsx';
+import { AreaOptions } from '../components/AreaOptions.jsx';
 
 const SORTS = [
   { value: 'newest', key: 'browse.sortNewest' },
@@ -145,9 +146,7 @@ export function Browse() {
               <span className="sr-only">{t('browse.districtLabel')}</span>
               <select className="select" value={district} onChange={(event) => update('district', event.target.value)}>
                 <option value="">{t('browse.allDistricts')}</option>
-                {(cities.find((item) => item.key === city)?.districts ?? []).map((value) => (
-                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
-                ))}
+                <AreaOptions keys={cities.find((item) => item.key === city)?.districts ?? []} current={district} />
               </select>
             </label>
           )}

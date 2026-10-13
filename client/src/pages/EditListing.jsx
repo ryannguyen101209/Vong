@@ -7,6 +7,7 @@ import { digitsOnly } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
 import { ErrorState } from '../components/States.jsx';
 import { PageLoader } from '../components/Loader.jsx';
+import { AreaOptions } from '../components/AreaOptions.jsx';
 
 export function EditListing() {
   const { id } = useParams();
@@ -15,6 +16,8 @@ export function EditListing() {
   const navigate = useNavigate();
   const [meta, setMeta] = useState({ categories: [], districts: [], cities: [], conditions: [] });
   const [values, setValues] = useState(null);
+  // Where the listing was when it loaded: an older Saigon district stays selectable.
+  const [original, setOriginal] = useState(null);
   const [status, setStatus] = useState('loading');
   const [errors, setErrors] = useState({});
   const [saving, setSaving] = useState(false);
@@ -30,6 +33,7 @@ export function EditListing() {
         const listing = mine.listings.find((item) => item.id === id);
         if (!listing) { setStatus('missing'); return; }
         setMeta(metaData);
+        setOriginal({ city: listing.city || 'ho_chi_minh', district: listing.district });
         setValues({
           title: localized(listing, 'title') || '',
           description: localized(listing, 'description') || '',
@@ -144,9 +148,7 @@ export function EditListing() {
           <Field label={t('sell.districtLabel')} error={errorFor('district')} required>
             {(props) => (
               <select {...props} value={values.district} onChange={set('district')}>
-                {(meta.cities.find((item) => item.key === values.city)?.districts ?? []).map((value) => (
-                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
-                ))}
+                <AreaOptions keys={meta.cities.find((item) => item.key === values.city)?.districts ?? []} current={original?.city === values.city ? original.district : ''} />
               </select>
             )}
           </Field>

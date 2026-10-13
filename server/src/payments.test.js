@@ -68,7 +68,7 @@ try {
   assert.equal(sent.length, 1);
   assert.match(sent[0].subject, /Welcome to Vòng/);
   sent.length = 0;
-  const listing = { title: 'Payment test chair', description: 'A test listing used to check automatic payment matching works properly.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Payment test chair', description: 'A test listing used to check automatic payment matching works properly.', category: 'furniture', price_vnd: 120000, district: 'hcm_ban_co', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (title) => (await api('/api/listings', { cookie: login, body: { ...listing, title } })).body;
   const a = await make('Payment test A');   // pending_payment, fee 10000
   const b = await make('Payment test B');

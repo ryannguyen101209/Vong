@@ -6,6 +6,7 @@ import { BANKS, findBank } from '../vietqr.js';
 import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
 import { buildReport } from './analytics.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
+import { CITIES } from '../seed-data.js';
 
 /** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
 function sellerEmailFor(id) {
@@ -58,14 +59,24 @@ router.get('/analytics', (req, res) => {
 router.get('/listings', (req, res) => {
   const status = String(req.query.status ?? 'awaiting_approval');
   const statuses = ['pending_payment', 'awaiting_approval', 'published', 'rejected'];
+  // Optional: only listings in one city.
+  const city = CITIES.includes(String(req.query.city)) ? String(req.query.city) : null;
+  const inCity = city ? ' AND city = @city' : '';
 
   // "queue" = everything that needs you: paid-and-claimed first, then waiting-for-payment.
   const rows = status === 'queue'
-    ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status IN ('awaiting_approval','pending_payment')
-        ORDER BY (status = 'awaiting_approval') DESC, COALESCE(paid_marked_at, created_at) ASC`).all()
+    ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status IN ('awaiting_approval','pending_payment')${inCity}
+        ORDER BY (status = 'awaiting_approval') DESC, COALESCE(paid_marked_at, created_at) ASC`).all({ city })
     : statuses.includes(status)
-    ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status = ? ORDER BY COALESCE(paid_marked_at, created_at) ASC`).all(status)
-    : db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings ORDER BY created_at DESC`).all();
+    ? db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE status = @status${inCity} ORDER BY COALESCE(paid_marked_at, created_at) ASC`).all({ status, city })
+    : db.prepare(`SELECT ${ADMIN_COLUMNS} FROM listings WHERE 1 = 1${inCity} ORDER BY created_at DESC`).all({ city });
+
+  // How many listings with this status each city has, for the city filter.
+  const cityCounts = Object.fromEntries(
+    db.prepare(`SELECT COALESCE(city, 'ho_chi_minh') AS city, COUNT(*) AS n FROM listings
+      WHERE is_seed = 0${statuses.includes(status) ? ' AND status = @status' : ''} GROUP BY 1`).all({ status })
+      .map((r) => [r.city, r.n]),
+  );
 
   const counts = Object.fromEntries(statuses.map((s) => [s, 0]));
   for (const row of db.prepare('SELECT status, COUNT(*) AS n FROM listings GROUP BY status').all()) {
@@ -74,7 +85,7 @@ router.get('/listings', (req, res) => {
 
   const free_given = db.prepare('SELECT COUNT(*) AS n FROM listings WHERE is_seed = 0 AND fee_vnd = 0').get().n;
 
-  res.json({ listings: rows.map((r) => ({ ...r, is_first_listing: !!r.is_first_listing })), counts, free_given });
+  res.json({ listings: rows.map((r) => ({ ...r, is_first_listing: !!r.is_first_listing })), counts, free_given, city_counts: cityCounts });
 });
 
 /** POST /api/admin/listings/:id/approve — you saw the money arrive. */
@@ -185,6 +196,11 @@ router.put('/settings', (req, res) => {
     const emails = [...new Set(String(body.free_emails).split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean))];
     if (emails.length > 50 || emails.some((e) => !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e))) return res.status(400).json({ error: 'bad_free_emails' });
     patch.free_emails = emails.join(', ');
+  }
+  if (body.stats_exclude_emails !== undefined) {
+    const emails = [...new Set(String(body.stats_exclude_emails).split(/[\s,;]+/).map((e) => e.trim().toLowerCase()).filter(Boolean))];
+    if (emails.length > 50 || emails.some((e) => !/^[^@\s',;]+@[^@\s',;]+\.[^@\s',;]+$/.test(e))) return res.status(400).json({ error: 'bad_stats_emails' });
+    patch.stats_exclude_emails = emails.join(', ');
   }
   // The listing fee is set by LISTING_FEE_VND on the host, not here.
 

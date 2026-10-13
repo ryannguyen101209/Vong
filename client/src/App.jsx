@@ -49,9 +49,17 @@ function PageTitle() {
   return null;
 }
 
-/** Tells the server this tab is open, so the owner can see how many people are here now. */
+/**
+ * Tells the server this tab is open, so the owner can see how many people are here now.
+ * The owner's own tab doesn't count: not on the admin page, nor once signed in to it.
+ */
 function VisitorPing() {
+  const { pathname } = useLocation();
+  const isOwner = pathname.startsWith('/admin') || (() => {
+    try { return Boolean(sessionStorage.getItem('vong.admin.token')); } catch { return false; }
+  })();
   useEffect(() => {
+    if (isOwner) return undefined;
     let id = '';
     try {
       id = sessionStorage.getItem('vong_visit') || '';
@@ -63,7 +71,7 @@ function VisitorPing() {
     const timer = setInterval(ping, 30_000);
     document.addEventListener('visibilitychange', ping);
     return () => { clearInterval(timer); document.removeEventListener('visibilitychange', ping); };
-  }, []);
+  }, [isOwner]);
   return null;
 }
 

@@ -53,7 +53,7 @@ const translate = (id, to) => request(`/api/listings/${id}/translate`, { body: {
 
 try {
   const seller = (await request('/api/auth/google', { body: { credential: 'seller' } })).cookie;
-  const listing = { title: 'Đèn bàn gỗ', description: 'Đèn còn mới 95%, fix nhẹ. Qua Quận 3 lấy nha.', category: 'furniture', price_vnd: 150000, district: 'district_3', condition: 'good', seller_name: 'Linh', seller_phone: '0900000000', lang: 'vi' };
+  const listing = { title: 'Đèn bàn gỗ', description: 'Đèn còn mới 95%, fix nhẹ. Qua Quận 3 lấy nha.', category: 'furniture', price_vnd: 150000, district: 'hcm_ban_co', condition: 'good', seller_name: 'Linh', seller_phone: '0900000000', lang: 'vi' };
   const id = (await request('/api/listings', { cookie: seller, body: listing })).body.id;
   const row = db.prepare('SELECT title_vi, title_en FROM listings WHERE id = ?').get(id);
   assert.ok(row.title_vi && !row.title_en, 'test listing is written in Vietnamese');

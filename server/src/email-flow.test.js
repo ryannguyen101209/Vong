@@ -54,7 +54,7 @@ try {
   assert.ok(sent.every((m) => /Welcome to Vòng/.test(m.subject)));
   sent.length = 0;
 
-  const listing = { title: 'Email flow chair', description: 'A test listing used to check that emails go out at the right moments.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Email flow chair', description: 'A test listing used to check that emails go out at the right moments.', category: 'furniture', price_vnd: 120000, district: 'hcm_ban_co', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const a = await request('/api/listings', { cookie: seller.cookie, body: listing });
   const b = await request('/api/listings', { cookie: seller.cookie, body: { ...listing, title: 'Email flow desk' } });
   assert.equal(sent.length, 0, 'creating a listing sends no email');

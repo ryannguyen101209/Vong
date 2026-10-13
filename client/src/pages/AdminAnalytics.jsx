@@ -3,12 +3,12 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, formatDate } from '../lib/format.js';
 
-const METRICS = ['listings', 'users', 'buy_requests', 'chat_messages'];
+const METRICS = ['listings', 'users', 'buy_requests', 'conversations'];
 const METRIC_LABEL = {
   listings: 'metricListings',
   users: 'metricUsers',
   buy_requests: 'metricBuyRequests',
-  chat_messages: 'metricChats',
+  conversations: 'metricConversations',
 };
 const STATUSES = [
   ['pending_payment', 'var(--line-strong)'],
@@ -26,7 +26,6 @@ function niceMax(value) {
 }
 
 /** Saigon-time month key, e.g. "2026-10". */
-const thisMonth = () => new Date(Date.now() + 7 * 3600000).toISOString().slice(0, 7);
 
 function Stat({ label, value, sub }) {
   return (
@@ -86,139 +85,6 @@ function DailyChart({ days, metric, label }) {
   );
 }
 
-/** Monthly rows in time order, with a zero row for any month in between that earned nothing. */
-function monthSeries(monthly) {
-  const rows = [...monthly].sort((x, y) => x.month.localeCompare(y.month));
-  if (!rows.length) return [];
-  const byMonth = new Map(rows.map((r) => [r.month, r]));
-  const out = [];
-  let [y, m] = rows[0].month.split('-').map(Number);
-  const [endY, endM] = rows[rows.length - 1].month.split('-').map(Number);
-  while (y < endY || (y === endY && m <= endM)) {
-    const key = `${y}-${String(m).padStart(2, '0')}`;
-    out.push(byMonth.get(key) || { month: key, fees_vnd: 0, listings: 0, free_listings: 0 });
-    m += 1;
-    if (m > 12) { m = 1; y += 1; }
-  }
-  return out;
-}
-
-/** Axis with four even steps that land on round numbers (10k, 20k, 25k, 50k...). */
-function niceScale(value) {
-  const raw = value / 4;
-  const p = 10 ** Math.floor(Math.log10(raw));
-  const step = [1, 2, 2.5, 5, 10].map((m) => m * p).find((s) => s >= raw);
-  return { step, max: step * 4 };
-}
-
-const compact = (v) => (v >= 1e6 ? `${+(v / 1e6).toFixed(2)}M` : v >= 1e3 ? `${+(v / 1e3).toFixed(1)}k` : String(v));
-
-/** Line chart of fees earned per month. One series, so no legend: the section title names it. */
-function MonthlyChart({ months, lang, locale, labels }) {
-  const [hover, setHover] = useState(null);
-  const [W, setW] = useState(640); // drawn at the card's real width, so text stays readable on a phone
-  const wrapRef = useRef(null);
-  useEffect(() => {
-    const el = wrapRef.current;
-    if (!el || typeof ResizeObserver === 'undefined') return undefined;
-    const ro = new ResizeObserver(([entry]) => setW(Math.max(260, Math.round(entry.contentRect.width))));
-    ro.observe(el);
-    return () => ro.disconnect();
-  }, []);
-  const n = months.length;
-  const values = months.map((m) => m.fees_vnd || 0);
-  const { max, step } = niceScale(Math.max(10000, ...values));
-  const H = 240, L = 46, R = 18, T = 28, B = 28, PAD = 16;
-  const iw = W - L - R, ih = H - T - B;
-  const x = (i) => (n === 1 ? L + iw / 2 : L + PAD + (i / (n - 1)) * (iw - 2 * PAD));
-  const y = (v) => T + ih - (v / max) * ih;
-  const slotPx = n > 1 ? (iw - 2 * PAD) / (n - 1) : iw;
-  const every = slotPx >= 58 ? 1 : slotPx >= 29 ? 2 : 3; // thin out month labels so they never collide
-  // Same options for every label so the form never switches (e.g. "thg 10" vs "Tháng 11" in Vietnamese).
-  const monthName = (key) => {
-    const [yy, mm] = key.split('-').map(Number);
-    return new Date(Date.UTC(yy, mm - 1, 1)).toLocaleDateString(locale, { month: 'short', year: '2-digit', timeZone: 'UTC' });
-  };
-  const longName = (key) => {
-    const [yy, mm] = key.split('-').map(Number);
-    return new Date(Date.UTC(yy, mm - 1, 1)).toLocaleDateString(locale, { month: 'long', year: 'numeric', timeZone: 'UTC' });
-  };
-
-  const points = values.map((v, i) => `${x(i).toFixed(1)},${y(v).toFixed(1)}`).join(' ');
-  const last = n - 1;
-  const summary = `${labels.title}: ${months.map((m, i) => `${longName(m.month)} ${formatPrice(values[i], lang)}`).join(', ')}`;
-
-  const nearest = (clientX, svg) => {
-    const box = svg.getBoundingClientRect();
-    const px = ((clientX - box.left) / box.width) * W;
-    let best = 0, dist = Infinity;
-    for (let i = 0; i < n; i += 1) {
-      const d = Math.abs(x(i) - px);
-      if (d < dist) { dist = d; best = i; }
-    }
-    return best;
-  };
-  const onKeyDown = (e) => {
-    if (e.key === 'ArrowRight') { e.preventDefault(); setHover((h) => Math.min(n - 1, (h ?? -1) + 1)); }
-    if (e.key === 'ArrowLeft') { e.preventDefault(); setHover((h) => Math.max(0, (h ?? n) - 1)); }
-    if (e.key === 'Escape') setHover(null);
-  };
-
-  const tipPct = hover === null ? 0 : (x(hover) / W) * 100;
-  const tipRight = tipPct > 55; // flip to the left of the crosshair near the right edge
-
-  return (
-    <div className="an-chart-wrap" ref={wrapRef}>
-      <svg
-        className="an-chart"
-        viewBox={`0 0 ${W} ${H}`}
-        role="img"
-        aria-label={summary}
-        tabIndex={0}
-        onPointerMove={(e) => setHover(nearest(e.clientX, e.currentTarget))}
-        onPointerLeave={() => setHover(null)}
-        onFocus={() => setHover((h) => h ?? last)}
-        onBlur={() => setHover(null)}
-        onKeyDown={onKeyDown}
-      >
-        {[0, 1, 2, 3, 4].map((i) => (
-          <g key={i}>
-            <line className="grid" x1={L} x2={W - R} y1={y(step * i)} y2={y(step * i)} />
-            <text x={L - 8} y={y(step * i) + 4} textAnchor="end">{compact(step * i)}</text>
-          </g>
-        ))}
-        {months.map((m, i) => ((n - 1 - i) % every === 0) && (
-          <text key={m.month} x={x(i)} y={H - 8} textAnchor="middle">{monthName(m.month)}</text>
-        ))}
-        {hover !== null && <line className="cross" x1={x(hover)} x2={x(hover)} y1={T} y2={T + ih} />}
-        {n > 1 && <polyline className="line" points={points} />}
-        {values.map((v, i) => (
-          <circle key={months[i].month} className={`dot${hover === i ? ' dot--active' : ''}`} cx={x(i)} cy={y(v)} r={hover === i ? 5.5 : 4.5} />
-        ))}
-        {hover === null && (
-          <text className="an-chart__value" x={x(last)} y={y(values[last]) - 12} textAnchor={n === 1 ? 'middle' : 'end'}>
-            {formatPrice(values[last], lang)}
-          </text>
-        )}
-      </svg>
-      {hover !== null && (
-        <div className={`an-tip${tipRight ? ' an-tip--left' : ''}`} style={{ left: `${tipPct}%` }} role="status">
-          <div className="an-tip__label">{longName(months[hover].month)}</div>
-          <div className="an-tip__row">
-            <i className="an-tip__key" />
-            <strong className="an-tip__value">{formatPrice(values[hover], lang)}</strong>
-          </div>
-          <div className="an-tip__label">
-            {num_(months[hover].listings, locale)} {labels.approved} · {num_(months[hover].free_listings, locale)} {labels.free}
-          </div>
-        </div>
-      )}
-    </div>
-  );
-}
-
-const num_ = (v, locale) => new Intl.NumberFormat(locale).format(Number(v) || 0);
-
 function BarList({ rows, label, empty }) {
   if (!rows.length) return <p className="muted small" style={{ margin: 0 }}>{empty}</p>;
   const max = Math.max(...rows.map((r) => r.n));
@@ -236,6 +102,57 @@ function BarList({ rows, label, empty }) {
 }
 
 /** The admin panel's Analytics tab: counts only, read from /api/admin/analytics. */
+/** The team's own and test accounts, left out of every number above. */
+function ExcludedAccounts({ token, onAuthError, onSaved, counted }) {
+  const { t } = useI18n();
+  const a = (key, vars) => t(`admin.analytics.${key}`, vars);
+  const [emails, setEmails] = useState(null);
+  const [state, setState] = useState('idle');
+
+  useEffect(() => {
+    api.admin.settings(token)
+      .then((data) => setEmails(data.settings.stats_exclude_emails || ''))
+      .catch((error) => error.status === 401 && onAuthError());
+  }, [token, onAuthError]);
+
+  if (emails === null) return null;
+  const save = async (event) => {
+    event.preventDefault();
+    setState('saving');
+    try {
+      const data = await api.admin.saveSettings(token, { stats_exclude_emails: emails });
+      setEmails(data.settings.stats_exclude_emails || '');
+      setState('saved');
+      onSaved();
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      setState('error');
+    }
+  };
+
+  return (
+    <section className="an-section">
+      <h2>{a('excludeTitle')}</h2>
+      <form className="card panel form" onSubmit={save} style={{ maxWidth: 620 }}>
+        <p className="small muted" style={{ margin: 0 }}>{a('excludeHint')}</p>
+        <textarea
+          className="textarea"
+          style={{ minHeight: 80 }}
+          value={emails}
+          onChange={(event) => { setEmails(event.target.value); setState('idle'); }}
+          placeholder="ban@gmail.com, test@gmail.com"
+          aria-label={a('excludeTitle')}
+        />
+        <div className="row" style={{ gap: 12, alignItems: 'center' }}>
+          <button type="submit" className="btn btn--small" disabled={state === 'saving'}>{t('common.save')}</button>
+          {state === 'saved' && <span className="small muted" role="status">{a('excludeSaved', { n: counted ?? 0 })}</span>}
+          {state === 'error' && <span className="small" role="alert">{a('excludeError')}</span>}
+        </div>
+      </form>
+    </section>
+  );
+}
+
 export function AdminAnalytics({ token, onAuthError }) {
   const { t, lang } = useI18n();
   const [report, setReport] = useState(null);
@@ -244,7 +161,7 @@ export function AdminAnalytics({ token, onAuthError }) {
   const [metric, setMetric] = useState('listings');
   const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
   const num = (v) => new Intl.NumberFormat(locale).format(Number(v) || 0);
-  const a = (key) => t(`admin.analytics.${key}`);
+  const a = (key, vars) => t(`admin.analytics.${key}`, vars);
 
   const load = useCallback(() => {
     setBusy(true);
@@ -268,8 +185,7 @@ export function AdminAnalytics({ token, onAuthError }) {
   }
 
   const status = report.listings?.by_status || {};
-  const monthly = report.monthly || [];
-  const current = monthly.find((m) => m.month === thisMonth());
+  const cities = report.cities || [];
   const statusTotal = Object.values(status).reduce((s, v) => s + v, 0);
   const waiting = status.awaiting_approval || 0;
   const updated = new Date(report.generated_at).toLocaleTimeString(locale, { hour: '2-digit', minute: '2-digit', timeZone: 'Asia/Ho_Chi_Minh' });
@@ -289,8 +205,8 @@ export function AdminAnalytics({ token, onAuthError }) {
 
       <div className="an-stats">
         <Stat label={a('liveNow')} value={num(report.live_visitors)} />
-        <Stat label={a('earnedMonth')} value={formatPrice(current ? current.fees_vnd : 0, lang)} sub={`${num(current ? current.listings : 0)} ${a('approved')}`} />
-        <Stat label={a('totalEarned')} value={formatPrice(report.fees_vnd?.collected, lang)} sub={report.fees_vnd?.awaiting_approval ? `${formatPrice(report.fees_vnd.awaiting_approval, lang)} ${a('pending')}` : undefined} />
+        <Stat label={a('sold')} value={num(report.sold?.total)} sub={`+${num(report.sold?.last_30d)} ${a('in30Days')}`} />
+        <Stat label={a('sellers')} value={num(report.sellers?.active)} sub={`+${num(report.sellers?.new_7d)} ${a('newSellers')}`} />
         <Stat label={a('liveListings')} value={num(status.published)} sub={`+${num(report.listings?.published_7d)} ${a('thisWeek')}`} />
         <Stat label={a('waiting')} value={num(waiting)} sub={waiting ? a('needsYou') : a('queueClear')} />
         <Stat label={a('accounts')} value={num(report.users?.total)} sub={`+${num(report.users?.new_7d)} ${a('thisWeek')}`} />
@@ -340,38 +256,29 @@ export function AdminAnalytics({ token, onAuthError }) {
       </div>
 
       <section className="an-section">
-        <h2>{a('monthly')}</h2>
-        {monthly.length > 0 && (
-          <div className="card panel" style={{ marginBottom: 12 }}>
-            <MonthlyChart
-              months={monthSeries(monthly)}
-              lang={lang}
-              locale={locale}
-              labels={{ title: a('monthly'), approved: a('approved'), free: a('freeShort') }}
-            />
-            {monthSeries(monthly).length === 1 && <p className="small muted" style={{ margin: '8px 0 0' }}>{a('oneMonth')}</p>}
-          </div>
-        )}
+        <h2>{a('byCityTitle')}</h2>
         <div className="card panel table-scroll">
-          {monthly.length === 0 ? (
-            <p className="muted small" style={{ margin: 0 }}>{a('noApproved')}</p>
+          {cities.length === 0 ? (
+            <p className="muted small" style={{ margin: 0 }}>{a('noLive')}</p>
           ) : (
             <table className="admin-table">
               <thead>
                 <tr>
-                  <th>{a('month')}</th>
-                  <th className="an-num">{a('fees')}</th>
-                  <th className="an-num">{a('approvedCol')}</th>
-                  <th className="an-num">{a('freeCol')}</th>
+                  <th>{a('city')}</th>
+                  <th className="an-num">{a('liveListings')}</th>
+                  <th className="an-num">{a('new30Days')}</th>
+                  <th className="an-num">{a('sold')}</th>
+                  <th className="an-num">{a('views')}</th>
                 </tr>
               </thead>
               <tbody>
-                {monthly.map((m) => (
-                  <tr key={m.month}>
-                    <td className="an-nowrap">{m.month}</td>
-                    <td className="an-num">{formatPrice(m.fees_vnd, lang)}</td>
-                    <td className="an-num">{num(m.listings)}</td>
-                    <td className="an-num">{num(m.free_listings)}</td>
+                {cities.map((c) => (
+                  <tr key={c.city}>
+                    <td className="an-nowrap">{t(`cities.${c.city}`)}</td>
+                    <td className="an-num">{num(c.live)}</td>
+                    <td className="an-num">{num(c.new_30d)}</td>
+                    <td className="an-num">{num(c.sold)}</td>
+                    <td className="an-num">{num(c.views)}</td>
                   </tr>
                 ))}
               </tbody>
@@ -384,11 +291,13 @@ export function AdminAnalytics({ token, onAuthError }) {
         <h2>{a('engagement')}</h2>
         <div className="an-stats" style={{ marginBottom: 0 }}>
           <Stat label={a('buyRequests')} value={num(report.engagement?.buy_requests)} sub={`+${num(report.engagement?.buy_requests_7d)} ${a('thisWeek')}`} />
-          <Stat label={a('conversations')} value={num(report.engagement?.conversations)} />
-          <Stat label={a('chatMessages')} value={num(report.engagement?.chat_messages)} sub={`+${num(report.engagement?.chat_messages_7d)} ${a('thisWeek')}`} />
+          <Stat label={a('conversations')} value={num(report.engagement?.conversations)} sub={`+${num(report.engagement?.conversations_7d)} ${a('thisWeek')}`} />
+          <Stat label={a('buyers')} value={num(report.engagement?.buyers)} sub={`+${num(report.engagement?.buyers_7d)} ${a('thisWeek')}`} />
           <Stat label={a('contactForm')} value={num(report.engagement?.contact_messages)} />
         </div>
       </section>
+
+      <ExcludedAccounts token={token} onAuthError={onAuthError} onSaved={load} counted={report.excluded_accounts} />
 
       <section className="an-section">
         <h2>{a('top')}</h2>

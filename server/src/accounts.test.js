@@ -40,7 +40,7 @@ try {
   assert.match(seller.cookie, /HttpOnly/);
   assert.match(seller.cookie, /SameSite=Lax/);
   assert.equal((await request('/api/auth/me', { cookie: seller.cookie })).body.profile.id, seller.body.profile.id);
-  const listingBody = { title: 'Integration test chair', description: 'A test listing for checking account ownership and private messages.', category: 'furniture', price_vnd: 120000, district: 'district_3', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000', seller_email: 'spoof@example.test', seller_id: stranger.body.profile.id };
+  const listingBody = { title: 'Integration test chair', description: 'A test listing for checking account ownership and private messages.', category: 'furniture', price_vnd: 120000, district: 'hcm_ban_co', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000', seller_email: 'spoof@example.test', seller_id: stranger.body.profile.id };
   assert.equal((await request('/api/listings', { body: listingBody })).status, 401);
   const created = await request('/api/listings', { cookie: seller.cookie, body: listingBody });
   assert.equal(created.status, 201);
