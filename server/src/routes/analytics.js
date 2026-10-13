@@ -90,6 +90,26 @@ export function buildReport() {
     GROUP BY month ORDER BY month DESC LIMIT 12
   `).all();
 
+  const monthAgo = new Date(Date.now() - 30 * 86_400_000).toISOString();
+
+  // Chats started in the last 30 days, and how many the seller answered: the
+  // clearest sign of whether buyers are getting anywhere on Vòng.
+  const replies = db.prepare(`
+    SELECT COUNT(*) AS chats,
+           SUM(CASE WHEN EXISTS (SELECT 1 FROM chat_messages m WHERE m.conversation_id = c.id AND m.sender_id = c.seller_id) THEN 1 ELSE 0 END) AS answered
+    FROM conversations c WHERE c.created_at >= ?
+  `).get(monthAgo);
+
+  // Each city: live listings, new in the last 30 days, sold, and views.
+  const cities = db.prepare(`
+    SELECT COALESCE(city, 'ho_chi_minh') AS city,
+           SUM(CASE WHEN status = 'published' THEN 1 ELSE 0 END) AS live,
+           SUM(CASE WHEN created_at >= @monthAgo THEN 1 ELSE 0 END) AS new_30d,
+           SUM(CASE WHEN status = 'sold' THEN 1 ELSE 0 END) AS sold,
+           COALESCE(SUM(views), 0) AS views
+    FROM listings WHERE ${real} GROUP BY 1 ORDER BY live DESC, new_30d DESC, city
+  `).all({ monthAgo });
+
   return {
     generated_at: new Date().toISOString(),
     live_visitors: liveVisitors(),
@@ -105,6 +125,12 @@ export function buildReport() {
       collected: count(`SELECT COALESCE(SUM(fee_vnd), 0) AS n FROM listings WHERE ${real} AND status IN ('published', 'sold')`),
       awaiting_approval: count(`SELECT COALESCE(SUM(fee_vnd), 0) AS n FROM listings WHERE ${real} AND status = 'awaiting_approval'`),
     },
+    sold: {
+      total: count(`SELECT COUNT(*) AS n FROM listings WHERE ${real} AND status = 'sold'`),
+      last_30d: count(`SELECT COUNT(*) AS n FROM listings WHERE ${real} AND status = 'sold' AND sold_at >= ?`, monthAgo),
+    },
+    replies_30d: { chats: replies.chats, answered: replies.answered ?? 0 },
+    cities,
     users: {
       total: count('SELECT COUNT(*) AS n FROM users'),
       new_7d: count('SELECT COUNT(*) AS n FROM users WHERE created_at >= ?', weekAgo),

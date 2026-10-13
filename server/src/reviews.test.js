@@ -46,7 +46,7 @@ try {
   const seller = await signIn('seller');
   const buyer = await signIn('buyer');
   const stranger = await signIn('stranger');
-  const listing = { description: 'A listing used to check seller profiles and reviews work properly.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Linh', seller_phone: '0900000000' };
+  const listing = { description: 'A listing used to check seller profiles and reviews work properly.', category: 'furniture', price_vnd: 90000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Linh', seller_phone: '0900000000' };
   const id = (await request('/api/listings', { cookie: seller.cookie, body: { ...listing, title: 'Ghế gỗ teak' } })).body.id;
 
   // No public listings yet: no public profile.

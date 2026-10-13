@@ -32,7 +32,7 @@ try {
   const seller = await request('/api/auth/google', { body: { credential: 'seller' } });
   const other = await request('/api/auth/google', { body: { credential: 'other' } });
   const token = (await request('/api/admin/login', { body: { password: 'test-admin-pass' } })).body.token;
-  const listing = { title: 'Promo test lamp', description: 'A test listing used to check the promo code flow.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Promo test lamp', description: 'A test listing used to check the promo code flow.', category: 'furniture', price_vnd: 90000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (cookie, title) => (await request('/api/listings', { cookie, body: { ...listing, title } })).body;
 
   // With a fee set, every listing waits for payment, including the first.

@@ -44,7 +44,7 @@ try {
   // A seller edits a listing after approval: it is flagged for the owner.
   const sellerCookie = (await request('/api/auth/google', { body: { credential: 'seller' } })).cookie;
   const token = (await request('/api/admin/login', { body: { password: 'test-admin-pass' } })).body.token;
-  const listing = { title: 'Security test chair', description: 'A plain chair used to check edits after approval.', category: 'furniture', price_vnd: 150000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Security test chair', description: 'A plain chair used to check edits after approval.', category: 'furniture', price_vnd: 150000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const id = (await request('/api/listings', { cookie: sellerCookie, body: listing })).body.id;
   const editedAt = async () => (await request('/api/admin/listings?status=all', { token })).body.listings.find((l) => l.id === id).edited_at;
 

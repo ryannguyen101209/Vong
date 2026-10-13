@@ -30,7 +30,7 @@ async function request(url, { cookie, token, body, method = body ? 'POST' : 'GET
 try {
   const sellerCookie = (await fetch(base + '/api/auth/google', { method: 'POST', headers: { 'X-Vong-Request': '1', 'Content-Type': 'application/json' }, body: JSON.stringify({ credential: 'seller' }) })).headers.get('set-cookie');
   const token = (await request('/api/admin/login', { body: { password: 'test-admin-pass' } })).body.token;
-  const listing = { title: 'Report test bike', description: 'A listing used to check that reports reach the owner.', category: 'sports', price_vnd: 900000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Report test bike', description: 'A listing used to check that reports reach the owner.', category: 'sports', price_vnd: 900000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const id = (await request('/api/listings', { cookie: sellerCookie, body: listing })).body.id;
   assert.ok(id);
 

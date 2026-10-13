@@ -5,7 +5,7 @@ import multer from 'multer';
 import { db, getSettings, listingFee, UPLOADS_DIR, DEFAULT_SETTINGS } from '../db.js';
 import { newId, newRef, transferNote } from '../ids.js';
 import { buildVietQrPayload, findBank } from '../vietqr.js';
-import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from '../seed-data.js';
+import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS, LEGACY_AREAS } from '../seed-data.js';
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
 import { sellerSummary } from './sellers.js';
@@ -155,7 +155,7 @@ router.get('/:id', (req, res) => {
   res.json({ listing: withImages(row), seller: sellerSummary(row.seller_id) });
 });
 
-function validateListing(body) {
+function validateListing(body, current = null) {
   const errors = {};
   const title = String(body.title ?? '').trim();
   const description = String(body.description ?? '').trim();
@@ -170,7 +170,12 @@ function validateListing(body) {
   // Sellers who send no city (older clients, the API) are in Saigon, where Vòng started.
   const city = String(body.city || DEFAULT_CITY);
   if (!CITIES.includes(city)) errors.city = 'invalid';
-  else if (!CITY_DISTRICTS[city].includes(String(body.district))) errors.district = 'invalid';
+  else if (!CITY_DISTRICTS[city].includes(String(body.district))) {
+    // An older listing may keep the area it was written with (e.g. a Saigon district).
+    const keptLegacy = current && current.city === city && current.district === String(body.district)
+      && LEGACY_AREAS[city]?.includes(current.district);
+    if (!keptLegacy) errors.district = 'invalid';
+  }
   if (!CONDITIONS.includes(String(body.condition))) errors.condition = 'invalid';
   if (!Number.isFinite(price) || price < 1000 || price > 2_000_000_000) errors.price_vnd = 'invalid';
   if (sellerName.length < 2 || sellerName.length > 80) errors.seller_name = 'length';
@@ -392,7 +397,7 @@ router.patch('/:id', requireUser, (req, res) => {
     seller_phone: body.seller_phone ?? row.seller_phone,
     seller_email: req.user.email,
   };
-  const { errors, values } = validateListing(merged);
+  const { errors, values } = validateListing(merged, row);
   if (Object.keys(errors).length > 0) return res.status(400).json({ error: 'validation_failed', fields: errors });
 
   // An approved listing changed after review: flag it and tell the owner, so a

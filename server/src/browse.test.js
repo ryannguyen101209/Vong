@@ -29,10 +29,10 @@ try {
   const base_ = { description: 'A test listing used to check the district and price filters.', category: 'furniture', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const make = async (title, district, price_vnd) => (await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title, district, price_vnd } })).body.id;
   const ids = {
-    cheap1: await make('Browse cheap lamp', 'district_1', 150000),
-    edge: await make('Browse edge stool', 'district_1', 200000),
-    mid3: await make('Browse mid chair', 'district_3', 450000),
-    dear3: await make('Browse dear sofa', 'district_3', 3500000),
+    cheap1: await make('Browse cheap lamp', 'hcm_ben_thanh', 150000),
+    edge: await make('Browse edge stool', 'hcm_ben_thanh', 200000),
+    mid3: await make('Browse mid chair', 'hcm_ban_co', 450000),
+    dear3: await make('Browse dear sofa', 'hcm_ban_co', 3500000),
   };
   db.prepare("UPDATE listings SET status = 'published' WHERE is_seed = 0").run();
 
@@ -40,11 +40,11 @@ try {
   const pick = (...keys) => keys.map((k) => ids[k]).sort();
 
   assert.deepEqual(await titles(''), pick('cheap1', 'edge', 'mid3', 'dear3'));
-  assert.deepEqual(await titles('district=district_3'), pick('mid3', 'dear3'));
+  assert.deepEqual(await titles('district=hcm_ban_co'), pick('mid3', 'dear3'));
   assert.deepEqual(await titles('max_price=199999'), pick('cheap1'), 'under 200k excludes exactly 200k');
   assert.deepEqual(await titles('min_price=200000&max_price=499999'), pick('edge', 'mid3'));
   assert.deepEqual(await titles('min_price=3000000'), pick('dear3'));
-  assert.deepEqual(await titles('district=district_1&min_price=200000'), pick('edge'), 'filters combine');
+  assert.deepEqual(await titles('district=hcm_ben_thanh&min_price=200000'), pick('edge'), 'filters combine');
 
   // Cities: a listing in Hà Nội is found under its city, and an area must belong to the chosen city.
   const hanoi = (await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title: 'Browse Hanoi desk', city: 'ha_noi', district: 'hn_hoan_kiem', price_vnd: 600000 } })).body;
@@ -54,16 +54,16 @@ try {
   assert.deepEqual(await titles('district=hn_hoan_kiem'), [hanoi.id]);
   assert.equal((await titles('city=ho_chi_minh')).includes(hanoi.id), false, 'Saigon filter hides Hà Nội');
   assert.equal(db.prepare('SELECT city FROM listings WHERE id = ?').get(ids.mid3).city, 'ho_chi_minh', 'no city sent means Saigon');
-  const wrong = await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title: 'Browse mismatch', city: 'ha_noi', district: 'district_1', price_vnd: 100000 } });
+  const wrong = await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title: 'Browse mismatch', city: 'ha_noi', district: 'hcm_ben_thanh', price_vnd: 100000 } });
   assert.equal(wrong.status, 400, 'a Saigon district cannot be listed in Hà Nội');
   assert.equal(wrong.body.fields.district, 'invalid');
-  const fake = await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title: 'Browse nowhere', city: 'atlantis', district: 'district_1', price_vnd: 100000 } });
+  const fake = await request('/api/listings', { cookie: seller.cookie, body: { ...base_, title: 'Browse nowhere', city: 'atlantis', district: 'hcm_ben_thanh', price_vnd: 100000 } });
   assert.equal(fake.body.fields.city, 'invalid');
 
   // Junk values are ignored rather than breaking the page.
   assert.deepEqual(await titles('district=not_a_district'), [...pick('cheap1', 'edge', 'mid3', 'dear3'), hanoi.id].sort());
   assert.deepEqual(await titles('min_price=abc&max_price=-5'), [...pick('cheap1', 'edge', 'mid3', 'dear3'), hanoi.id].sort());
-  assert.equal((await request("/api/listings?district=district_1'%20OR%201=1--")).body.listings.length, 5);
+  assert.equal((await request("/api/listings?district=hcm_ben_thanh'%20OR%201=1--")).body.listings.length, 5);
 
   console.log('browse filter tests passed');
 } finally {

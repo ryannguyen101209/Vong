@@ -9,6 +9,7 @@ import { ErrorState } from '../components/States.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { legalTitle } from './Legal.jsx';
 import { Loader, PageLoader } from '../components/Loader.jsx';
+import { AreaOptions } from '../components/AreaOptions.jsx';
 
 const PHOTO_TYPES = ['image/jpeg', 'image/png', 'image/webp'];
 const MAX_PHOTO_BYTES = 5 * 1024 * 1024;
@@ -331,9 +332,7 @@ export function Sell() {
             {(props) => (
               <select {...props} value={values.district} onChange={set('district')}>
                 <option value="">{t('sell.districtPlaceholder')}</option>
-                {(meta.cities.find((item) => item.key === values.city)?.districts ?? []).map((value) => (
-                  <option key={value} value={value}>{t(`districts.${value}`)}</option>
-                ))}
+                <AreaOptions keys={meta.cities.find((item) => item.key === values.city)?.districts ?? []} />
               </select>
             )}
           </Field>

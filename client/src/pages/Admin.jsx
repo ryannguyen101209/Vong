@@ -248,7 +248,7 @@ function Queue({ token, onAuthError }) {
                   <SellerCount listing={listing} />
                 </div>
                 <p className="small muted" style={{ marginBottom: 10 }}>
-                  {listing.seller_name} · {listing.seller_phone} · {t(`districts.${listing.district}`)} ·{' '}
+                  {listing.seller_name} · {listing.seller_phone} · {t(`districts.${listing.district}`)}, {t(`cities.${listing.city || 'ho_chi_minh'}`)} ·{' '}
                   {formatPrice(listing.price_vnd, lang)}
                   {listing.seller_email && (
                     <>
@@ -443,14 +443,21 @@ function SellerCount({ listing }) {
 function AllListings({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [status, setStatus] = useState('published');
+  const [city, setCity] = useState('');
   const [listings, setListings] = useState([]);
+  const [cityCounts, setCityCounts] = useState({});
+  const [cities, setCities] = useState([]);
+
+  useEffect(() => {
+    api.meta().then((meta) => setCities(meta.cities.map((item) => item.key))).catch(() => {});
+  }, []);
 
   const load = useCallback(() => {
     api.admin
-      .listings(token, status)
-      .then((data) => setListings(data.listings))
+      .listings(token, status, city)
+      .then((data) => { setListings(data.listings); setCityCounts(data.city_counts ?? {}); })
       .catch((error) => error.status === 401 && onAuthError());
-  }, [token, status, onAuthError]);
+  }, [token, status, city, onAuthError]);
 
   useEffect(load, [load]);
 
@@ -463,6 +470,13 @@ function AllListings({ token, onAuthError }) {
             <option key={key} value={key}>{t(`status.${key}`)}</option>
           ))}
         </select>
+        <span className="small muted">{t('admin.cityFilter')}</span>
+        <select className="select" value={city} onChange={(event) => setCity(event.target.value)}>
+          <option value="">{t('browse.allCities')}</option>
+          {cities.map((key) => (
+            <option key={key} value={key}>{t(`cities.${key}`)} ({cityCounts[key] ?? 0})</option>
+          ))}
+        </select>
       </div>
 
       <div className="card panel table-scroll">
@@ -473,7 +487,7 @@ function AllListings({ token, onAuthError }) {
               <th>{t('admin.sellerColumn')}</th>
               <th>{t('listing.reference')}</th>
               <th>{t('sell.priceLabel')}</th>
-              <th>{t('listing.district')}</th>
+              <th>{t('admin.locationColumn')}</th>
               <th>{t('listing.views')}</th>
               <th>{t('listing.posted')}</th>
               <th />
@@ -503,7 +517,10 @@ function AllListings({ token, onAuthError }) {
                 </td>
                 <td style={{ fontFamily: 'ui-monospace, monospace' }}>{listing.ref}</td>
                 <td>{formatPrice(listing.price_vnd, lang)}</td>
-                <td>{t(`districts.${listing.district}`)}</td>
+                <td>
+                  <div>{t(`districts.${listing.district}`)}</div>
+                  <div className="small muted">{t(`cities.${listing.city || 'ho_chi_minh'}`)}</div>
+                </td>
                 <td>{listing.views}</td>
                 <td>{formatDateTime(listing.created_at, lang)}</td>
                 <td><DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} /></td>

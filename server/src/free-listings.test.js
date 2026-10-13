@@ -35,13 +35,13 @@ async function request(url, { cookie, token, body, method = body ? 'POST' : 'GET
 try {
   const token = (await request('/api/admin/login', { body: { password: 'test-admin-pass' } })).body.token;
   const seller = (await request('/api/auth/google', { body: { credential: 'seller' } })).cookie;
-  const listing = { description: 'A listing used to check that listing on Vòng is free for everyone.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { description: 'A listing used to check that listing on Vòng is free for everyone.', category: 'furniture', price_vnd: 90000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const post = async (title) => (await request('/api/listings', { cookie: seller, body: { ...listing, title } })).body;
 
   // History: four listings paid at 10.000đ and approved in October 2026 (40.000đ that month).
   const oldRow = db.prepare(`INSERT INTO listings (id, ref, title_vi, description_vi, category, price_vnd, district, condition,
     seller_name, seller_phone, status, fee_vnd, created_at, paid_marked_at, payment_verified_at, reviewed_at, published_at)
-    VALUES (?, ?, 'Món cũ đã trả phí', 'Tin đăng từ trước, khi còn thu phí đăng tin.', 'furniture', 100000, 'district_3', 'good',
+    VALUES (?, ?, 'Món cũ đã trả phí', 'Tin đăng từ trước, khi còn thu phí đăng tin.', 'furniture', 100000, 'hcm_ban_co', 'good',
     'Old seller', '0900000001', 'published', 10000, ?, ?, ?, ?, ?)`);
   for (let i = 1; i <= 4; i += 1) {
     const at = `2026-10-0${i}T03:00:00.000Z`;

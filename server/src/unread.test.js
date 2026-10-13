@@ -30,7 +30,7 @@ try {
   const seller = (await request('/api/auth/google', { body: { credential: 'seller' } })).cookie;
   const buyer = (await request('/api/auth/google', { body: { credential: 'buyer' } })).cookie;
   const other = (await request('/api/auth/google', { body: { credential: 'other' } })).cookie;
-  const listing = { title: 'Unread test lamp', description: 'A test listing used to check unread message counts.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Unread test lamp', description: 'A test listing used to check unread message counts.', category: 'furniture', price_vnd: 90000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const id = (await request('/api/listings', { cookie: seller, body: listing })).body.id;
   db.prepare("UPDATE listings SET status = 'published' WHERE id = ?").run(id);
 

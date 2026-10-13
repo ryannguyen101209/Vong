@@ -29,7 +29,7 @@ async function request(url, { cookie, token, body, method = body ? 'POST' : 'GET
 try {
   const seller = await request('/api/auth/google', { body: { credential: 'seller' } });
   const token = (await request('/api/admin/login', { body: { password: 'test-admin-pass' } })).body.token;
-  const listing = { title: 'Admin test lamp', description: 'A test listing used to check the admin listing count and delete.', category: 'furniture', price_vnd: 90000, district: 'district_1', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
+  const listing = { title: 'Admin test lamp', description: 'A test listing used to check the admin listing count and delete.', category: 'furniture', price_vnd: 90000, district: 'hcm_ben_thanh', condition: 'good', seller_name: 'Seller', seller_phone: '0900000000' };
   const ids = [];
   for (const title of ['Admin test lamp one', 'Admin test lamp two', 'Admin test lamp three']) {
     ids.push((await request('/api/listings', { cookie: seller.cookie, body: { ...listing, title } })).body.id);
