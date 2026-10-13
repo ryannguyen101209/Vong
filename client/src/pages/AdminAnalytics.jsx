@@ -85,6 +85,154 @@ function DailyChart({ days, metric, label }) {
   );
 }
 
+function niceScale(value) {
+  const raw = Math.max(value, 4) / 4;
+  const p = 10 ** Math.floor(Math.log10(raw));
+  const step = [1, 2, 2.5, 5, 10].map((m) => m * p).find((st) => st >= raw && Number.isInteger(st)) ?? Math.ceil(raw);
+  return { step, max: step * 4 };
+}
+
+const ACCOUNT_RANGES = [30, 90, 0]; // days; 0 = since the first account
+const saigonToday = () => new Date(Date.now() + 7 * 3600000).toISOString().slice(0, 10);
+const addDays = (day, n) => new Date(Date.parse(`${day}T00:00:00Z`) + n * 86400000).toISOString().slice(0, 10);
+
+/**
+ * Line chart of the total number of accounts, day by day. One series, so no
+ * legend: the section title names it. Hover or arrow keys show a day's total
+ * and how many joined that day; a table view is under the chart.
+ */
+function AccountsChart({ byDay, locale }) {
+  const { t } = useI18n();
+  const a = (key, vars) => t(`admin.analytics.${key}`, vars);
+  const [range, setRange] = useState(30);
+  const [hover, setHover] = useState(null);
+  const [W, setW] = useState(640); // drawn at the card's real width, so text stays readable on a phone
+  const wrapRef = useRef(null);
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el || typeof ResizeObserver === 'undefined') return undefined;
+    const ro = new ResizeObserver(([entry]) => setW(Math.max(260, Math.round(entry.contentRect.width))));
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const today = saigonToday();
+  const first = byDay[0]?.day ?? today;
+  let start = range ? addDays(today, -(range - 1)) : first;
+  if (start >= today) start = addDays(today, -1); // always at least two days, so there is a line
+  const newOn = new Map(byDay.map((d) => [d.day, d.n]));
+  let total = byDay.filter((d) => d.day < start).reduce((sum, d) => sum + d.n, 0);
+  const days = [];
+  for (let day = start; day <= today; day = addDays(day, 1)) {
+    const joined = newOn.get(day) ?? 0;
+    total += joined;
+    days.push({ day, joined, total });
+  }
+  const n = days.length;
+  const last = n - 1;
+  const gained = days.reduce((sum, d) => sum + d.joined, 0);
+
+  const { max, step } = niceScale(Math.max(...days.map((d) => d.total)));
+  const H = 240, L = 40, R = 18, T = 28, B = 28;
+  const iw = W - L - R, ih = H - T - B;
+  const x = (i) => L + (i / (n - 1)) * iw;
+  const y = (v) => T + ih - (v / max) * ih;
+  const short = (day) => new Date(`${day}T00:00:00Z`).toLocaleDateString(locale, { day: 'numeric', month: 'short', timeZone: 'UTC' });
+  const long = (day) => new Date(`${day}T00:00:00Z`).toLocaleDateString(locale, { weekday: 'short', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
+  // About five date labels, always including today, never crowding each other.
+  const labelEvery = Math.max(1, Math.ceil(n / Math.max(2, Math.floor(iw / 90))));
+  const points = days.map((d, i) => `${x(i).toFixed(1)},${y(d.total).toFixed(1)}`).join(' ');
+  const summary = a('accountsSummary', { total: days[last].total, gained, from: long(start) });
+
+  const nearest = (clientX, svg) => {
+    const box = svg.getBoundingClientRect();
+    const px = ((clientX - box.left) / box.width) * W;
+    return Math.max(0, Math.min(last, Math.round(((px - L) / iw) * (n - 1))));
+  };
+  const onKeyDown = (e) => {
+    if (e.key === 'ArrowRight') { e.preventDefault(); setHover((h) => Math.min(last, (h ?? -1) + 1)); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); setHover((h) => Math.max(0, (h ?? n) - 1)); }
+    if (e.key === 'Escape') setHover(null);
+  };
+  const tipPct = hover === null ? 0 : (x(hover) / W) * 100;
+  const shown = hover ?? last;
+
+  return (
+    <>
+      <div className="spread" style={{ marginBottom: 12, flexWrap: 'wrap', gap: 10, alignItems: 'flex-end' }}>
+        <p style={{ margin: 0 }}>
+          <strong style={{ fontSize: '1.4rem' }}>{days[last].total}</strong>{' '}
+          <span className="small muted">{a('accountsNow', { gained })}</span>
+        </p>
+        <div className="tabs" role="tablist" aria-label={a('accountsTitle')}>
+          {ACCOUNT_RANGES.map((r) => (
+            <button key={r} type="button" role="tab" className="tab" aria-selected={range === r} onClick={() => { setRange(r); setHover(null); }}>
+              {r ? a('lastDays', { n: r }) : a('allTime')}
+            </button>
+          ))}
+        </div>
+      </div>
+      <div className="an-chart-wrap" ref={wrapRef}>
+        <svg
+          className="an-chart"
+          viewBox={`0 0 ${W} ${H}`}
+          role="img"
+          aria-label={summary}
+          tabIndex={0}
+          onPointerMove={(e) => setHover(nearest(e.clientX, e.currentTarget))}
+          onPointerLeave={() => setHover(null)}
+          onFocus={() => setHover((h) => h ?? last)}
+          onBlur={() => setHover(null)}
+          onKeyDown={onKeyDown}
+        >
+          {[0, 1, 2, 3, 4].map((i) => (
+            <g key={i}>
+              <line className="grid" x1={L} x2={W - R} y1={y(step * i)} y2={y(step * i)} />
+              <text x={L - 8} y={y(step * i) + 4} textAnchor="end">{step * i}</text>
+            </g>
+          ))}
+          {days.map((d, i) => ((last - i) % labelEvery === 0) && (
+            <text key={d.day} x={x(i)} y={H - 8} textAnchor={i === last ? 'end' : i === 0 ? 'start' : 'middle'}>{short(d.day)}</text>
+          ))}
+          {hover !== null && <line className="cross" x1={x(hover)} x2={x(hover)} y1={T} y2={T + ih} />}
+          <polyline className="line" points={points} />
+          <circle className="dot" cx={x(shown)} cy={y(days[shown].total)} r="4.5" />
+          {hover === null && (
+            <text className="an-chart__value" x={x(last)} y={y(days[last].total) - 12} textAnchor="end">{days[last].total}</text>
+          )}
+        </svg>
+        {hover !== null && (
+          <div className={`an-tip${tipPct > 55 ? ' an-tip--left' : ''}`} style={{ left: `${tipPct}%` }} role="status">
+            <div className="an-tip__label">{long(days[hover].day)}</div>
+            <div className="an-tip__row">
+              <i className="an-tip__key" />
+              <strong className="an-tip__value">{days[hover].total}</strong>
+              <span className="an-tip__label">{a('accountsUnit')}</span>
+            </div>
+            <div className="an-tip__label">{a('joinedThatDay', { n: days[hover].joined })}</div>
+          </div>
+        )}
+      </div>
+      <details className="an-table-view">
+        <summary className="small">{a('showTable')}</summary>
+        <div className="table-scroll">
+          <table className="admin-table">
+            <thead>
+              <tr><th>{a('day')}</th><th className="an-num">{a('joined')}</th><th className="an-num">{a('accountsUnit')}</th></tr>
+            </thead>
+            <tbody>
+              {days.filter((d) => d.joined > 0).reverse().map((d) => (
+                <tr key={d.day}><td className="an-nowrap">{long(d.day)}</td><td className="an-num">+{d.joined}</td><td className="an-num">{d.total}</td></tr>
+              ))}
+            </tbody>
+          </table>
+          {gained === 0 && <p className="small muted" style={{ margin: '8px 0 0' }}>{a('noneJoined')}</p>}
+        </div>
+      </details>
+    </>
+  );
+}
+
 function BarList({ rows, label, empty }) {
   if (!rows.length) return <p className="muted small" style={{ margin: 0 }}>{empty}</p>;
   const max = Math.max(...rows.map((r) => r.n));
@@ -254,6 +402,13 @@ export function AdminAnalytics({ token, onAuthError }) {
           </div>
         </section>
       </div>
+
+      <section className="an-section">
+        <h2>{a('accountsTitle')}</h2>
+        <div className="card panel">
+          <AccountsChart byDay={report.users?.by_day || []} locale={locale} />
+        </div>
+      </section>
 
       <section className="an-section">
         <h2>{a('byCityTitle')}</h2>

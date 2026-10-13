@@ -1457,3 +1457,6 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 @keyframes vong-draw { 0% { stroke-dashoffset: 1; } 48%, 60% { stroke-dashoffset: 0; } 100% { stroke-dashoffset: -1; } }
 /* Without motion, the whole mark is simply shown. */
 @media (prefers-reduced-motion: reduce) { .vong-loader__ink { stroke-dasharray: none; animation: none; } }
+.an-table-view { margin-top: 12px; }
+.an-table-view summary { cursor: pointer; color: var(--ink-soft); }
+.an-table-view .admin-table { margin-top: 8px; }

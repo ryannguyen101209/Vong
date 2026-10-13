@@ -104,6 +104,8 @@ try {
   assert.equal(report.cities.find((c) => c.city === 'ha_noi').live, 1);
   assert.equal(report.daily.reduce((n, d) => n + d.conversations, 0), 2, 'the chart counts new chats');
   assert.equal(report.users.total, 2);
+  assert.equal(report.users.by_day.reduce((n, d) => n + d.n, 0), 2, 'accounts per day add up');
+  assert.match(report.users.by_day[0].day, /^\d{4}-\d{2}-\d{2}$/);
 
   // Accounts marked "not counted" (the team, test accounts) drop out of every number,
   // but a listing with no account (from before sign-in existed) still counts.
@@ -117,6 +119,7 @@ try {
   report = (await request('/api/admin/analytics', { token })).body;
   assert.equal(report.excluded_accounts, 2);
   assert.equal(report.users.total, 0);
+  assert.deepEqual(report.users.by_day, [], 'left-out accounts are not on the chart');
   assert.equal(report.engagement.conversations, 0);
   assert.equal(report.engagement.buyers, 0);
   assert.deepEqual(report.sellers, { active: 0, new_7d: 0 });
