@@ -14,10 +14,10 @@ export const router = express.Router();
 /** GET /api/site-reviews — approved reviews (newest first), their average, and the caller's own review. */
 router.get('/', (req, res) => {
   const reviews = db.prepare(`
-    SELECT r.id, r.rating, r.body, r.created_at, u.name AS reviewer_name
+    SELECT r.id, r.rating, r.body, r.created_at, u.name AS reviewer_name, u.admin_at IS NOT NULL AS admin
     FROM site_reviews r JOIN users u ON u.id = r.user_id
     WHERE r.status = 'approved' ORDER BY r.created_at DESC LIMIT 12
-  `).all().map(({ reviewer_name, ...r }) => ({ ...r, reviewer: shortName(reviewer_name) }));
+  `).all().map(({ reviewer_name, ...r }) => ({ ...r, admin: Boolean(r.admin), reviewer: shortName(reviewer_name) }));
   const stats = db.prepare("SELECT COUNT(*) AS n, AVG(rating) AS avg FROM site_reviews WHERE status = 'approved'").get();
   const mine = req.user ? db.prepare('SELECT rating, body, status FROM site_reviews WHERE user_id = ?').get(req.user.id) ?? null : null;
   res.json({ reviews, count: stats.n, average: stats.n ? Math.round(stats.avg * 10) / 10 : null, mine });

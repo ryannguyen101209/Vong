@@ -117,6 +117,22 @@ try {
   await request(`/api/admin/site-reviews/${admin1.site[0].id}/hide`, { token, method: 'POST' });
   assert.equal((await request('/api/site-reviews')).body.count, 0);
 
+  // The "Admin" badge: switched on by the admin only, then shown on the profile, listing, chats and reviews.
+  assert.equal((await request(`/api/admin/users/${seller.id}/admin`, { cookie: seller.cookie, body: { admin: true } })).status, 401);
+  assert.equal((await request(`/api/sellers/${seller.id}`)).body.seller.admin, false);
+  assert.deepEqual((await request(`/api/admin/users/${seller.id}/admin`, { token, body: { admin: true } })).body, { id: seller.id, admin: true });
+  assert.equal((await request(`/api/sellers/${seller.id}`)).body.seller.admin, true);
+  assert.equal((await request(`/api/listings/${id}`)).body.seller.admin, true);
+  assert.equal((await request('/api/conversations', { cookie: buyer.cookie })).body.conversations[0].other_admin, 1);
+  assert.equal((await request('/api/conversations', { cookie: seller.cookie })).body.conversations[0].other_admin, 0, 'the buyer is not an admin');
+  assert.equal((await request('/api/admin/users', { token })).body.users.find((u) => u.id === seller.id).admin, true);
+  await request('/api/site-reviews', { cookie: seller.cookie, body: { rating: 5, body: 'Tụi mình làm Vòng đó' } });
+  const own = (await request('/api/admin/reviews', { token })).body.site.find((r) => r.body === 'Tụi mình làm Vòng đó');
+  await request(`/api/admin/site-reviews/${own.id}/approve`, { token, method: 'POST' });
+  assert.equal((await request('/api/site-reviews')).body.reviews.find((r) => r.body === 'Tụi mình làm Vòng đó').admin, true, 'an admin review is labelled');
+  await request(`/api/admin/users/${seller.id}/admin`, { token, body: { admin: false } });
+  assert.equal((await request(`/api/sellers/${seller.id}`)).body.seller.admin, false);
+
   console.log('review tests passed');
 } finally {
   server.close();

@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
-import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
+import { emailUser, mailEnabled, sendMail, buildContactReply, buildSellerNote, inboxAddress } from '../mailer.js';
 import { buildReport } from './analytics.js';
 import { notifyOwner, notifyConfigured, lastNotify } from '../notify.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
@@ -98,13 +98,13 @@ router.get('/users', (req, res) => {
   res.set('Cache-Control', 'no-store');
   const q = String(req.query.q ?? '').trim().toLowerCase().slice(0, 100);
   const users = db.prepare(`
-    SELECT u.id, u.name, u.email, u.created_at, u.trusted_at IS NOT NULL AS trusted,
+    SELECT u.id, u.name, u.email, u.created_at, u.trusted_at IS NOT NULL AS trusted, u.admin_at IS NOT NULL AS admin,
            (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status <> 'removed') AS listings,
            (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status IN ('published', 'sold')) AS public_listings
     FROM users u
     WHERE @q = '' OR instr(lower(u.name), @q) > 0 OR instr(lower(u.email), @q) > 0
     ORDER BY u.created_at DESC
-  `).all({ q }).map((u) => ({ ...u, trusted: Boolean(u.trusted) }));
+  `).all({ q }).map((u) => ({ ...u, trusted: Boolean(u.trusted), admin: Boolean(u.admin) }));
   res.json({ users, total: db.prepare('SELECT COUNT(*) AS n FROM users').get().n });
 });
 
@@ -285,6 +285,28 @@ router.post('/messages/:id/reply', async (req, res) => {
   res.json({ ok: true, replied_at: repliedAt });
 });
 
+/**
+ * POST /api/admin/listings/:id/email { subject?, body } — write to the seller
+ * from the site's address (hello@…). Replies and a copy go to the inbox.
+ */
+router.post('/listings/:id/email', async (req, res) => {
+  const listing = db.prepare('SELECT id, title_en, title_vi FROM listings WHERE id = ? AND is_seed = 0').get(req.params.id);
+  if (!listing) return res.status(404).json({ error: 'not_found' });
+  const body = String(req.body?.body ?? '').trim();
+  const subject = String(req.body?.subject ?? '').trim();
+  if (body.length < 2 || body.length > 5000) return res.status(400).json({ error: 'bad_body' });
+  if (subject.length > 150) return res.status(400).json({ error: 'bad_subject' });
+  if (!mailEnabled()) return res.status(503).json({ error: 'mail_off' });
+  const to = sellerEmailFor(listing.id)?.email;
+  if (!to) return res.status(409).json({ error: 'no_email' });
+
+  const site = (process.env.PUBLIC_URL || 'https://usevong.com').replace(/\/+$/, '');
+  const email = buildSellerNote({ title: listing.title_vi || listing.title_en, url: `${site}/listing/${listing.id}`, body, subject });
+  const sent = await sendMail({ to, ...email, replyTo: inboxAddress(), bcc: inboxAddress() });
+  if (!sent) return res.status(502).json({ error: 'send_failed' });
+  res.json({ ok: true, to });
+});
+
 /** GET /api/admin/reports — open reports, newest first, with the listing they are about. */
 router.get('/reports', (req, res) => {
   const reports = db.prepare(`
@@ -312,6 +334,15 @@ router.post('/sellers/:id/trust', (req, res) => {
   const trustedAt = req.body?.trusted ? new Date().toISOString() : null;
   db.prepare('UPDATE users SET trusted_at = ? WHERE id = ?').run(trustedAt, user.id);
   res.json({ id: user.id, trusted: Boolean(trustedAt) });
+});
+
+/** POST /api/admin/users/:id/admin { admin } — show or hide the "Admin" badge on this account. */
+router.post('/users/:id/admin', (req, res) => {
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
+  if (!user) return res.status(404).json({ error: 'not_found' });
+  const adminAt = req.body?.admin ? new Date().toISOString() : null;
+  db.prepare('UPDATE users SET admin_at = ? WHERE id = ?').run(adminAt, user.id);
+  res.json({ id: user.id, admin: Boolean(adminAt) });
 });
 
 /** GET /api/admin/reviews — reviews of Vòng (waiting ones first) and the latest seller reviews. */

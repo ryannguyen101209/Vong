@@ -43,6 +43,17 @@ export function TrustedBadge({ small = false }) {
   );
 }
 
+/** "Admin" pill: this account belongs to the Vòng team. Switched on by hand in the admin panel. */
+export function AdminBadge({ small = false }) {
+  const { t } = useI18n();
+  return (
+    <span className={`admin-badge${small ? ' admin-badge--small' : ''}`} title={t('reviews.adminHint')}>
+      <svg viewBox="0 0 16 16" width="11" height="11" aria-hidden="true" focusable="false"><path d="M8 1 2.5 3v4.2c0 3.4 2.3 6.3 5.5 7.3 3.2-1 5.5-3.9 5.5-7.3V3L8 1Z" fill="currentColor" /></svg>
+      {t('reviews.admin')}
+    </span>
+  );
+}
+
 /** One review: stars, who, when, and what they wrote. */
 export function ReviewItem({ review, context }) {
   const { lang } = useI18n();
@@ -51,6 +62,7 @@ export function ReviewItem({ review, context }) {
       <div className="review__head">
         <Stars value={review.rating} size={14} />
         <span className="small muted">{review.reviewer} · {formatDate(review.created_at, lang)}</span>
+        {review.admin && <AdminBadge small />}
       </div>
       <p className="review__body">{review.body}</p>
       {context && <p className="small muted review__context">{context}</p>}

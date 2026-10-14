@@ -13,6 +13,7 @@ const UNREAD = `SELECT COUNT(*) FROM chat_messages m WHERE m.conversation_id = c
   AND m.id > COALESCE((SELECT last_read_id FROM conversation_reads r WHERE r.conversation_id = c.id AND r.user_id = @user), 0)`;
 const query = `SELECT c.*, l.title_en, l.title_vi, l.image_path,
   CASE WHEN c.buyer_id = @user THEN seller.name ELSE buyer.name END AS other_name,
+  CASE WHEN c.buyer_id = @user THEN seller.admin_at ELSE buyer.admin_at END IS NOT NULL AS other_admin,
   (SELECT body FROM chat_messages WHERE conversation_id = c.id ORDER BY id DESC LIMIT 1) AS last_message,
   (${UNREAD}) AS unread
   FROM conversations c JOIN listings l ON l.id = c.listing_id
