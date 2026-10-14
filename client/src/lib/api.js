@@ -192,6 +192,8 @@ export const api = {
     settings: (token) =>
       request('/api/admin/settings', { headers: { authorization: `Bearer ${token}` } }),
 
+    ntfyTest: (token) =>
+      request('/api/admin/ntfy-test', { method: 'POST', headers: { authorization: `Bearer ${token}` } }),
     saveSettings: (token, patch) =>
       request('/api/admin/settings', {
         method: 'PUT',

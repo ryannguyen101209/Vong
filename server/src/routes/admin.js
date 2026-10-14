@@ -5,6 +5,7 @@ import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
 import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
 import { buildReport } from './analytics.js';
+import { notifyOwner, notifyConfigured, lastNotify } from '../notify.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
 import { CITIES } from '../seed-data.js';
 
@@ -167,6 +168,7 @@ router.get('/settings', (req, res) => {
   res.json({
     settings: getSettings(), banks: BANKS, default_password: usingDefaultPassword(),
     backup: { email: backupEmail() ? backupEmail().replace(/^(.).*(@.*)$/, '$1…$2') : null, mail_enabled: mailEnabled(), last_sent: lastEmailedBackup() },
+    ntfy: { configured: notifyConfigured(), token: Boolean(process.env.NTFY_TOKEN?.trim()), last: lastNotify() },
   });
 });
 
@@ -224,6 +226,12 @@ router.put('/settings', (req, res) => {
   // The listing fee is set by LISTING_FEE_VND on the host, not here.
 
   res.json({ settings: saveSettings(patch) });
+});
+
+/** POST /api/admin/ntfy-test — send a test alert now and report what ntfy answered. */
+router.post('/ntfy-test', async (req, res) => {
+  const result = await notifyOwner({ title: 'Vòng test alert', message: 'If you can read this, phone alerts work.', tags: ['white_check_mark'] });
+  res.json({ configured: notifyConfigured(), ...result });
 });
 
 /** GET /api/admin/promo-codes — every code with how often it has been used. */
