@@ -88,6 +88,25 @@ router.get('/listings', (req, res) => {
   res.json({ listings: rows.map((r) => ({ ...r, is_first_listing: !!r.is_first_listing })), counts, free_given, city_counts: cityCounts });
 });
 
+/**
+ * GET /api/admin/users?q= — every account, newest first: name, Google email,
+ * when they joined, how many listings they have posted, and the trusted badge.
+ * `q` matches name or email. Admin only, never public.
+ */
+router.get('/users', (req, res) => {
+  res.set('Cache-Control', 'no-store');
+  const q = String(req.query.q ?? '').trim().toLowerCase().slice(0, 100);
+  const users = db.prepare(`
+    SELECT u.id, u.name, u.email, u.created_at, u.trusted_at IS NOT NULL AS trusted,
+           (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status <> 'removed') AS listings,
+           (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status IN ('published', 'sold')) AS public_listings
+    FROM users u
+    WHERE @q = '' OR instr(lower(u.name), @q) > 0 OR instr(lower(u.email), @q) > 0
+    ORDER BY u.created_at DESC
+  `).all({ q }).map((u) => ({ ...u, trusted: Boolean(u.trusted) }));
+  res.json({ users, total: db.prepare('SELECT COUNT(*) AS n FROM users').get().n });
+});
+
 /** POST /api/admin/listings/:id/approve — you saw the money arrive. */
 router.post('/listings/:id/approve', (req, res) => {
   const row = db.prepare('SELECT id, status FROM listings WHERE id = ?').get(req.params.id);

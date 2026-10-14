@@ -129,6 +129,17 @@ try {
   await request('/api/admin/settings', { token, method: 'PUT', body: { stats_exclude_emails: '' } });
   assert.equal((await request('/api/admin/analytics', { token })).body.engagement.buyers, 1);
 
+  // Admin accounts list: everyone who signed up, admin only, searchable.
+  assert.equal((await request('/api/admin/users')).status, 401);
+  assert.equal((await request('/api/admin/users', { cookie: seller })).status, 401, 'a signed-in user is not the admin');
+  const accounts = (await request('/api/admin/users', { token })).body;
+  assert.equal(accounts.total, 2);
+  assert.deepEqual(accounts.users.map((u) => u.email).sort(), ['buyer@example.test', 'seller@example.test']);
+  const sellerRow = accounts.users.find((u) => u.email === 'seller@example.test');
+  assert.equal(sellerRow.listings, 3, 'live, sold and waiting listings, not removed ones');
+  assert.equal(typeof sellerRow.trusted, 'boolean');
+  assert.deepEqual((await request('/api/admin/users?q=BUYER', { token })).body.users.map((u) => u.email), ['buyer@example.test']);
+
   console.log('area and admin stats tests passed');
 } finally {
   server.close();

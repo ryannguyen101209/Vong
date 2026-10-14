@@ -117,6 +117,10 @@ export const api = {
     analytics: (token) =>
       request('/api/admin/analytics', { headers: { authorization: `Bearer ${token}` } }),
 
+    users: (token, q = '') =>
+      request(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`, {
+        headers: { authorization: `Bearer ${token}` },
+      }),
     listings: (token, status, city = '') =>
       request(`/api/admin/listings?status=${encodeURIComponent(status)}${city ? `&city=${encodeURIComponent(city)}` : ''}`, {
         headers: { authorization: `Bearer ${token}` },
