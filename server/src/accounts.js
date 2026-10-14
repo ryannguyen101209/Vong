@@ -4,6 +4,7 @@ import { OAuth2Client } from 'google-auth-library';
 import { rateLimit } from 'express-rate-limit';
 import { db } from './db.js';
 import { emailUser } from './mailer.js';
+import { notifyOwner } from './notify.js';
 
 const google = new OAuth2Client();
 const COOKIE = 'vong_session';
@@ -71,7 +72,12 @@ export function createAuthRouter(verify = async (credential, audience) => {
         return user;
       })();
       // A brand-new account gets one welcome email; signing in again sends nothing.
-      if (isNew) emailUser(profile.email, 'welcome', { name: profile.name });
+      if (isNew) {
+        emailUser(profile.email, 'welcome', { name: profile.name });
+        // Only a count reaches the phone, never the person's name or email.
+        const n = db.prepare('SELECT COUNT(*) AS n FROM users').get().n;
+        notifyOwner({ title: 'New account on Vòng', message: `Account #${n} just signed up.`, tags: ['wave'], path: '/admin' });
+      }
       res.json({ profile });
     } catch (error) { next(error); }
   });

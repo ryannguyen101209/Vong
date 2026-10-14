@@ -534,6 +534,50 @@ function AllListings({ token, onAuthError }) {
   );
 }
 
+/** Phone alerts: whether ntfy is set up, what happened last time, and a test button. */
+function NtfyCard({ token, status, onAuthError }) {
+  const { t, lang } = useI18n();
+  const [last, setLast] = useState(status?.last ?? null);
+  const [testing, setTesting] = useState(false);
+  const reason = (result) => {
+    if (!result) return '';
+    if (result.ok) return t('admin.ntfyOk');
+    const code = String(result.error ?? '').split(':')[0];
+    const known = ['not_configured', 'rate_limited', 'not_allowed', 'unreachable', 'timeout'];
+    return known.includes(code) ? t(`admin.ntfy_${code}`) : t('admin.ntfyOther', { error: result.error });
+  };
+  const test = async () => {
+    setTesting(true);
+    try {
+      const result = await api.admin.ntfyTest(token);
+      setLast({ ...result, at: new Date().toISOString() });
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+      else setLast({ ok: false, error: `http_${error.status ?? 0}`, at: new Date().toISOString() });
+    } finally {
+      setTesting(false);
+    }
+  };
+
+  return (
+    <div className="card panel" style={{ maxWidth: 620, marginBottom: 24 }}>
+      <h2 style={{ fontSize: '1.05rem', margin: '0 0 6px' }}>{t('admin.ntfyTitle')}</h2>
+      <p className="small muted" style={{ margin: '0 0 12px' }}>
+        {status?.configured ? t('admin.ntfyOn') : t('admin.ntfy_not_configured')}
+        {status?.configured && !status?.token && <> {t('admin.ntfyNoToken')}</>}
+      </p>
+      {last && (
+        <p className={`small notice ${last.ok ? 'notice--positive' : 'notice--warning'}`} role="status" style={{ margin: '0 0 12px' }}>
+          {t('admin.ntfyLast', { when: formatDateTime(last.at, lang) })} {reason(last)}
+        </p>
+      )}
+      <button type="button" className="btn btn--ghost btn--small" onClick={test} disabled={testing}>
+        {testing ? t('common.loading') : t('admin.ntfyTest')}
+      </button>
+    </div>
+  );
+}
+
 /** Every account: name, Google email, when they joined and what they have posted. */
 function Accounts({ token, onAuthError }) {
   const { t, lang } = useI18n();
@@ -727,6 +771,7 @@ function Settings({ token, onAuthError }) {
   const [message, setMessage] = useState(null);
   const [messages, setMessages] = useState([]);
   const [backup, setBackup] = useState(null);
+  const [ntfy, setNtfy] = useState(null);
 
   useEffect(() => {
     api.admin
@@ -735,6 +780,7 @@ function Settings({ token, onAuthError }) {
         setBanks(data.banks);
         setForm(data.settings);
         setBackup(data.backup ?? null);
+        setNtfy(data.ntfy ?? null);
       })
       .catch((error) => error.status === 401 && onAuthError());
     api.admin.messages(token).then((data) => setMessages(data.messages)).catch(() => {});
@@ -766,6 +812,8 @@ function Settings({ token, onAuthError }) {
 
   return (
     <>
+      <NtfyCard token={token} status={ntfy} onAuthError={onAuthError} />
+
       <p className="lead" style={{ marginBottom: 24 }}>{t('admin.settingsLead')}</p>
 
       <form className="card panel form" onSubmit={save} style={{ maxWidth: 620 }}>

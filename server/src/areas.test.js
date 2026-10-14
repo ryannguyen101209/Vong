@@ -140,6 +140,13 @@ try {
   assert.equal(typeof sellerRow.trusted, 'boolean');
   assert.deepEqual((await request('/api/admin/users?q=BUYER', { token })).body.users.map((u) => u.email), ['buyer@example.test']);
 
+  // Phone alerts: status in settings and a test button that reports ntfy's answer.
+  assert.deepEqual((await request('/api/admin/settings', { token })).body.ntfy, { configured: false, token: false, last: null });
+  const test = (await request('/api/admin/ntfy-test', { token, method: 'POST' })).body;
+  assert.equal(test.ok, false);
+  assert.equal(test.error, 'not_configured');
+  assert.equal((await request('/api/admin/ntfy-test', { method: 'POST' })).status, 401);
+
   console.log('area and admin stats tests passed');
 } finally {
   server.close();
