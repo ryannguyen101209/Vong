@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from 'react';
+import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
 import { Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { api } from '../lib/api.js';
@@ -440,6 +440,60 @@ function SellerCount({ listing }) {
   return <span className="badge">{t('admin.sellerTotal', { index: listing.seller_index, n: listing.seller_total })}</span>;
 }
 
+/** Write to a listing's seller from the site's address; replies come back to the inbox. */
+function EmailSellerForm({ token, listing, onClose, onAuthError }) {
+  const { t, localized } = useI18n();
+  const [subject, setSubject] = useState(t('admin.emailSellerSubject', { title: localized(listing, 'title') }));
+  const [body, setBody] = useState('');
+  const [state, setState] = useState({ kind: 'idle' });
+
+  const send = async (event) => {
+    event.preventDefault();
+    setState({ kind: 'sending' });
+    try {
+      const data = await api.admin.emailSeller(token, listing.id, { subject, body });
+      setState({ kind: 'sent', to: data.to });
+    } catch (error) {
+      if (error.status === 401) return onAuthError();
+      const code = error.payload?.error;
+      setState({ kind: 'error', message: code === 'mail_off' ? t('admin.emailSellerMailOff') : code === 'no_email' ? t('admin.emailSellerNoEmail') : t('admin.emailSellerFailed') });
+    }
+  };
+
+  if (state.kind === 'sent') {
+    return (
+      <div className="notice notice--positive" role="status">
+        {t('admin.emailSellerSent', { to: state.to })}{' '}
+        <button type="button" className="link-quiet" onClick={onClose}>{t('common.close')}</button>
+      </div>
+    );
+  }
+  return (
+    <form className="form" onSubmit={send} style={{ maxWidth: 620 }}>
+      <input className="input" value={subject} onChange={(event) => setSubject(event.target.value)} maxLength={150} aria-label={t('admin.emailSellerSubjectLabel')} />
+      <textarea
+        className="textarea"
+        style={{ minHeight: 160 }}
+        value={body}
+        onChange={(event) => setBody(event.target.value)}
+        placeholder={t('admin.emailSellerPlaceholder')}
+        aria-label={t('admin.emailSellerBodyLabel')}
+        required
+        minLength={2}
+        maxLength={5000}
+      />
+      <p className="small muted" style={{ margin: 0 }}>{t('admin.emailSellerHint')}</p>
+      {state.kind === 'error' && <p className="small" role="alert" style={{ margin: 0, color: 'var(--danger)' }}>{state.message}</p>}
+      <div className="row" style={{ gap: 10 }}>
+        <button type="submit" className="btn btn--small" disabled={state.kind === 'sending' || body.trim().length < 2}>
+          {state.kind === 'sending' ? t('common.loading') : t('admin.emailSellerSend')}
+        </button>
+        <button type="button" className="btn btn--ghost btn--small" onClick={onClose}>{t('common.cancel')}</button>
+      </div>
+    </form>
+  );
+}
+
 function AllListings({ token, onAuthError }) {
   const { t, lang, localized } = useI18n();
   const [status, setStatus] = useState('published');
@@ -447,6 +501,7 @@ function AllListings({ token, onAuthError }) {
   const [listings, setListings] = useState([]);
   const [cityCounts, setCityCounts] = useState({});
   const [cities, setCities] = useState([]);
+  const [emailing, setEmailing] = useState(null);
 
   useEffect(() => {
     api.meta().then((meta) => setCities(meta.cities.map((item) => item.key))).catch(() => {});
@@ -495,7 +550,8 @@ function AllListings({ token, onAuthError }) {
           </thead>
           <tbody>
             {listings.map((listing) => (
-              <tr key={listing.id}>
+              <Fragment key={listing.id}>
+              <tr>
                 <td>
                   <a href={`/listing/${listing.id}`}>{localized(listing, 'title')}</a>
                   {listing.edited_at && (
@@ -523,8 +579,23 @@ function AllListings({ token, onAuthError }) {
                 </td>
                 <td>{listing.views}</td>
                 <td>{formatDateTime(listing.created_at, lang)}</td>
-                <td><DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} /></td>
+                <td>
+                  <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
+                    <button type="button" className="btn btn--ghost btn--small" onClick={() => setEmailing(emailing === listing.id ? null : listing.id)}>
+                      {t('admin.emailSeller')}
+                    </button>
+                    <DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} />
+                  </div>
+                </td>
               </tr>
+              {emailing === listing.id && (
+                <tr>
+                  <td colSpan={8} style={{ background: 'var(--surface-sunk)' }}>
+                    <EmailSellerForm token={token} listing={listing} onClose={() => setEmailing(null)} onAuthError={onAuthError} />
+                  </td>
+                </tr>
+              )}
+              </Fragment>
             ))}
           </tbody>
         </table>

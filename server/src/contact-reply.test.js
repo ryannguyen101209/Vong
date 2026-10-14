@@ -79,6 +79,33 @@ try {
   assert.equal(listed.created_at, '2026-10-11T08:30:00.000Z');
   assert.equal(listed.reply_body, reply);
   assert.ok(listed.replied_at);
+
+  // Writing to a listing's seller: from hello@, with the listing link; replies and a copy to the inbox.
+  db.prepare(`INSERT INTO listings (id, ref, title_vi, description_vi, category, price_vnd, district, condition,
+    seller_name, seller_phone, seller_email, status, fee_vnd, created_at)
+    VALUES ('many', 'VONG-MANY01', 'Combo bàn ghế + đèn + kệ', 'Nhiều món trong một tin.', 'furniture', 500000, 'hcm_ben_thanh', 'good',
+    'Dũng', '0900000003', 'dung@example.test', 'published', 0, ?)`).run(new Date().toISOString());
+  sent.length = 0;
+  assert.equal((await call('/api/admin/listings/many/email', { body: { body: 'Chào bạn' } })).status, 401, 'admin only');
+  assert.equal((await call('/api/admin/listings/many/email', { token, body: { body: 'x' } })).status, 400);
+  assert.equal((await call('/api/admin/listings/nope/email', { token, body: { body: 'Chào bạn' } })).status, 404);
+  const note = 'Chào bạn,\n\nMỗi tin nên là một món <b>nhé</b>.';
+  const emailed = await call('/api/admin/listings/many/email', { token, body: { subject: 'Gợi ý tách tin', body: note } });
+  assert.equal(emailed.status, 200);
+  assert.equal(emailed.body.to, 'dung@example.test');
+  assert.equal(sent.length, 1);
+  assert.deepEqual(sent[0].to, ['dung@example.test']);
+  assert.equal(sent[0].from, 'Vòng <hello@usevong.com>');
+  assert.equal(sent[0].subject, 'Gợi ý tách tin');
+  assert.equal(sent[0].reply_to, 'vong-inquiries@outlook.com');
+  assert.deepEqual(sent[0].bcc, ['vong-inquiries@outlook.com']);
+  assert.ok(sent[0].text.startsWith(note));
+  assert.match(sent[0].html, /\/listing\/many/);
+  assert.match(sent[0].html, /&lt;b&gt;nhé/, 'html is escaped');
+  // No subject: a default that names the listing.
+  await call('/api/admin/listings/many/email', { token, body: { body: 'Chào bạn' } });
+  assert.match(sent[1].subject, /Combo bàn ghế/);
+
   console.log('contact reply tests passed');
 } finally {
   server.close();

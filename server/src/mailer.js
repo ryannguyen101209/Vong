@@ -150,6 +150,24 @@ export function buildContactReply({ name, originalBody, originalAt, replyBody })
   };
 }
 
+/** A note from the owner to a seller about one of their listings. Replies go to the inbox. */
+export function buildSellerNote({ title, url, body, subject }) {
+  const heading = String(subject || '').trim() || `Về tin đăng "${title}" trên Vòng`;
+  return {
+    subject: heading,
+    text: `${body}\n\n---\nTin đăng: ${title}\n${url}`,
+    html: `<!doctype html><html><body style="margin:0;background:${PAGE};font-family:-apple-system,Segoe UI,Roboto,Helvetica,Arial,sans-serif;color:${INK}">
+<div style="max-width:560px;margin:0 auto;padding:28px 20px">
+<p style="margin:0 0 18px;font-size:22px;font-weight:700;color:${GREEN}">Vòng</p>
+<div style="line-height:1.6;white-space:pre-wrap">${esc(body)}</div>
+<hr style="border:0;border-top:1px solid #dfe5da;margin:28px 0 16px">
+<p style="margin:0;font-size:13px;color:#7b8a80">Tin đăng / Listing</p>
+<p style="margin:4px 0 0"><a href="${esc(url)}" style="color:${GREEN};font-weight:600">${esc(title)}</a></p>
+<p style="margin:28px 0 0;font-size:12px;color:#7b8a80">usevong.com · Trả lời email này để nhắn cho tụi mình / Reply to this email to write back</p>
+</div></body></html>`,
+  };
+}
+
 /** True when email is configured. Callers check this before doing throttle bookkeeping. */
 export const mailEnabled = () => Boolean(process.env.RESEND_API_KEY?.trim());
 

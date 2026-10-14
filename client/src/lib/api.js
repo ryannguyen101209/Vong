@@ -117,6 +117,12 @@ export const api = {
     analytics: (token) =>
       request('/api/admin/analytics', { headers: { authorization: `Bearer ${token}` } }),
 
+    emailSeller: (token, id, patch) =>
+      request(`/api/admin/listings/${id}/email`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify(patch),
+      }),
     users: (token, q = '') =>
       request(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`, {
         headers: { authorization: `Bearer ${token}` },

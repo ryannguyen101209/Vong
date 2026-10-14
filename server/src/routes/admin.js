@@ -3,7 +3,7 @@ import { rateLimit } from 'express-rate-limit';
 import { db, getSettings, saveSettings } from '../db.js';
 import { login, logout, requireAdmin, usingDefaultPassword } from '../auth.js';
 import { BANKS, findBank } from '../vietqr.js';
-import { emailUser, mailEnabled, sendMail, buildContactReply, inboxAddress } from '../mailer.js';
+import { emailUser, mailEnabled, sendMail, buildContactReply, buildSellerNote, inboxAddress } from '../mailer.js';
 import { buildReport } from './analytics.js';
 import { notifyOwner, notifyConfigured, lastNotify } from '../notify.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
@@ -283,6 +283,28 @@ router.post('/messages/:id/reply', async (req, res) => {
   const repliedAt = new Date().toISOString();
   db.prepare('UPDATE messages SET reply_body = ?, replied_at = ? WHERE id = ?').run(body, repliedAt, message.id);
   res.json({ ok: true, replied_at: repliedAt });
+});
+
+/**
+ * POST /api/admin/listings/:id/email { subject?, body } — write to the seller
+ * from the site's address (hello@…). Replies and a copy go to the inbox.
+ */
+router.post('/listings/:id/email', async (req, res) => {
+  const listing = db.prepare('SELECT id, title_en, title_vi FROM listings WHERE id = ? AND is_seed = 0').get(req.params.id);
+  if (!listing) return res.status(404).json({ error: 'not_found' });
+  const body = String(req.body?.body ?? '').trim();
+  const subject = String(req.body?.subject ?? '').trim();
+  if (body.length < 2 || body.length > 5000) return res.status(400).json({ error: 'bad_body' });
+  if (subject.length > 150) return res.status(400).json({ error: 'bad_subject' });
+  if (!mailEnabled()) return res.status(503).json({ error: 'mail_off' });
+  const to = sellerEmailFor(listing.id)?.email;
+  if (!to) return res.status(409).json({ error: 'no_email' });
+
+  const site = (process.env.PUBLIC_URL || 'https://usevong.com').replace(/\/+$/, '');
+  const email = buildSellerNote({ title: listing.title_vi || listing.title_en, url: `${site}/listing/${listing.id}`, body, subject });
+  const sent = await sendMail({ to, ...email, replyTo: inboxAddress(), bcc: inboxAddress() });
+  if (!sent) return res.status(502).json({ error: 'send_failed' });
+  res.json({ ok: true, to });
 });
 
 /** GET /api/admin/reports — open reports, newest first, with the listing they are about. */
