@@ -98,13 +98,13 @@ router.get('/users', (req, res) => {
   res.set('Cache-Control', 'no-store');
   const q = String(req.query.q ?? '').trim().toLowerCase().slice(0, 100);
   const users = db.prepare(`
-    SELECT u.id, u.name, u.email, u.created_at, u.trusted_at IS NOT NULL AS trusted,
+    SELECT u.id, u.name, u.email, u.created_at, u.trusted_at IS NOT NULL AS trusted, u.admin_at IS NOT NULL AS admin,
            (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status <> 'removed') AS listings,
            (SELECT COUNT(*) FROM listings l WHERE l.seller_id = u.id AND l.is_seed = 0 AND l.status IN ('published', 'sold')) AS public_listings
     FROM users u
     WHERE @q = '' OR instr(lower(u.name), @q) > 0 OR instr(lower(u.email), @q) > 0
     ORDER BY u.created_at DESC
-  `).all({ q }).map((u) => ({ ...u, trusted: Boolean(u.trusted) }));
+  `).all({ q }).map((u) => ({ ...u, trusted: Boolean(u.trusted), admin: Boolean(u.admin) }));
   res.json({ users, total: db.prepare('SELECT COUNT(*) AS n FROM users').get().n });
 });
 
@@ -334,6 +334,15 @@ router.post('/sellers/:id/trust', (req, res) => {
   const trustedAt = req.body?.trusted ? new Date().toISOString() : null;
   db.prepare('UPDATE users SET trusted_at = ? WHERE id = ?').run(trustedAt, user.id);
   res.json({ id: user.id, trusted: Boolean(trustedAt) });
+});
+
+/** POST /api/admin/users/:id/admin { admin } — show or hide the "Admin" badge on this account. */
+router.post('/users/:id/admin', (req, res) => {
+  const user = db.prepare('SELECT id FROM users WHERE id = ?').get(req.params.id);
+  if (!user) return res.status(404).json({ error: 'not_found' });
+  const adminAt = req.body?.admin ? new Date().toISOString() : null;
+  db.prepare('UPDATE users SET admin_at = ? WHERE id = ?').run(adminAt, user.id);
+  res.json({ id: user.id, admin: Boolean(adminAt) });
 });
 
 /** GET /api/admin/reviews — reviews of Vòng (waiting ones first) and the latest seller reviews. */

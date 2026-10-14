@@ -6,6 +6,7 @@ import { sessionApi } from '../lib/session-api.js';
 import { unreadChanged } from '../lib/unread.js';
 import { EmptyState, ErrorState } from '../components/States.jsx';
 import { PageLoader } from '../components/Loader.jsx';
+import { AdminBadge } from '../components/Reviews.jsx';
 
 export function Messages() {
   const { t } = useI18n();
@@ -76,6 +77,7 @@ function Inbox({ profile }) {
               <Link className={'thread-link' + (unread ? ' thread-link--unread' : '')} aria-current={thread.id === conversationId ? 'page' : undefined} to={'/messages?conversation=' + thread.id} key={thread.id}>
                 <span className="thread-link__top">
                   <strong>{thread.other_name}</strong>
+                  {thread.other_admin ? <AdminBadge small /> : null}
                   {unread > 0 && <span className="nav__count" aria-label={t('messages.unreadInThread', { count: unread })}>{unread}</span>}
                 </span>
                 <span>{localized(thread, 'title')}</span>
@@ -174,7 +176,7 @@ function Conversation({ id, profile }) {
   return (
     <section className="conversation" aria-label={t('messages.title')}>
       <header className="conversation__header">
-        <div><h2>{conversation.other_name}</h2><Link to={'/listing/' + conversation.listing_id}>{localized(conversation, 'title')}</Link><p>{t('messages.privateNotice')}</p></div>
+        <div><h2>{conversation.other_name}{conversation.other_admin ? <> <AdminBadge small /></> : null}</h2><Link to={'/listing/' + conversation.listing_id}>{localized(conversation, 'title')}</Link><p>{t('messages.privateNotice')}</p></div>
       </header>
       <div className="conversation__body" ref={scrollRef} role="log" aria-label={t('messages.title')} aria-live="polite" aria-relevant="additions">
         {hasOlder && <button className="link-quiet" onClick={older} disabled={olderLoading}>{t(olderLoading ? 'common.loading' : 'messages.older')}</button>}

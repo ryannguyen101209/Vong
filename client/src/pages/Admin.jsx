@@ -1,6 +1,6 @@
 import { Fragment, useCallback, useEffect, useState } from 'react';
 import { useI18n } from '../i18n/index.jsx';
-import { Stars, TrustedBadge } from '../components/Reviews.jsx';
+import { AdminBadge, Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, formatDateTime, transferNote } from '../lib/format.js';
 import { Field } from '../components/Field.jsx';
@@ -582,7 +582,7 @@ function AllListings({ token, onAuthError }) {
                 <td>
                   <div className="row" style={{ gap: 8, flexWrap: 'nowrap' }}>
                     <button type="button" className="btn btn--ghost btn--small" onClick={() => setEmailing(emailing === listing.id ? null : listing.id)}>
-                      {t('admin.emailSeller')}
+                      {t('admin.emailSellerButton')}
                     </button>
                     <DeleteButton token={token} id={listing.id} onDeleted={load} onAuthError={onAuthError} />
                   </div>
@@ -649,6 +649,28 @@ function NtfyCard({ token, status, onAuthError }) {
   );
 }
 
+/** Show or hide the "Admin" badge on an account (for the team's own accounts). */
+function AdminBadgeToggle({ token, user, onChanged, onAuthError }) {
+  const { t } = useI18n();
+  const [busy, setBusy] = useState(false);
+  const toggle = async () => {
+    setBusy(true);
+    try {
+      const data = await api.admin.setAdminBadge(token, user.id, !user.admin);
+      onChanged(data.admin);
+    } catch (error) {
+      if (error.status === 401) onAuthError();
+    } finally {
+      setBusy(false);
+    }
+  };
+  return (
+    <button type="button" className="link-quiet small" onClick={toggle} disabled={busy}>
+      {user.admin ? t('admin.adminBadgeRemove') : t('admin.adminBadgeGive')}
+    </button>
+  );
+}
+
 /** Every account: name, Google email, when they joined and what they have posted. */
 function Accounts({ token, onAuthError }) {
   const { t, lang } = useI18n();
@@ -705,7 +727,9 @@ function Accounts({ token, onAuthError }) {
               <tr key={u.id}>
                 <td>
                   {u.public_listings > 0 ? <a href={`/seller/${u.id}`} target="_blank" rel="noopener">{u.name}</a> : u.name}
+                  {u.admin && <> <AdminBadge small /></>}
                   {u.trusted && <> <TrustedBadge small /></>}
+                  <div><AdminBadgeToggle token={token} user={u} onChanged={(admin) => setUsers((all) => all.map((x) => (x.id === u.id ? { ...x, admin } : x)))} onAuthError={onAuthError} /></div>
                 </td>
                 <td><a href={`mailto:${u.email}`}>{u.email}</a></td>
                 <td className="an-nowrap">{formatDateTime(u.created_at, lang)}</td>

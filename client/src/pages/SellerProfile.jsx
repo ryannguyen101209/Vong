@@ -5,7 +5,7 @@ import { api } from '../lib/api.js';
 import { useAuth } from '../lib/auth.jsx';
 import { ListingCard } from '../components/ListingCard.jsx';
 import { EmptyState, ErrorState } from '../components/States.jsx';
-import { ReviewForm, ReviewItem, Stars, TrustedBadge } from '../components/Reviews.jsx';
+import { AdminBadge, ReviewForm, ReviewItem, Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { PageLoader } from '../components/Loader.jsx';
 
 /** A seller's public page: who they are, what they sell, and what buyers said. */
@@ -57,8 +57,10 @@ export function SellerProfile() {
         <div>
           <div className="seller-head__name">
             <h1>{seller.name}</h1>
+            {seller.admin && <AdminBadge />}
             {seller.trusted && <TrustedBadge />}
           </div>
+          {seller.admin && <p className="small" style={{ margin: '6px 0 0', color: 'var(--ink-soft)' }}>{t('seller.adminLabel')}</p>}
           <p className="muted" style={{ margin: '6px 0 0' }}>
             {t('seller.memberSince', { date: since })} · {t('seller.liveCount', { n: live.length })}
             {sold.length > 0 && ` · ${t('seller.soldCount', { n: sold.length })}`}

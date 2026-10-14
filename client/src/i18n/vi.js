@@ -505,7 +505,9 @@ export default {
     tabCodes: 'Mã',
     tabAnalytics: 'Thống kê',
     tabAccounts: 'Tài khoản',
-    emailSeller: 'Email',
+    adminBadgeGive: 'Gắn huy hiệu Admin',
+    adminBadgeRemove: 'Gỡ huy hiệu Admin',
+    emailSellerButton: 'Email',
     emailSellerSubject: 'Về tin đăng “{{title}}” của bạn trên Vòng',
     emailSellerSubjectLabel: 'Tiêu đề',
     emailSellerBodyLabel: 'Nội dung',
@@ -860,6 +862,8 @@ export default {
     sending: 'Đang gửi…',
     error: 'Chưa gửi được. Bạn thử lại nhé.',
     trusted: 'Người bán uy tín',
+    admin: 'Admin',
+    adminHint: 'Thành viên đội ngũ Vòng',
     trustedHint: 'Vòng đã xác minh người bán này',
     siteTitle: 'Mọi người nói gì về Vòng',
     siteEmpty: 'Chưa có đánh giá nào. Bạn dùng Vòng thấy sao?',
@@ -869,6 +873,7 @@ export default {
   },
 
   seller: {
+    adminLabel: 'Đây là tài khoản admin của Vòng.',
     missingTitle: 'Không tìm thấy người bán này',
     missingBody: 'Người bán chưa có tin nào đang hiện, hoặc đường link không đúng.',
     memberSince: 'Tham gia từ {{date}}',

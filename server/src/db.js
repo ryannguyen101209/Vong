@@ -273,6 +273,8 @@ db.exec(`
 // Seller profiles: a "trusted seller" badge the owner gives by hand, and reviews.
 const userColumns = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
 if (!userColumns.includes('trusted_at')) db.exec('ALTER TABLE users ADD COLUMN trusted_at TEXT');
+// The "Admin" badge, switched on by hand in the admin panel for the team's own accounts.
+if (!userColumns.includes('admin_at')) db.exec('ALTER TABLE users ADD COLUMN admin_at TEXT');
 db.exec(`
   -- A buyer who talked to a seller about a listing can review them once for it.
   CREATE TABLE IF NOT EXISTS seller_reviews (

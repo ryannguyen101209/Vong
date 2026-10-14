@@ -123,6 +123,12 @@ export const api = {
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify(patch),
       }),
+    setAdminBadge: (token, id, admin) =>
+      request(`/api/admin/users/${id}/admin`, {
+        method: 'POST',
+        headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
+        body: JSON.stringify({ admin }),
+      }),
     users: (token, q = '') =>
       request(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`, {
         headers: { authorization: `Bearer ${token}` },

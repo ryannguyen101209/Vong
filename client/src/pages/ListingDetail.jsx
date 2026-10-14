@@ -10,7 +10,7 @@ import { EmptyState, ErrorState } from '../components/States.jsx';
 import { ArrowLeftIcon, PhoneIcon, MessageIcon } from '../components/Icons.jsx';
 import { useAuth } from '../lib/auth.jsx';
 import { ReportListing } from '../components/ReportListing.jsx';
-import { Stars, TrustedBadge } from '../components/Reviews.jsx';
+import { AdminBadge, Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { ShareYourListing } from '../components/ShareYourListing.jsx';
 import { PageLoader } from '../components/Loader.jsx';
 
@@ -220,8 +220,9 @@ export function ListingDetail() {
                 ) : (
                   <strong>{listing.seller_name}</strong>
                 )}
-                {seller && (seller.trusted || seller.rating_count > 0) && (
+                {seller && (seller.admin || seller.trusted || seller.rating_count > 0) && (
                   <div className="seller-card__meta">
+                    {seller.admin && <AdminBadge small />}
                     {seller.trusted && <TrustedBadge small />}
                     {seller.rating_count > 0 && (
                       <span className="small"><Stars value={seller.rating_avg} size={13} /> {seller.rating_avg} ({seller.rating_count})</span>

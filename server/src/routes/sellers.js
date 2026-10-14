@@ -24,7 +24,7 @@ export function shortName(name) {
 /** Badge, rating and counts shown wherever a seller appears. */
 export function sellerSummary(sellerId) {
   if (!sellerId) return null;
-  const user = db.prepare('SELECT id, name, created_at, trusted_at FROM users WHERE id = ?').get(sellerId);
+  const user = db.prepare('SELECT id, name, created_at, trusted_at, admin_at FROM users WHERE id = ?').get(sellerId);
   if (!user) return null;
   const rating = db.prepare('SELECT COUNT(*) AS n, AVG(rating) AS avg FROM seller_reviews WHERE seller_id = ?').get(sellerId);
   const latestName = db.prepare(
@@ -35,6 +35,7 @@ export function sellerSummary(sellerId) {
     name: latestName || shortName(user.name),
     member_since: user.created_at,
     trusted: Boolean(user.trusted_at),
+    admin: Boolean(user.admin_at),
     rating_count: rating.n,
     rating_avg: rating.n ? Math.round(rating.avg * 10) / 10 : null,
   };
@@ -70,10 +71,10 @@ router.get('/:id', (req, res) => {
   if (!seller || listings.length === 0) return res.status(404).json({ error: 'not_found' });
 
   const reviews = db.prepare(`
-    SELECT r.id, r.rating, r.body, r.created_at, u.name AS reviewer_name, l.title_en, l.title_vi
+    SELECT r.id, r.rating, r.body, r.created_at, u.name AS reviewer_name, u.admin_at IS NOT NULL AS admin, l.title_en, l.title_vi
     FROM seller_reviews r JOIN users u ON u.id = r.reviewer_id JOIN listings l ON l.id = r.listing_id
     WHERE r.seller_id = ? ORDER BY r.created_at DESC LIMIT 100
-  `).all(req.params.id).map(({ reviewer_name, ...r }) => ({ ...r, reviewer: shortName(reviewer_name) }));
+  `).all(req.params.id).map(({ reviewer_name, ...r }) => ({ ...r, admin: Boolean(r.admin), reviewer: shortName(reviewer_name) }));
 
   res.json({
     seller: { ...seller, sold_count: listings.filter((l) => l.status === 'sold').length },

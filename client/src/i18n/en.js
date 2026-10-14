@@ -513,7 +513,9 @@ export default {
     tabCodes: 'Codes',
     tabAnalytics: 'Analytics',
     tabAccounts: 'Accounts',
-    emailSeller: 'Email',
+    adminBadgeGive: 'Give Admin badge',
+    adminBadgeRemove: 'Remove Admin badge',
+    emailSellerButton: 'Email',
     emailSellerSubject: 'About your listing “{{title}}” on Vòng',
     emailSellerSubjectLabel: 'Subject',
     emailSellerBodyLabel: 'Message',
@@ -868,6 +870,8 @@ export default {
     sending: 'Sending…',
     error: 'Could not send it. Please try again.',
     trusted: 'Trusted seller',
+    admin: 'Admin',
+    adminHint: 'A member of the Vòng team',
     trustedHint: 'Vòng has verified this seller',
     siteTitle: 'What people say about Vòng',
     siteEmpty: 'No reviews yet. What do you think of Vòng?',
@@ -877,6 +881,7 @@ export default {
   },
 
   seller: {
+    adminLabel: 'This is a Vòng admin account.',
     missingTitle: 'Seller not found',
     missingBody: 'This seller has nothing listed right now, or the link is wrong.',
     memberSince: 'Member since {{date}}',
