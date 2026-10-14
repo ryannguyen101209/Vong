@@ -534,6 +534,77 @@ function AllListings({ token, onAuthError }) {
   );
 }
 
+/** Every account: name, Google email, when they joined and what they have posted. */
+function Accounts({ token, onAuthError }) {
+  const { t, lang } = useI18n();
+  const [users, setUsers] = useState(null);
+  const [query, setQuery] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  useEffect(() => {
+    api.admin.users(token)
+      .then((data) => setUsers(data.users))
+      .catch((error) => error.status === 401 && onAuthError());
+  }, [token, onAuthError]);
+
+  if (!users) return <p className="muted">{t('common.loading')}</p>;
+  const q = query.trim().toLowerCase();
+  const shown = q ? users.filter((u) => `${u.name} ${u.email}`.toLowerCase().includes(q)) : users;
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(shown.map((u) => u.email).join(', '));
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch { /* clipboard blocked: nothing to do */ }
+  };
+
+  return (
+    <>
+      <div className="row" style={{ marginBottom: 20, gap: 12, flexWrap: 'wrap', alignItems: 'center' }}>
+        <input
+          className="input"
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder={t('admin.accountsSearch')}
+          aria-label={t('admin.accountsSearch')}
+          style={{ maxWidth: 320 }}
+        />
+        <span className="small muted">{t('admin.accountsCount', { n: shown.length, total: users.length })}</span>
+        <button type="button" className="btn btn--ghost btn--small" onClick={copy} disabled={!shown.length}>
+          {copied ? t('admin.accountsCopied') : t('admin.accountsCopy')}
+        </button>
+      </div>
+      <div className="card panel table-scroll">
+        <table className="admin-table">
+          <thead>
+            <tr>
+              <th>{t('admin.accountsName')}</th>
+              <th>{t('admin.accountsEmail')}</th>
+              <th>{t('admin.accountsJoined')}</th>
+              <th className="an-num">{t('admin.accountsListings')}</th>
+            </tr>
+          </thead>
+          <tbody>
+            {shown.map((u) => (
+              <tr key={u.id}>
+                <td>
+                  {u.public_listings > 0 ? <a href={`/seller/${u.id}`} target="_blank" rel="noopener">{u.name}</a> : u.name}
+                  {u.trusted && <> <TrustedBadge small /></>}
+                </td>
+                <td><a href={`mailto:${u.email}`}>{u.email}</a></td>
+                <td className="an-nowrap">{formatDateTime(u.created_at, lang)}</td>
+                <td className="an-num">{u.listings}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+        {shown.length === 0 && <p className="muted small" style={{ marginTop: 16 }}>{t('admin.accountsNone')}</p>}
+      </div>
+    </>
+  );
+}
+
 /** Listings people reported: take the listing down, or dismiss the report. */
 function Reports({ token, onAuthError, onCount }) {
   const { t, lang, localized } = useI18n();
@@ -934,6 +1005,7 @@ export function Admin() {
           ['all', 'admin.tabAll'],
           ['reports', 'admin.tabReports'],
           ['reviews', 'admin.tabReviews'],
+          ['accounts', 'admin.tabAccounts'],
           ['analytics', 'admin.tabAnalytics'],
           ['settings', 'admin.tabSettings'],
         ].map(([key, label]) => (
@@ -956,6 +1028,7 @@ export function Admin() {
       {tab === 'all' && <AllListings token={token} onAuthError={signOut} />}
       {tab === 'reports' && <Reports token={token} onAuthError={signOut} onCount={setOpenReports} />}
       {tab === 'reviews' && <ReviewsAdmin token={token} onAuthError={signOut} onCount={setPendingReviews} />}
+      {tab === 'accounts' && <Accounts token={token} onAuthError={signOut} />}
       {tab === 'analytics' && <AdminAnalytics token={token} onAuthError={signOut} />}
       {tab === 'settings' && <Settings token={token} onAuthError={signOut} />}
     </div>
