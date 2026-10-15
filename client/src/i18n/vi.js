@@ -147,6 +147,7 @@ export default {
   },
 
   listing: {
+    phoneLimit: 'Hôm nay bạn đã xem nhiều số điện thoại rồi. Bạn nhắn tin cho người bán ngay trên web nhé, hoặc thử lại vào ngày mai.',
     backToBrowse: 'Quay lại',
     detailsTitle: 'Thông tin',
     category: 'Danh mục',
@@ -208,6 +209,7 @@ export default {
   },
 
   sell: {
+    listingLimit: 'Hôm nay bạn đã đăng nhiều tin rồi. Bạn thử lại vào ngày mai nhé.',
     eyebrow: 'Tạo tin đăng',
     title: 'Đăng tin bán',
     lead: 'Cứ viết như đang kể với bạn bè. Có lỗi gì thì nói luôn, tin thật thà thường bán nhanh hơn tin nói quá.',
@@ -454,6 +456,7 @@ export default {
   },
 
   contact: {
+    limit: 'Bạn đã gửi khá nhiều tin nhắn rồi. Bạn chờ một tiếng hoặc email trực tiếp cho tụi mình nhé.',
     title: 'Liên hệ',
     lead: 'Thắc mắc về một tin đăng, một khoản thanh toán, hay gặp ai có dấu hiệu gian, cứ nhắn. Tin nhắn tới thẳng ba đứa tụi mình.',
     nameLabel: 'Tên của bạn',

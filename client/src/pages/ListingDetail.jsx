@@ -112,7 +112,7 @@ export function ListingDetail() {
     api
       .buyRequest(listing.id)
       .then(setContact)
-      .catch(() => setContact({ error: true }))
+      .catch((error) => setContact({ error: error.payload?.error === 'too_many_reveals' ? 'limit' : 'failed' }))
       .finally(() => setRequesting(false));
   };
 
@@ -260,6 +260,11 @@ export function ListingDetail() {
                   >
                     <PhoneIcon /> {requesting ? t('listing.requesting') : t('listing.requestPhone')}
                   </button>
+                  {contact?.error && (
+                    <p className="small" role="alert" style={{ margin: '8px 0 0', flexBasis: '100%' }}>
+                      {contact.error === 'limit' ? t('listing.phoneLimit') : t('common.error')}
+                    </p>
+                  )}
                   <SaveButton listingId={listing.id} inline />
                   {listing.status === 'published' && (
                     <ShareButton

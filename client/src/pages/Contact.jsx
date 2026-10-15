@@ -20,6 +20,7 @@ export function Contact() {
     if (!errors[key]) return undefined;
     if (key === 'email') return t('contact.errorEmail');
     if (key === 'name') return t('contact.errorName');
+    if (errors[key] === 'limit') return t('contact.limit');
     return t('contact.errorMessage');
   };
 
@@ -32,7 +33,7 @@ export function Contact() {
       setSent(true);
       setValues(EMPTY);
     } catch (error) {
-      setErrors(error.payload?.fields ?? { message: 'error' });
+      setErrors(error.payload?.fields ?? { message: error.payload?.error === 'too_many_messages' ? 'limit' : 'error' });
     } finally {
       setSubmitting(false);
     }
