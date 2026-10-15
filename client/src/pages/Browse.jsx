@@ -34,6 +34,8 @@ export function Browse() {
   const city = params.get('city') ?? '';
   const district = params.get('district') ?? '';
   const price = params.get('price') ?? '';
+  // 'all' (default: available first, then sold), 'available' or 'sold'.
+  const show = params.get('show') ?? 'all';
   const band = PRICE_BANDS.find((item) => item.value === price);
 
   const [searchInput, setSearchInput] = useState(search);
@@ -71,7 +73,7 @@ export function Browse() {
     const currentRequest = ++requestId.current;
     setStatus('loading');
     api
-      .listings({ search, category, city, district, minPrice: band?.min, maxPrice: band?.max, sort })
+      .listings({ search, category, city, district, minPrice: band?.min, maxPrice: band?.max, sort, show })
       .then((data) => {
         if (currentRequest !== requestId.current) return;
         setListings(data.listings);
@@ -80,7 +82,7 @@ export function Browse() {
       .catch(() => {
         if (currentRequest === requestId.current) setStatus('error');
       });
-  }, [search, category, city, district, band, sort]);
+  }, [search, category, city, district, band, sort, show]);
 
   useEffect(() => {
     load();
@@ -94,7 +96,7 @@ export function Browse() {
     setParams(next);
   };
 
-  const hasFilters = Boolean(search || category || city || district || band || sort !== 'newest');
+  const hasFilters = Boolean(search || category || city || district || band || sort !== 'newest' || show !== 'all');
 
   const resultLabel = useMemo(
     () => (listings.length === 1 ? t('browse.resultsOne') : t('browse.resultsMany', { count: listings.length })),
@@ -158,6 +160,15 @@ export function Browse() {
               {PRICE_BANDS.map((option) => (
                 <option key={option.value} value={option.value}>{t(`browse.price_${option.value}`)}</option>
               ))}
+            </select>
+          </label>
+
+          <label>
+            <span className="sr-only">{t('browse.showLabel')}</span>
+            <select className="select" value={show} onChange={(event) => update('show', event.target.value === 'all' ? '' : event.target.value)}>
+              <option value="all">{t('browse.showAll')}</option>
+              <option value="available">{t('browse.showAvailable')}</option>
+              <option value="sold">{t('browse.showSold')}</option>
             </select>
           </label>
 

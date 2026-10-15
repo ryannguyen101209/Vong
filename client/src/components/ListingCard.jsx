@@ -22,12 +22,13 @@ export function ListingCard({ listing }) {
   const title = localized(listing, 'title');
 
   return (
-    <article className="listing-card">
+    <article className={`listing-card${listing.status === 'sold' ? ' listing-card--sold' : ''}`}>
       <div className="listing-card__media">
         <Link className="listing-card__image-link" to={`/listing/${listing.id}`} aria-label={title}>
           <ListingImage listing={listing} alt="" />
         </Link>
-        <SaveButton listingId={listing.id} />
+        {listing.status === 'sold' && <span className="listing-card__sold">{t('status.sold')}</span>}
+        <SaveButton listingId={listing.id} likes={listing.likes ?? 0} />
       </div>
 
       <div className="listing-card__body">

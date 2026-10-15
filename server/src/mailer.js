@@ -109,6 +109,23 @@ export function buildEmail(kind, data) {
       }),
     };
   }
+  if (kind === 'new_comment') {
+    const from = clip(data.fromName, 40) || 'Someone';
+    const titleVi = clip(data.titleVi || data.titleEn, 80);
+    const titleEn = clip(data.titleEn || data.titleVi, 80);
+    const preview = clip(data.body, 140);
+    const url = `${base}/listing/${encodeURIComponent(data.listingId)}#comments`;
+    return {
+      subject: `${from} bình luận về "${titleVi}" · New comment on Vòng`,
+      text: `${from} vừa bình luận về "${titleVi}":\n"${preview}"\nTrả lời tại: ${url}\n\n---\n${from} commented on "${titleEn}":\n"${preview}"\nReply here: ${url}`,
+      html: layout({
+        heading: { vi: `${from} vừa bình luận tin của bạn`, en: `New comment from ${from}` },
+        bodyVi: `Về tin <b>${esc(titleVi)}</b>. Mọi người đều thấy bình luận này, trả lời sớm nhé.`,
+        bodyEn: `About <b>${esc(titleEn)}</b>. Everyone can see it, so a quick reply helps.`,
+        reason: preview, button: { vi: 'Xem và trả lời', en: 'See and reply' }, url,
+      }),
+    };
+  }
   if (kind === 'welcome') {
     const name = clip(data.name, 40);
     const hi = { vi: name ? `Chào ${name},` : 'Chào bạn,', en: name ? `Hi ${name},` : 'Hi,' };

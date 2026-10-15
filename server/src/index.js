@@ -14,6 +14,7 @@ import { router as analyticsRouter } from './routes/analytics.js';
 import { router as paymentsRouter } from './routes/payments.js';
 import { router as sellersRouter } from './routes/sellers.js';
 import { router as siteReviewsRouter } from './routes/site-reviews.js';
+import { router as engagementRouter } from './routes/engagement.js';
 import { mountSharePages } from './share-pages.js';
 import { notifyOwner } from './notify.js';
 import { startBackupSchedule } from './backup.js';
@@ -111,6 +112,7 @@ app.post('/api/contact', contactLimit, (req, res) => {
   res.status(201).json({ ok: true });
 });
 
+app.use('/api/listings', engagementRouter);
 app.use('/api/listings', listingsRouter);
 app.use('/api/sellers', sellersRouter);
 app.use('/api/site-reviews', siteReviewsRouter);
