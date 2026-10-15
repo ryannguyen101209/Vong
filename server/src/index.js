@@ -17,7 +17,7 @@ import { router as siteReviewsRouter } from './routes/site-reviews.js';
 import { mountSharePages } from './share-pages.js';
 import { notifyOwner } from './notify.js';
 import { startBackupSchedule } from './backup.js';
-import { touchVisitor } from './presence.js';
+import { touchVisitor, recordDailyVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from './seed-data.js';
 import { translationEnabled } from './translate.js';
@@ -65,10 +65,14 @@ app.get('/api/meta', (req, res) => {
   });
 });
 
-/** Anonymous heartbeat for the live visitor count. Stores nothing on disk. */
+/**
+ * Anonymous heartbeat: the live visitor count (memory only) and the daily
+ * visitor count (a per-day hash of the browser's random id, see presence.js).
+ */
 app.post('/api/presence', (req, res) => {
   res.set('Cache-Control', 'no-store');
   if (!touchVisitor(req.body?.id)) return res.status(400).json({ error: 'bad_id' });
+  if (req.body?.visitor !== undefined) recordDailyVisitor(req.body.visitor);
   res.json({ ok: true });
 });
 

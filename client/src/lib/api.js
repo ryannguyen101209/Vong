@@ -56,7 +56,7 @@ export const api = {
 
   // Seller tools: the signed-in seller's own listings.
   /** Anonymous heartbeat for the owner's live visitor count. */
-  ping: (id) => request('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id }) }),
+  ping: (id, visitor) => request('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, visitor }) }),
 
   myListings: () => request('/api/listings/mine'),
 

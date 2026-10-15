@@ -66,7 +66,13 @@ function VisitorPing() {
       if (!id) { id = crypto.randomUUID(); sessionStorage.setItem('vong_visit', id); }
     } catch { id = id || (crypto.randomUUID?.() ?? ''); }
     if (!id) return undefined;
-    const ping = () => { if (document.visibilityState === 'visible') api.ping(id).catch(() => {}); };
+    // One random id per browser (not per tab), so the daily count counts people, not tabs.
+    let visitor = '';
+    try {
+      visitor = localStorage.getItem('vong_visitor') || '';
+      if (!visitor) { visitor = crypto.randomUUID(); localStorage.setItem('vong_visitor', visitor); }
+    } catch { visitor = id; }
+    const ping = () => { if (document.visibilityState === 'visible') api.ping(id, visitor).catch(() => {}); };
     ping();
     const timer = setInterval(ping, 30_000);
     document.addEventListener('visibilitychange', ping);
