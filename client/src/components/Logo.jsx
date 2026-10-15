@@ -61,7 +61,7 @@ export function Logo({ size = 30 }) {
   return (
     <>
       <LogoMark size={size} />
-      <span className="brand__word">Vòng</span>
+      <span className="brand__word" translate="no">Vòng</span>
     </>
   );
 }

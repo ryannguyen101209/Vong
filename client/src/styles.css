@@ -1302,16 +1302,21 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
   to { opacity: 1; transform: none; }
 }
 @media (max-width: 720px) {
-  .welcome { margin: 8px 8px 0; min-height: calc(100dvh - 66px - 8px); top: 74px; }
-  /* A tall phone screen would crop the chair to a fragment. Give the film a band
-     in the middle instead, its top and bottom edges faded into the backdrop. */
-  .welcome__media {
-    inset: auto 0; top: 30%; height: 50%; object-position: 52% 70%;
-    -webkit-mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
-    mask-image: linear-gradient(transparent, #000 18%, #000 82%, transparent);
+  /* A phone is tall and narrow: the word, then the photo pulled up under it so the
+     chair's back sits just below the word, as on a wide screen, then the line and button. */
+  .welcome {
+    margin: 8px 8px 0; min-height: calc(100dvh - 66px - 8px); top: 74px;
+    display: flex; flex-direction: column; padding-top: 28px;
   }
-  .welcome__word { font-size: clamp(3.4rem, 19vw, 6rem); top: 28px; }
-  .welcome__bar { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+  .welcome__word { order: 1; position: relative; top: auto; z-index: 1; margin-top: auto; font-size: clamp(2.8rem, 16vw, 6rem); }
+  .welcome__media {
+    order: 2; position: relative; inset: auto; z-index: 0; width: 100%; height: auto; flex: none;
+    aspect-ratio: 4 / 5; object-fit: cover; object-position: 52% 100%;
+    margin-top: -40vw;
+    -webkit-mask-image: linear-gradient(transparent, #000 30%);
+    mask-image: linear-gradient(transparent, #000 30%);
+  }
+  .welcome__bar { order: 3; position: relative; margin-top: auto; grid-template-columns: 1fr; gap: 16px; padding: 4px 20px 20px; }
   .welcome__cta { grid-column: auto; justify-content: center; }
 }
 
