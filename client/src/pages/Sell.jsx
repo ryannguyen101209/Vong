@@ -101,6 +101,7 @@ export function Sell() {
       if (error.payload?.fields) setErrors(error.payload.fields);
       else if (error.payload?.error === 'image_too_large') setErrors({ image: 'too_large' });
       else if (error.payload?.error === 'too_many_images') setErrors({ image: 'too_many' });
+      else if (error.payload?.error === 'too_many_listings') setErrors({ form: 'limit' });
       else setErrors({ form: 'error' });
       setSubmitting(false);
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -201,7 +202,7 @@ export function Sell() {
         <div className="notice notice--danger" style={{ marginBottom: 24 }} role="alert">
           <p className="notice__title">{t('sell.errorTitle')}</p>
           {imageError && <p style={{ margin: 0 }}>{imageError}</p>}
-          {errors.form && <p style={{ margin: 0 }}>{t('common.error')}</p>}
+          {errors.form && <p style={{ margin: 0 }}>{errors.form === 'limit' ? t('sell.listingLimit') : t('common.error')}</p>}
         </div>
       )}
 

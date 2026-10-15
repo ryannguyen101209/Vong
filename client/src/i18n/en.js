@@ -147,6 +147,7 @@ export default {
   },
 
   listing: {
+    phoneLimit: 'You have looked up a lot of phone numbers today. Message the seller here instead, or try again tomorrow.',
     backToBrowse: 'Back to browse',
     detailsTitle: 'Details',
     category: 'Category',
@@ -210,6 +211,7 @@ export default {
   },
 
   sell: {
+    listingLimit: 'You have posted a lot of listings today. Please try again tomorrow.',
     eyebrow: 'Create a listing',
     title: 'Post a listing',
     lead:
@@ -462,6 +464,7 @@ export default {
   },
 
   contact: {
+    limit: 'You have sent several messages already. Please wait an hour, or email us directly.',
     title: 'Contact',
     lead: 'Questions about a listing, a payment, or someone behaving badly — this reaches the three of us.',
     nameLabel: 'Your name',

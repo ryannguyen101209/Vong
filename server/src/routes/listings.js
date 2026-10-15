@@ -9,7 +9,7 @@ import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
 import { sellerSummary } from './sellers.js';
-import { rateLimit } from 'express-rate-limit';
+import { rateLimit, ipKeyGenerator } from 'express-rate-limit';
 import { translateListing, TranslationError } from '../translate.js';
 
 export const router = express.Router();
@@ -188,7 +188,16 @@ function validateListing(body, current = null) {
 }
 
 /** POST /api/listings — creates a listing in pending_payment. Nothing is public yet. */
-router.post('/', requireUser, upload.fields([{ name: 'images', maxCount: MAX_PHOTOS }, { name: 'image', maxCount: 1 }]), (req, res) => {
+// New listings one account may post per day, checked before any photo is saved.
+export const LISTINGS_PER_DAY = 15;
+function listingQuota(req, res, next) {
+  const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
+  const n = db.prepare('SELECT COUNT(*) AS n FROM listings WHERE seller_id = ? AND created_at >= ?').get(req.user.id, dayAgo).n;
+  if (n >= LISTINGS_PER_DAY) return res.status(429).json({ error: 'too_many_listings' });
+  next();
+}
+
+router.post('/', requireUser, listingQuota, upload.fields([{ name: 'images', maxCount: MAX_PHOTOS }, { name: 'image', maxCount: 1 }]), (req, res) => {
   const files = uploadedFiles(req);
   const { errors, values } = validateListing({ ...req.body, seller_email: req.user.email });
   if (files.length > MAX_PHOTOS) errors.images = 'too_many';
@@ -504,7 +513,8 @@ router.post('/:id/translate', translateLimit, async (req, res, next) => {
 });
 
 export const REPORT_REASONS = ['prohibited', 'scam', 'wrong_info', 'offensive', 'other'];
-const reportLimit = rateLimit({ windowMs: 60 * 60_000, limit: 10, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_reports' } });
+// Per account when signed in, else per address.
+const reportLimit = rateLimit({ windowMs: 60 * 60_000, limit: 10, keyGenerator: (req) => req.user?.id ?? ipKeyGenerator(req.ip), standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_reports' } });
 
 /**
  * POST /api/listings/:id/report { reason, details? } — flags a public listing for
@@ -533,14 +543,29 @@ router.post('/:id/report', reportLimit, (req, res) => {
   res.status(201).json({ ok: true });
 });
 
+// Phone numbers one account may reveal per day: plenty for a real buyer, too few to harvest them.
+export const PHONE_REVEALS_PER_DAY = 30;
+
 router.post('/:id/buy-request', requireUser, (req, res) => {
   const row = db
     .prepare("SELECT id, seller_name, seller_phone FROM listings WHERE id = ? AND status = 'published' AND is_seed = 0")
     .get(req.params.id);
   if (!row) return res.status(404).json({ error: 'not_found' });
 
-  db.prepare('INSERT INTO buy_requests (listing_id, created_at) VALUES (?, ?)')
-    .run(row.id, new Date().toISOString());
+  const dayAgo = new Date(Date.now() - 86_400_000).toISOString();
+  // Asking again for a number already revealed today costs nothing.
+  const already = db.prepare('SELECT 1 FROM buy_requests WHERE requester_id = ? AND listing_id = ? AND created_at >= ?').get(req.user.id, row.id, dayAgo);
+  if (!already) {
+    const today = db.prepare('SELECT COUNT(DISTINCT listing_id) AS n FROM buy_requests WHERE requester_id = ? AND created_at >= ?').get(req.user.id, dayAgo).n;
+    if (today >= PHONE_REVEALS_PER_DAY) {
+      if (today === PHONE_REVEALS_PER_DAY) {
+        notifyOwner({ title: 'Many phone numbers revealed', message: `One account has revealed ${today} sellers' numbers in 24 hours and was stopped.`, tags: ['warning'], path: '/admin' });
+      }
+      return res.status(429).json({ error: 'too_many_reveals' });
+    }
+  }
+  db.prepare('INSERT INTO buy_requests (listing_id, requester_id, created_at) VALUES (?, ?, ?)')
+    .run(row.id, req.user.id, new Date().toISOString());
 
   res.json({ seller_name: row.seller_name, seller_phone: row.seller_phone });
 });

@@ -21,6 +21,7 @@ import { touchVisitor } from './presence.js';
 import { rateLimit } from 'express-rate-limit';
 import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS } from './seed-data.js';
 import { translationEnabled } from './translate.js';
+import { securityHeaders } from './security-headers.js';
 
 dotenv.config({ path: path.join(SERVER_ROOT, '..', '.env') });
 dotenv.config({ path: path.join(SERVER_ROOT, '.env') });
@@ -32,6 +33,8 @@ const PORT = Number(process.env.PORT) || 4000;
 
 const allowedOrigins = (process.env.CORS_ORIGIN || 'http://localhost:5173,http://localhost:5174').split(',').map((origin) => origin.trim());
 app.use(cors({ origin: allowedOrigins, credentials: true }));
+// Browser protections on every response, API and pages alike.
+app.use(securityHeaders(path.join(SERVER_ROOT, '..', 'client', 'dist')));
 app.use(express.json({ limit: '1mb' }));
 app.use('/api', rateLimit({ windowMs: 60_000, limit: 240, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_requests' } }));
 // The bank webhook is called by SePay's servers, not a browser: it has its own API key
@@ -40,13 +43,6 @@ app.use('/api/payments', paymentsRouter);
 app.use('/api', protectWrites, sessionUser);
 app.use('/api/auth', createAuthRouter());
 app.use('/api/conversations', conversationsRouter);
-app.use((req, res, next) => {
-  res.set('X-Content-Type-Options', 'nosniff');
-  res.set('Referrer-Policy', 'strict-origin-when-cross-origin');
-  res.set('X-Frame-Options', 'DENY');
-  res.set('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-  next();
-});
 
 // Uploaded and seed images. In production put these behind a CDN or object
 // store -- local disk does not survive a redeploy on most hosts.
@@ -88,7 +84,9 @@ app.use('/api/analytics', analyticsRouter);
  * POST /api/contact — stores the message and prints it to the server log.
  * It does NOT send an email; see README, "What is stubbed".
  */
-app.post('/api/contact', (req, res) => {
+// Contact messages ping the owner's phone, so cap them per address.
+const contactLimit = rateLimit({ windowMs: 60 * 60_000, limit: 5, standardHeaders: 'draft-7', legacyHeaders: false, message: { error: 'too_many_messages' } });
+app.post('/api/contact', contactLimit, (req, res) => {
   const name = String(req.body?.name ?? '').trim();
   const email = String(req.body?.email ?? '').trim();
   const body = String(req.body?.message ?? '').trim();

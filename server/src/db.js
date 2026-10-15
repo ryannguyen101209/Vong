@@ -274,6 +274,9 @@ db.exec(`
 const userColumns = db.prepare('PRAGMA table_info(users)').all().map((c) => c.name);
 if (!userColumns.includes('trusted_at')) db.exec('ALTER TABLE users ADD COLUMN trusted_at TEXT');
 // The "Admin" badge, switched on by hand in the admin panel for the team's own accounts.
+// Who asked for a seller's phone number, so one account cannot collect them all.
+const buyRequestColumns = db.prepare('PRAGMA table_info(buy_requests)').all().map((c) => c.name);
+if (!buyRequestColumns.includes('requester_id')) db.exec('ALTER TABLE buy_requests ADD COLUMN requester_id TEXT');
 if (!userColumns.includes('admin_at')) db.exec('ALTER TABLE users ADD COLUMN admin_at TEXT');
 db.exec(`
   -- A buyer who talked to a seller about a listing can review them once for it.
