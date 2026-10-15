@@ -1,7 +1,7 @@
 import crypto from 'node:crypto';
 import express from 'express';
 import { db, getSettings } from '../db.js';
-import { liveVisitors } from '../presence.js';
+import { liveVisitors, visitorsByDay } from '../presence.js';
 
 /**
  * GET /api/analytics?key=...
@@ -69,8 +69,9 @@ export function buildReport() {
     buy_requests: dailySeries('buy_requests', realRequest),
     conversations: dailySeries('conversations', realChat),
   };
-  const days = [];
   const today = new Date(Date.now() + 7 * 3_600_000);
+  const visits = visitorsByDay(new Date(today.getTime() - (DAYS - 1) * 86_400_000).toISOString().slice(0, 10));
+  const days = [];
   for (let i = DAYS - 1; i >= 0; i -= 1) {
     const day = new Date(today.getTime() - i * 86_400_000).toISOString().slice(0, 10);
     days.push({
@@ -79,6 +80,7 @@ export function buildReport() {
       users: series.users[day] || 0,
       buy_requests: series.buy_requests[day] || 0,
       conversations: series.conversations[day] || 0,
+      visitors: visits[day] || 0,
     });
   }
 
@@ -123,6 +125,11 @@ export function buildReport() {
   return {
     generated_at: new Date().toISOString(),
     live_visitors: liveVisitors(),
+    // Different browsers that opened the site each day (Saigon time). The owner's own admin tab is not counted.
+    visitors: {
+      today: visits[today.toISOString().slice(0, 10)] || 0,
+      yesterday: visits[new Date(today.getTime() - 86_400_000).toISOString().slice(0, 10)] || 0,
+    },
     monthly,
     listings: {
       by_status: byStatus,

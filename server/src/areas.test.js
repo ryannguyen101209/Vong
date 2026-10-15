@@ -104,6 +104,8 @@ try {
   assert.equal(report.cities.find((c) => c.city === 'ha_noi').live, 1);
   assert.equal(report.daily.reduce((n, d) => n + d.conversations, 0), 2, 'the chart counts new chats');
   assert.equal(report.users.total, 2);
+  assert.deepEqual(report.visitors, { today: 0, yesterday: 0 });
+  assert.ok(report.daily.every((d) => d.visitors === 0), 'daily visitors are on the chart');
   assert.equal(report.users.by_day.reduce((n, d) => n + d.n, 0), 2, 'accounts per day add up');
   assert.match(report.users.by_day[0].day, /^\d{4}-\d{2}-\d{2}$/);
 

@@ -4,7 +4,7 @@
  * Mỗi đoạn là một chuỗi; chuỗi bắt đầu bằng "- " được hiện thành gạch đầu dòng.
  */
 export default {
-  updated: 'Cập nhật ngày 12/10/2026',
+  updated: 'Cập nhật ngày 15/10/2026',
   draftNote: 'Đây là bản đầu tiên. Nếu có chỗ nào chưa rõ, bạn cứ hỏi tụi mình qua trang Liên hệ.',
 
   terms: {
@@ -110,7 +110,7 @@ export default {
           '- Tin nhắn giữa người mua và người bán trên Vòng.',
           '- Phí đăng tin, nếu có thu: số tiền, nội dung chuyển khoản và thời gian, do ngân hàng gửi qua dịch vụ SePay. Vòng không bao giờ thấy thẻ hay mật khẩu ngân hàng của bạn.',
           '- Báo cáo vi phạm và tin nhắn bạn gửi qua trang Liên hệ.',
-          '- Dữ liệu kỹ thuật: cookie đăng nhập, lượt xem tin, và một mã ngẫu nhiên cho mỗi tab để đếm số người đang xem (mã này không được lưu lại).',
+          '- Dữ liệu kỹ thuật: cookie đăng nhập, lượt xem tin, và một mã ngẫu nhiên lưu trong trình duyệt để đếm số người đang xem và số khách mỗi ngày. Máy chủ chỉ lưu một mã băm của mã này theo từng ngày, không gắn với tài khoản và không dùng để theo dõi bạn qua các ngày.',
           'Ngôn ngữ, giao diện sáng/tối và tin bạn đã lưu nằm trong trình duyệt của bạn, không gửi lên máy chủ.',
         ],
       },

@@ -3,8 +3,9 @@ import { useI18n } from '../i18n/index.jsx';
 import { api } from '../lib/api.js';
 import { formatPrice, formatDate } from '../lib/format.js';
 
-const METRICS = ['listings', 'users', 'buy_requests', 'conversations'];
+const METRICS = ['visitors', 'listings', 'users', 'buy_requests', 'conversations'];
 const METRIC_LABEL = {
+  visitors: 'metricVisitors',
   listings: 'metricListings',
   users: 'metricUsers',
   buy_requests: 'metricBuyRequests',
@@ -306,7 +307,7 @@ export function AdminAnalytics({ token, onAuthError }) {
   const [report, setReport] = useState(null);
   const [failed, setFailed] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [metric, setMetric] = useState('listings');
+  const [metric, setMetric] = useState('visitors');
   const locale = lang === 'vi' ? 'vi-VN' : 'en-US';
   const num = (v) => new Intl.NumberFormat(locale).format(Number(v) || 0);
   const a = (key, vars) => t(`admin.analytics.${key}`, vars);
@@ -353,12 +354,12 @@ export function AdminAnalytics({ token, onAuthError }) {
 
       <div className="an-stats">
         <Stat label={a('liveNow')} value={num(report.live_visitors)} />
+        <Stat label={a('visitorsToday')} value={num(report.visitors?.today)} sub={a('visitorsYesterday', { n: num(report.visitors?.yesterday) })} />
         <Stat label={a('sold')} value={num(report.sold?.total)} sub={`+${num(report.sold?.last_30d)} ${a('in30Days')}`} />
         <Stat label={a('sellers')} value={num(report.sellers?.active)} sub={`+${num(report.sellers?.new_7d)} ${a('newSellers')}`} />
         <Stat label={a('liveListings')} value={num(status.published)} sub={`+${num(report.listings?.published_7d)} ${a('thisWeek')}`} />
         <Stat label={a('waiting')} value={num(waiting)} sub={waiting ? a('needsYou') : a('queueClear')} />
         <Stat label={a('accounts')} value={num(report.users?.total)} sub={`+${num(report.users?.new_7d)} ${a('thisWeek')}`} />
-        <Stat label={a('views')} value={num(report.listings?.total_views)} />
         <Stat label={a('buyRequests')} value={num(report.engagement?.buy_requests)} sub={`+${num(report.engagement?.buy_requests_7d)} ${a('thisWeek')}`} />
       </div>
 
@@ -366,7 +367,7 @@ export function AdminAnalytics({ token, onAuthError }) {
         <section>
           <div className="spread" style={{ marginBottom: 12, flexWrap: 'wrap', gap: 10 }}>
             <h2 style={{ fontSize: '1.05rem', margin: 0 }}>{a('last30')}</h2>
-            <div className="tabs" role="tablist">
+            <div className="tabs" role="tablist" style={{ flexWrap: 'wrap' }}>
               {METRICS.map((m) => (
                 <button key={m} type="button" role="tab" className="tab" aria-selected={metric === m} onClick={() => setMetric(m)}>
                   {a(METRIC_LABEL[m])}

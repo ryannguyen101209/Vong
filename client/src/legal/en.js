@@ -5,7 +5,7 @@
  * with "- " is shown as a bullet.
  */
 export default {
-  updated: 'Updated 12 October 2026',
+  updated: 'Updated 15 October 2026',
   draftNote: 'This is our first version. If anything is unclear, ask us through the Contact page. If this English text and the Vietnamese text differ, the Vietnamese text applies.',
 
   terms: {
@@ -111,7 +111,7 @@ export default {
           '- Messages between buyers and sellers on Vòng.',
           '- Listing fees, when one is charged: the amount, transfer note and time, sent by your bank through SePay. Vòng never sees your card or banking password.',
           '- Reports and messages you send through the Contact page.',
-          '- Technical data: a sign-in cookie, listing view counts, and a random code per browser tab used to count how many people are online (it is not stored).',
+          '- Technical data: a sign-in cookie, listing view counts, and a random code kept in your browser to count how many people are online and how many visit each day. The server keeps only a per-day hash of that code, not linked to any account and not used to follow you from one day to the next.',
           'Your language, light or dark mode and saved listings are kept in your own browser, not on our server.',
         ],
       },
