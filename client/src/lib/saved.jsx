@@ -4,6 +4,8 @@
  * was saved -- either a quick-pick key or the shopper's own note.
  */
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
+import { api } from './api.js';
+import { visitorId } from './visitor.js';
 
 const STORAGE_KEY = 'vong.saved';
 const SavedContext = createContext(null);
@@ -28,6 +30,16 @@ function read() {
 
 export function SavedProvider({ children }) {
   const [items, setItems] = useState(read);
+
+  // Saves made before hearts were public count too: send them once per browser.
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('vong.saved.synced')) return;
+      localStorage.setItem('vong.saved.synced', '1');
+    } catch { return; }
+    const visitor = visitorId();
+    if (visitor) items.forEach((item) => api.like(item.id, visitor).catch(() => {}));
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     try {

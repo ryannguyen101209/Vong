@@ -78,7 +78,9 @@ try {
   db.prepare("UPDATE listings SET status = 'published' WHERE id = ?").run(listingId);
   assert.equal((await request(`/api/listings/${listingId}/sold`, { cookie: seller.cookie, body: {} })).body.status, 'sold');
   assert.equal((await request(`/api/listings/${listingId}`, { cookie: buyer.cookie })).body.listing.status, 'sold'); // old links still work
-  assert.equal((await request('/api/listings')).body.listings.some((l) => l.id === listingId), false); // but it leaves Browse
+  assert.equal((await request('/api/listings')).body.listings.find((l) => l.id === listingId).status, 'sold'); // stays in Browse, marked sold
+  assert.equal((await request('/api/listings?status=available')).body.listings.some((l) => l.id === listingId), false); // unless filtered out
+  assert.deepEqual((await request('/api/listings?status=sold')).body.listings.map((l) => l.id), [listingId]);
   assert.equal((await request(`/api/listings/${listingId}/relist`, { cookie: seller.cookie, body: {} })).body.status, 'published');
   assert.equal((await request(`/api/listings/${second.body.id}`, { cookie: buyer.cookie, method: 'DELETE' })).status, 404);
   assert.equal((await request(`/api/listings/${second.body.id}`, { cookie: seller.cookie, method: 'DELETE' })).body.status, 'removed');

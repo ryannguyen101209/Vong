@@ -24,8 +24,9 @@ async function request(path, options = {}) {
 export const api = {
   meta: () => request('/api/meta'),
 
-  listings: ({ search = '', category = '', city = '', district = '', minPrice, maxPrice, sort = 'newest', ids } = {}) => {
+  listings: ({ search = '', category = '', city = '', district = '', minPrice, maxPrice, sort = 'newest', ids, show } = {}) => {
     const params = new URLSearchParams();
+    if (show) params.set('status', show);
     if (search) params.set('search', search);
     if (category) params.set('category', category);
     if (city) params.set('city', city);
@@ -57,6 +58,12 @@ export const api = {
   // Seller tools: the signed-in seller's own listings.
   /** Anonymous heartbeat for the owner's live visitor count. */
   ping: (id, visitor) => request('/api/presence', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ id, visitor }) }),
+
+  like: (id, visitor) => request(`/api/listings/${id}/like`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ visitor }) }),
+  unlike: (id, visitor) => request(`/api/listings/${id}/like`, { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ visitor }) }),
+  comments: (id) => request(`/api/listings/${id}/comments`),
+  postComment: (id, body) => request(`/api/listings/${id}/comments`, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ body }) }),
+  deleteComment: (id, commentId) => request(`/api/listings/${id}/comments/${commentId}`, { method: 'DELETE' }),
 
   myListings: () => request('/api/listings/mine'),
 
@@ -129,6 +136,8 @@ export const api = {
         headers: { authorization: `Bearer ${token}`, 'content-type': 'application/json' },
         body: JSON.stringify({ admin }),
       }),
+    deleteComment: (token, id) =>
+      request(`/api/admin/comments/${id}`, { method: 'DELETE', headers: { authorization: `Bearer ${token}` } }),
     users: (token, q = '') =>
       request(`/api/admin/users${q ? `?q=${encodeURIComponent(q)}` : ''}`, {
         headers: { authorization: `Bearer ${token}` },

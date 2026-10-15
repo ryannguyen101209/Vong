@@ -1468,3 +1468,31 @@ h2 { font-size: clamp(1.45rem, 2.4vw, 1.9rem); }
 /* "Admin" pill: the Vòng team's own accounts. Dark ink so it never reads as the green trusted badge. */
 .admin-badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 10px; border-radius: 999px; background: var(--ink); color: var(--page); font-size: 0.8rem; font-weight: 700; white-space: nowrap; vertical-align: middle; }
 .admin-badge--small { padding: 2px 8px; font-size: 0.72rem; }
+
+/* Public hearts and sold items. */
+.save-btn__count { font-size: 0.78rem; font-weight: 700; font-variant-numeric: tabular-nums; }
+.save-btn:has(.save-btn__count):not(.save-btn--inline) { width: auto; min-width: 40px; padding: 0 10px; gap: 4px; border-radius: 999px; }
+.listing-card__sold {
+  position: absolute; left: 10px; top: 10px; z-index: 2; padding: 4px 10px; border-radius: 999px;
+  background: var(--ink); color: var(--page); font-size: 0.75rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase;
+}
+.listing-card--sold .listing-card__media img { filter: grayscale(0.6); opacity: 0.75; }
+.listing-card--sold .listing-card__price { text-decoration: line-through; color: var(--ink-faint); }
+.save-btn:has(.save-btn__count):not(.save-btn--inline) { display: flex; align-items: center; justify-content: center; }
+.save-btn--inline { grid-auto-flow: column; }
+
+/* Public comments under a listing. */
+.comments { margin-top: 36px; padding-top: 28px; border-top: 1px solid var(--line); }
+.comments > h2 { font-size: 1.15rem; margin: 0 0 14px; }
+.comment-list { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
+.comment { padding: 12px 14px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--surface); }
+.comment--seller { background: var(--accent-soft); border-color: transparent; }
+.comment__head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.comment__tag { padding: 1px 8px; border-radius: 999px; background: var(--accent); color: var(--page); font-size: 0.72rem; font-weight: 700; }
+.comment__delete { margin-left: auto; }
+.comment__body { margin: 6px 0 0; white-space: pre-wrap; overflow-wrap: anywhere; }
+.comment-form { display: grid; gap: 10px; }
+.comment-form__quick { margin: 0; }
+.comment-form__row { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 10px; align-items: end; }
+.comment-form__row .textarea { min-height: 52px; }
+@media (max-width: 520px) { .comment-form__row { grid-template-columns: 1fr; } }

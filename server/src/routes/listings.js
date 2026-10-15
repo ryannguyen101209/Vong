@@ -9,6 +9,7 @@ import { CATEGORIES, CITIES, CITY_DISTRICTS, DEFAULT_CITY, DISTRICTS, CONDITIONS
 import { requireUser } from '../accounts.js';
 import { notifyOwner } from '../notify.js';
 import { sellerSummary } from './sellers.js';
+import { LIKES_COLUMN } from './engagement.js';
 import { rateLimit, ipKeyGenerator } from 'express-rate-limit';
 import { translateListing, TranslationError } from '../translate.js';
 
@@ -40,7 +41,8 @@ const upload = multer({
 const PUBLIC_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category,
   price_vnd, city, district, condition, seller_name, image_path, images, status,
-  reject_reason, fee_vnd, views, created_at, published_at, seller_id
+  reject_reason, fee_vnd, views, created_at, published_at, seller_id, sold_at,
+  ${LIKES_COLUMN}
 `;
 
 /** Turns the stored JSON column into an array, falling back to the single cover photo. */
@@ -85,7 +87,9 @@ router.get('/', (req, res) => {
     wanted.forEach((id, i) => { params[`id${i}`] = id; });
   }
 
-  where.push("status = 'published'");
+  // Sold things stay visible (marked sold) unless the visitor filters them out.
+  const show = String(req.query.status ?? 'all');
+  where.push(show === 'available' ? "status = 'published'" : show === 'sold' ? "status = 'sold'" : "status IN ('published', 'sold')");
   where.push('is_seed = 0');
 
   if (category && CATEGORIES.includes(String(category))) {
@@ -120,7 +124,7 @@ router.get('/', (req, res) => {
 
   const order = SORTS[String(sort)] ?? SORTS.newest;
   const rows = db
-    .prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE ${where.join(' AND ')} ORDER BY ${order}`)
+    .prepare(`SELECT ${PUBLIC_COLUMNS} FROM listings WHERE ${where.join(' AND ')} ORDER BY (status = 'sold'), ${order}`)
     .all(params);
 
   res.json({ listings: rows.map(withImages) });

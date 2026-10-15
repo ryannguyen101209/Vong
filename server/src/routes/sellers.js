@@ -56,7 +56,8 @@ function reviewableListings(sellerId, userId) {
 
 const PROFILE_LISTING_COLUMNS = `
   id, ref, title_en, title_vi, description_en, description_vi, category, price_vnd, city, district,
-  condition, seller_name, image_path, images, status, views, created_at, published_at, seller_id
+  condition, seller_name, image_path, images, status, views, created_at, published_at, seller_id,
+  (SELECT COUNT(*) FROM listing_likes k WHERE k.listing_id = listings.id) AS likes
 `;
 
 /** GET /api/sellers/:id — the public profile: summary, live and sold listings, reviews. */

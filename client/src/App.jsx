@@ -21,6 +21,7 @@ import { MyListings } from './pages/MyListings.jsx';
 import { EditListing } from './pages/EditListing.jsx';
 import { SignInDialog } from './components/SignInDialog.jsx';
 import { api } from './lib/api.js';
+import { visitorId } from './lib/visitor.js';
 
 function ScrollToTop() {
   const { pathname } = useLocation();
@@ -67,11 +68,7 @@ function VisitorPing() {
     } catch { id = id || (crypto.randomUUID?.() ?? ''); }
     if (!id) return undefined;
     // One random id per browser (not per tab), so the daily count counts people, not tabs.
-    let visitor = '';
-    try {
-      visitor = localStorage.getItem('vong_visitor') || '';
-      if (!visitor) { visitor = crypto.randomUUID(); localStorage.setItem('vong_visitor', visitor); }
-    } catch { visitor = id; }
+    const visitor = visitorId() || id;
     const ping = () => { if (document.visibilityState === 'visible') api.ping(id, visitor).catch(() => {}); };
     ping();
     const timer = setInterval(ping, 30_000);

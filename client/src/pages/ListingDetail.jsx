@@ -12,6 +12,7 @@ import { useAuth } from '../lib/auth.jsx';
 import { ReportListing } from '../components/ReportListing.jsx';
 import { AdminBadge, Stars, TrustedBadge } from '../components/Reviews.jsx';
 import { ShareYourListing } from '../components/ShareYourListing.jsx';
+import { Comments } from '../components/Comments.jsx';
 import { PageLoader } from '../components/Loader.jsx';
 
 export function ListingDetail() {
@@ -161,6 +162,7 @@ export function ListingDetail() {
               ))}
             </div>
           </div>
+          <Comments listing={listing} />
         </div>
 
         <aside className="detail__aside">
@@ -265,7 +267,7 @@ export function ListingDetail() {
                       {contact.error === 'limit' ? t('listing.phoneLimit') : t('common.error')}
                     </p>
                   )}
-                  <SaveButton listingId={listing.id} inline />
+                  <SaveButton listingId={listing.id} inline likes={listing.likes ?? 0} />
                   {listing.status === 'published' && (
                     <ShareButton
                       url={`${window.location.origin}/listing/${listing.id}`}

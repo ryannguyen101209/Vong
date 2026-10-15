@@ -8,6 +8,7 @@ import { buildReport } from './analytics.js';
 import { notifyOwner, notifyConfigured, lastNotify } from '../notify.js';
 import { snapshot, backupFilename, backupEmail, lastEmailedBackup, emailBackup } from '../backup.js';
 import { CITIES } from '../seed-data.js';
+import { adminDeleteComment } from './engagement.js';
 
 /** Who to tell about a listing: the signed-in seller's account email, else the listing's email. */
 function sellerEmailFor(id) {
@@ -343,6 +344,12 @@ router.post('/users/:id/admin', (req, res) => {
   const adminAt = req.body?.admin ? new Date().toISOString() : null;
   db.prepare('UPDATE users SET admin_at = ? WHERE id = ?').run(adminAt, user.id);
   res.json({ id: user.id, admin: Boolean(adminAt) });
+});
+
+/** DELETE /api/admin/comments/:id — remove any public comment. */
+router.delete('/comments/:id', (req, res) => {
+  if (!adminDeleteComment(req.params.id)) return res.status(404).json({ error: 'not_found' });
+  res.json({ ok: true });
 });
 
 /** GET /api/admin/reviews — reviews of Vòng (waiting ones first) and the latest seller reviews. */
